@@ -15,3 +15,6 @@ WebApplication app = builder.Build();
 startup.Configure(app, app.Environment);
 
 app.Run();
+
+// Make Program class public for testing
+public partial class Program { }
