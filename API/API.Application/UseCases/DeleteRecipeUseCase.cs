@@ -23,8 +23,11 @@ public class DeleteRecipeUseCase(ICosmosDbRepository<RecipeEntity> repository)
                 return DeleteRecipeUseCaseOutput.Failure($"Recipe with ID '{input.Id}' not found.");
             }
 
-            // Use the recipe's title as the partition key for deletion
-            bool deleted = await repository.DeleteAsync(input.Id, existingRecipe.Title);
+            // Debug: Log the actual partition key from the database
+            Console.WriteLine($"DEBUG: Found recipe with ID '{existingRecipe.Id}', Title '{existingRecipe.Title}', PartitionKey '{existingRecipe.PartitionKey}'");
+
+            // Use the actual partition key from the database (could be title for old recipes or "recipes" for new ones)
+            bool deleted = await repository.DeleteAsync(input.Id, existingRecipe.PartitionKey);
             
             if (deleted)
             {

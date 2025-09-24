@@ -1,6 +1,7 @@
 using API.Application.Dtos;
 using API.Application.UseCases;
 using API.Infrastructure.CosmosDb.Interfaces;
+using API.Infrastructure.CosmosDb.Entities;
 
 namespace API.Application.Controllers;
 
@@ -24,6 +25,27 @@ public static class RecipesController
             }
         })
         .WithName("GetRecipes")
+        .WithOpenApi();
+
+        // GET /api/recipes/{id} - Get a specific recipe
+        endpoints.MapGet("/api/recipes/{id}", async (string id, ICosmosDbRepository<RecipeEntity> repository) =>
+        {
+            try
+            {
+                var recipes = await repository.QueryAsync("SELECT * FROM c WHERE c.id = @id", new Dictionary<string, object> { { "id", id } });
+                var recipe = recipes.FirstOrDefault();
+                if (recipe == null)
+                {
+                    return Results.Json(new { error = "Recipe not found" }, statusCode: 404);
+                }
+                return Results.Json(recipe);
+            }
+            catch (Exception ex)
+            {
+                return Results.Json(new { error = ex.Message }, statusCode: 500);
+            }
+        })
+        .WithName("GetRecipe")
         .WithOpenApi();
 
         // POST /api/recipes - Create a new recipe

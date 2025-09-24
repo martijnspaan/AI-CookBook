@@ -1,5 +1,5 @@
 using API.Infrastructure.CosmosDb.Interfaces;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace API.Infrastructure.CosmosDb.Entities;
 
@@ -8,25 +8,25 @@ namespace API.Infrastructure.CosmosDb.Entities;
 /// </summary>
 public abstract class BaseCosmosDbEntity : ICosmosDbEntity
 {
-    [JsonPropertyName("id")]
-    public string Id { get; set; } = string.Empty;
+    [JsonProperty("id")]
+    public string Id { get; set; } = Guid.NewGuid().ToString();
 
-    [JsonPropertyName("partitionKey")]
+    [JsonProperty("partitionKey")]
     public string PartitionKey { get; set; } = string.Empty;
 
-    [JsonPropertyName("type")]
+    [JsonProperty("type")]
     public string Type { get; set; } = string.Empty;
 
-    [JsonPropertyName("createdAt")]
+    [JsonProperty("createdAt")]
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-    [JsonPropertyName("updatedAt")]
+    [JsonProperty("updatedAt")]
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
-    [JsonPropertyName("_etag")]
+    [JsonProperty("_etag")]
     public string? ETag { get; set; }
 
-    [JsonPropertyName("_ts")]
+    [JsonProperty("_ts")]
     public long Timestamp { get; set; }
 
     /// <summary>

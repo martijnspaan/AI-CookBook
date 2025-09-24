@@ -27,28 +27,31 @@
               <th scope="col">Title</th>
               <th scope="col">Description</th>
               <th scope="col">Tags</th>
-              <th scope="col">Recipe</th>
+              <th scope="col">Actions</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let recipe of recipes">
+            <tr *ngFor="let recipe of recipes" (click)="viewRecipe(recipe)" class="clickable-row">
               <td>
-                <strong>{{ recipe.Title }}</strong>
+                <strong>{{ recipe.title }}</strong>
               </td>
               <td>
-                <span class="text-muted">{{ recipe.Description }}</span>
+                <span class="text-muted">{{ recipe.description }}</span>
               </td>
               <td>
                 <div class="d-flex flex-wrap gap-1">
-                  <span *ngFor="let tag of recipe.Tags" class="badge bg-secondary">
+                  <span *ngFor="let tag of recipe.tags" class="badge bg-secondary">
                     {{ tag }}
                   </span>
                 </div>
               </td>
               <td>
-                <div class="recipe-content">
-                  <pre class="mb-0">{{ recipe.Recipe }}</pre>
-                </div>
+                <button 
+                  class="btn btn-danger btn-sm" 
+                  (click)="deleteRecipe(recipe, $event)"
+                  title="Delete recipe">
+                  <i class="fas fa-trash"></i>
+                </button>
               </td>
             </tr>
           </tbody>

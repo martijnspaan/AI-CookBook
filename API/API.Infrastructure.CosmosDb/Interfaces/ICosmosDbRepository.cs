@@ -43,6 +43,14 @@ public interface ICosmosDbRepository<T> where T : class
     Task<T> UpdateAsync(T item, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Upserts an item (creates if not exists, updates if exists)
+    /// </summary>
+    /// <param name="item">The item to upsert</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>The upserted item</returns>
+    Task<T> UpsertAsync(T item, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Deletes an item by its ID and partition key
     /// </summary>
     /// <param name="id">The item ID</param>

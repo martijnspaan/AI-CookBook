@@ -152,8 +152,13 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
         {
             _logger.LogDebug("Updating item with ID '{Id}' in container '{ContainerName}'", GetItemId(item), _containerName);
 
-            ItemResponse<T> response = await Container.UpsertItemAsync(
+            // Get the partition key from the item
+            string partitionKey = GetPartitionKey(item);
+            
+            ItemResponse<T> response = await Container.ReplaceItemAsync(
                 item,
+                GetItemId(item),
+                new PartitionKey(partitionKey),
                 cancellationToken: cancellationToken);
 
             _logger.LogDebug("Successfully updated item with ID '{Id}'", GetItemId(item));
@@ -162,6 +167,32 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error updating item with ID '{Id}' in container '{ContainerName}'", GetItemId(item), _containerName);
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Upserts an item (creates if not exists, updates if exists)
+    /// </summary>
+    /// <param name="item">The item to upsert</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>The upserted item</returns>
+    public async Task<T> UpsertAsync(T item, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            _logger.LogDebug("Upserting item with ID '{Id}' in container '{ContainerName}'", GetItemId(item), _containerName);
+
+            ItemResponse<T> response = await Container.UpsertItemAsync(
+                item,
+                cancellationToken: cancellationToken);
+
+            _logger.LogDebug("Successfully upserted item with ID '{Id}'", GetItemId(item));
+            return response.Resource;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error upserting item with ID '{Id}' in container '{ContainerName}'", GetItemId(item), _containerName);
             throw;
         }
     }
@@ -259,6 +290,28 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
         if (idProperty != null)
         {
             return idProperty.GetValue(item)?.ToString() ?? "unknown";
+        }
+
+        return "unknown";
+    }
+
+    /// <summary>
+    /// Gets the partition key from the entity
+    /// </summary>
+    /// <param name="item">The item</param>
+    /// <returns>The partition key</returns>
+    private static string GetPartitionKey(T item)
+    {
+        if (item is ICosmosDbEntity entity)
+        {
+            return entity.PartitionKey;
+        }
+
+        // Try to get PartitionKey using reflection as fallback
+        System.Reflection.PropertyInfo? partitionKeyProperty = typeof(T).GetProperty("PartitionKey");
+        if (partitionKeyProperty != null)
+        {
+            return partitionKeyProperty.GetValue(item)?.ToString() ?? "unknown";
         }
 
         return "unknown";

@@ -1,0 +1,54 @@
+.recipe-detail {
+  .recipe-field {
+    padding: 0.75rem;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    min-height: 2.5rem;
+  }
+
+  .recipe-content {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    margin: 0;
+    font-family: inherit;
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+  }
+
+  .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  }
+
+  .form-label {
+    color: #495057;
+    margin-bottom: 0.5rem;
+  }
+
+  .input-group {
+    min-width: 200px;
+  }
+
+  .btn {
+    border-radius: 0.375rem;
+  }
+
+  .badge {
+    font-size: 0.75rem;
+  }
+
+  .recipe-step {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+  }
+
+  ol {
+    padding-left: 1.5rem;
+  }
+}

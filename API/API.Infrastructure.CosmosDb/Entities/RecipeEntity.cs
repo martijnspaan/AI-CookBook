@@ -1,5 +1,5 @@
 using API.Infrastructure.CosmosDb.Interfaces;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 
 namespace API.Infrastructure.CosmosDb.Entities;
 
@@ -8,19 +8,19 @@ namespace API.Infrastructure.CosmosDb.Entities;
 /// </summary>
 public class RecipeEntity : BaseCosmosDbEntity
 {
-    [JsonPropertyName("Title")]
+    [JsonProperty("Title")]
     public string Title { get; set; } = string.Empty;
 
-    [JsonPropertyName("Description")]
+    [JsonProperty("Description")]
     public string Description { get; set; } = string.Empty;
 
-    [JsonPropertyName("Tags")]
+    [JsonProperty("Tags")]
     public List<string> Tags { get; set; } = new();
 
-    [JsonPropertyName("Ingredients")]
+    [JsonProperty("Ingredients")]
     public List<Ingredient> Ingredients { get; set; } = new();
 
-    [JsonPropertyName("Recipe")]
+    [JsonProperty("Recipe")]
     public List<string> Recipe { get; set; } = new();
 
     /// <summary>
@@ -28,16 +28,19 @@ public class RecipeEntity : BaseCosmosDbEntity
     /// </summary>
     public RecipeEntity()
     {
-        // Set the partition key to the recipe title for better distribution
-        PartitionKey = Title;
+        // Use a fixed partition key to avoid issues when title changes
+        // This allows recipes to be updated without partition key conflicts
+        PartitionKey = "recipes";
     }
 
     /// <summary>
     /// Updates the partition key when the title changes
+    /// Note: We use a fixed partition key to avoid conflicts when updating
     /// </summary>
     public void UpdatePartitionKey()
     {
-        PartitionKey = Title;
+        // Keep the partition key stable to avoid update conflicts
+        PartitionKey = "recipes";
     }
 }
 
@@ -48,9 +51,9 @@ public class RecipeEntity : BaseCosmosDbEntity
 /// <param name="Type">The type of the ingredient</param>
 /// <param name="Amount">The amount of the ingredient</param>
 public record Ingredient(
-    [property: JsonPropertyName("name")] string Name = "",
-    [property: JsonPropertyName("type")] string Type = "",
-    [property: JsonPropertyName("amount")] Amount Amount = null!);
+    [property: JsonProperty("name")] string Name = "",
+    [property: JsonProperty("type")] string Type = "",
+    [property: JsonProperty("amount")] Amount Amount = null!);
 
 /// <summary>
 /// Amount model for ingredients
@@ -58,5 +61,5 @@ public record Ingredient(
 /// <param name="Value">The numeric value of the amount</param>
 /// <param name="Unit">The unit of measurement</param>
 public record Amount(
-    [property: JsonPropertyName("value")] double Value = 0,
-    [property: JsonPropertyName("unit")] string Unit = "");
+    [property: JsonProperty("value")] double Value = 0,
+    [property: JsonProperty("unit")] string Unit = "");
