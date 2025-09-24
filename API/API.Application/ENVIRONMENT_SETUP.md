@@ -41,6 +41,14 @@ SWAGGER_DOCUMENT_TITLE=AI Cookbook API Documentation
 
 # Recipes Configuration
 RECIPES_PATH=recipes
+
+# CosmosDB Configuration
+COSMOSDB_CONNECTION_STRING=AccountEndpoint=https://cosmos-ai-cookbook.documents.azure.com:443/;AccountKey=YOUR_ACTUAL_KEY_HERE
+COSMOSDB_DATABASE_NAME=CookBook
+COSMOSDB_CONTAINER_NAME=Recipes
+COSMOSDB_PARTITION_KEY_PATH=/id
+COSMOSDB_THROUGHPUT=400
+COSMOSDB_CREATE_IF_NOT_EXISTS=true
 ```
 
 ## Environment Variables
@@ -64,6 +72,14 @@ RECIPES_PATH=recipes
 
 ### Recipes Configuration
 - `RECIPES_PATH`: Path to the recipes directory (default: "recipes")
+
+### CosmosDB Configuration
+- `COSMOSDB_CONNECTION_STRING`: Azure CosmosDB connection string
+- `COSMOSDB_DATABASE_NAME`: Name of the CosmosDB database (default: "CookBook")
+- `COSMOSDB_CONTAINER_NAME`: Name of the CosmosDB container (default: "Recipes")
+- `COSMOSDB_PARTITION_KEY_PATH`: Partition key path for the container (default: "/id")
+- `COSMOSDB_THROUGHPUT`: Request units per second (default: "400")
+- `COSMOSDB_CREATE_IF_NOT_EXISTS`: Whether to create database/container if they don't exist (default: "true")
 
 ## Setup Instructions
 

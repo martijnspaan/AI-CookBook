@@ -1,5 +1,5 @@
 ---
 description: Best practises
-globs: Always use best practices when writing code. The API layer should use union architecture. The frontend web app should also use best practises for Angular apps.
+globs: Always use best practices when writing code. The API layer should use union architecture. The frontend web app should also use best practises for Angular apps and responsive design for tablets and mobile.
 alwaysApply: true
 ---

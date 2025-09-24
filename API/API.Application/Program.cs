@@ -1,3 +1,7 @@
+using API.Infrastructure.CosmosDb.Entities;
+using API.Infrastructure.CosmosDb.Interfaces;
+using API.Infrastructure.CosmosDb.Extensions;
+
 // Load environment variables from .env file
 DotNetEnv.Env.Load();
 
@@ -5,6 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddEndpointsApiExplorer();
+
+// Add CosmosDB services
+builder.Services.AddCosmosDb(builder.Configuration);
+builder.Services.AddCosmosDbRepository<RecipeEntity>("Recipes");
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
@@ -60,6 +68,13 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Initialize Cosmos DB
+using (var scope = app.Services.CreateScope())
+{
+    var cosmosDbClientService = scope.ServiceProvider.GetRequiredService<ICosmosDbClientService>();
+    await cosmosDbClientService.InitializeAsync();
+}
+
 // Configure the HTTP request pipeline.
 var swaggerEnabled = Environment.GetEnvironmentVariable("SWAGGER_ENABLED") ?? "true";
 if (app.Environment.IsDevelopment() && swaggerEnabled.ToLower() == "true")
@@ -88,38 +103,11 @@ app.MapGet("/api/empty", () => "")
     .WithName("GetEmptyString")
     .WithOpenApi();
 
-app.MapGet("/api/recipes", () =>
+app.MapGet("/api/recipes", async (ICosmosDbRepository<RecipeEntity> repository) =>
 {
     try
     {
-        var recipesPath = Path.Combine(Directory.GetCurrentDirectory(), 
-            Environment.GetEnvironmentVariable("RECIPES_PATH") ?? "recipes");
-        if (!Directory.Exists(recipesPath))
-        {
-            return Results.Json(new { error = "Recipes directory not found" }, statusCode: 404);
-        }
-
-        var recipeFiles = Directory.GetFiles(recipesPath, "*.json");
-        var recipes = new List<object>();
-
-        foreach (var file in recipeFiles)
-        {
-            try
-            {
-                var jsonContent = File.ReadAllText(file);
-                var recipe = System.Text.Json.JsonSerializer.Deserialize<object>(jsonContent);
-                if (recipe != null)
-                {
-                    recipes.Add(recipe);
-                }
-            }
-            catch (Exception ex)
-            {
-                // Log error but continue processing other files
-                Console.WriteLine($"Error reading recipe file {file}: {ex.Message}");
-            }
-        }
-
+        var recipes = await repository.GetAllAsync();
         return Results.Json(recipes);
     }
     catch (Exception ex)
