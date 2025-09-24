@@ -2,18 +2,44 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
+using Xunit.Sdk;
 using API.Infrastructure.CosmosDb.Entities;
 using Microsoft.AspNetCore.Mvc.Testing;
 using API.Application.Dtos;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
+using DotNetEnv;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Hosting;
 
 namespace API.Specs;
+
+/// <summary>
+/// Custom test case orderer that enforces sequential execution based on test method names
+/// Tests are ordered by their numeric prefix (Test1_, Test2_, etc.)
+/// </summary>
+public class SequentialTestCaseOrderer : ITestCaseOrderer
+{
+    public IEnumerable<TTestCase> OrderTestCases<TTestCase>(IEnumerable<TTestCase> testCases)
+        where TTestCase : ITestCase
+    {
+        return testCases.OrderBy(testCase => GetTestOrder(testCase.DisplayName));
+    }
+
+    private static int GetTestOrder(string displayName)
+    {
+        // Extract the test number from method names like "Test1_CreateRecipe_ShouldReturnCreatedRecipe"
+        var match = System.Text.RegularExpressions.Regex.Match(displayName, @"Test(\d+)_");
+        return match.Success ? int.Parse(match.Groups[1].Value) : int.MaxValue;
+    }
+}
 
 /// <summary>
 /// Integration tests for the AI Cookbook API
 /// These tests run synchronously in the specified order to test the complete CRUD workflow
 /// </summary>
+[TestCaseOrderer("API.Specs.SequentialTestCaseOrderer", "API.Specs")]
 public class IntegrationSpecs : IClassFixture<ApiWebApplicationFactory>
 {
     private readonly HttpClient _client;
@@ -24,6 +50,41 @@ public class IntegrationSpecs : IClassFixture<ApiWebApplicationFactory>
     {
         _factory = factory;
         _client = factory.CreateClient();
+    }
+
+    [Fact]
+    public async Task Test0_CleanDatabase_ShouldDeleteAndRecreateCollection()
+    {
+        // Get CosmosDB service from the factory
+        using var scope = _factory.CreateScope();
+        var cosmosDbClientService = scope.ServiceProvider.GetRequiredService<API.Infrastructure.CosmosDb.Interfaces.ICosmosDbClientService>();
+        var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+        
+        // Get container name from configuration
+        var containerName = configuration.GetSection("CosmosDb:ContainerName").Value ?? 
+                           Environment.GetEnvironmentVariable("COSMOSDB_CONTAINER_NAME") ?? 
+                           "RecipesTest";
+        
+        // Get the container and delete it
+        var container = cosmosDbClientService.GetContainer(containerName);
+        await container.DeleteContainerAsync();
+        
+        // Recreate the container
+        var containerProperties = new Microsoft.Azure.Cosmos.ContainerProperties
+        {
+            Id = containerName,
+            PartitionKeyPath = configuration.GetSection("CosmosDb:PartitionKeyPath").Value ?? "/id"
+        };
+        
+        await cosmosDbClientService.Database.CreateContainerIfNotExistsAsync(containerProperties);
+        
+        // Verify database is now empty
+        var verifyResponse = await _client.GetAsync("/api/recipes");
+        verifyResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        
+        var remainingRecipes = await verifyResponse.Content.ReadFromJsonAsync<List<RecipeEntity>>();
+        remainingRecipes.Should().NotBeNull();
+        remainingRecipes.Should().BeEmpty("Database should be empty after collection recreation");
     }
 
     [Fact]
@@ -215,38 +276,100 @@ public class IntegrationSpecs : IClassFixture<ApiWebApplicationFactory>
 /// <summary>
 /// Web application factory for integration testing
 /// </summary>
-public class ApiWebApplicationFactory : IClassFixture<WebApplicationFactory<Program>>, IDisposable
+public class ApiWebApplicationFactory : WebApplicationFactory<Program>, IDisposable
 {
-    private readonly WebApplicationFactory<Program> _factory;
     private bool _disposed = false;
 
     public ApiWebApplicationFactory()
     {
-        _factory = new WebApplicationFactory<Program>()
-            .WithWebHostBuilder(builder =>
-            {
-                // Set environment variable for Cosmos DB connection
-                Environment.SetEnvironmentVariable("COSMOSDB_CONNECTION_STRING", 
-                    "AccountEndpoint=https://localhost:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==");
-                
-                // Configure test-specific settings
-                builder.ConfigureAppConfiguration((context, config) =>
-                {
-                    config.AddJsonFile("appsettings.Testing.json", optional: false, reloadOnChange: true);
-                });
-            });
+        // Load environment variables from .env file
+        LoadEnvironmentVariables();
     }
 
-    public HttpClient CreateClient()
+    private void LoadEnvironmentVariables()
     {
-        return _factory.CreateClient();
+        // Get the directory where the test project is located
+        var testProjectDirectory = Directory.GetCurrentDirectory();
+        var envFilePath = Path.Combine(testProjectDirectory, ".env");
+
+        // Load .env file if it exists
+        if (File.Exists(envFilePath))
+        {
+            DotNetEnv.Env.Load(envFilePath);
+        }
+        else
+        {
+            // If .env file doesn't exist, provide clear error message
+            throw new FileNotFoundException(
+                $"Environment file not found at: {envFilePath}\n" +
+                "Please create a .env file in the API.Specs directory with the following variables:\n" +
+                "ASPNETCORE_ENVIRONMENT=Testing\n" +
+                "COSMOSDB_CONNECTION_STRING=your_connection_string_here\n" +
+                "COSMOSDB_DATABASE_NAME=CookBookTest\n" +
+                "COSMOSDB_CONTAINER_NAME=RecipesTest\n" +
+                "COSMOSDB_PARTITION_KEY_PATH=/id\n" +
+                "COSMOSDB_CREATE_IF_NOT_EXISTS=true"
+            );
+        }
+
+        // Verify required environment variables are set
+        ValidateRequiredEnvironmentVariables();
     }
 
-    public void Dispose()
+    private void ValidateRequiredEnvironmentVariables()
+    {
+        var requiredVariables = new[]
+        {
+            "ASPNETCORE_ENVIRONMENT",
+            "COSMOSDB_CONNECTION_STRING",
+            "COSMOSDB_DATABASE_NAME",
+            "COSMOSDB_CONTAINER_NAME",
+            "COSMOSDB_PARTITION_KEY_PATH"
+        };
+
+        var missingVariables = new List<string>();
+
+        foreach (var variable in requiredVariables)
+        {
+            if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable(variable)))
+            {
+                missingVariables.Add(variable);
+            }
+        }
+
+        if (missingVariables.Any())
+        {
+            throw new InvalidOperationException(
+                $"Missing required environment variables: {string.Join(", ", missingVariables)}\n" +
+                "Please ensure all required variables are set in your .env file."
+            );
+        }
+    }
+
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        // Configure test-specific settings
+        builder.ConfigureAppConfiguration((context, config) =>
+        {
+            // Add the appsettings.Testing.json file from the test project directory
+            var testConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.Testing.json");
+            if (File.Exists(testConfigPath))
+            {
+                config.AddJsonFile(testConfigPath, optional: false, reloadOnChange: true);
+            }
+        });
+    }
+
+    public IServiceScope CreateScope()
+    {
+        return Services.CreateScope();
+    }
+
+    public new void Dispose()
     {
         if (!_disposed)
         {
-            _factory?.Dispose();
+            base.Dispose();
             _disposed = true;
         }
     }

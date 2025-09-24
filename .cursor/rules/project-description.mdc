@@ -1,5 +1,0 @@
----
-description: Describes the project, it's used technologies and frameworks that are part of this workspace
-globs: This project is an AI powered application that works with cooking recipes and grocery lists. The frontend is build as an angular web app with a responsive design for both tablet and mobile view, utilizing the Bootstrap framework for styling. The backend will be a .Net Core minimal API microservices framework hosted in kubernetes containers on Azure. The backend frameworks that will be used are Azure AI, Azure ServiceBus and OpenTelemetry
-alwaysApply: true
----

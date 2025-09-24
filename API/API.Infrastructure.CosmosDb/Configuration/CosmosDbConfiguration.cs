@@ -23,7 +23,7 @@ public class CosmosDbConfiguration
     /// <summary>
     /// The partition key path for the container
     /// </summary>
-    public string PartitionKeyPath { get; set; } = "/partitionKey";
+    public string PartitionKeyPath { get; set; } = "/id";
 
     /// <summary>
     /// The throughput for the container (RU/s)

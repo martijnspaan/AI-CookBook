@@ -1,7 +1,12 @@
 <div class="container mt-4">
   <div class="row">
     <div class="col-12">
-      <h2 class="mb-4">Recipe Collection</h2>
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Recipe Collection</h2>
+        <button class="btn btn-primary" (click)="openCreateModal()">
+          <i class="fas fa-plus"></i> Create New Recipe
+        </button>
+      </div>
       
       <!-- Loading State -->
       <div *ngIf="loading" class="text-center">
@@ -64,6 +69,89 @@
           <i class="fas fa-utensils fa-3x mb-3"></i>
           <h4>No recipes found</h4>
           <p>There are no recipes available at the moment.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Recipe Modal -->
+  <div class="modal fade" id="createRecipeModal" tabindex="-1" aria-labelledby="createRecipeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createRecipeModalLabel">Create New Recipe</h5>
+          <button type="button" class="btn-close" (click)="onCancel()" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form [formGroup]="createRecipeForm" (ngSubmit)="onSubmit()">
+            <div class="mb-3">
+              <label for="title" class="form-label">Title *</label>
+              <input type="text" class="form-control" id="title" formControlName="title" required>
+            </div>
+            
+            <div class="mb-3">
+              <label for="description" class="form-label">Description *</label>
+              <textarea class="form-control" id="description" formControlName="description" rows="3" required></textarea>
+            </div>
+            
+            <div class="mb-3">
+              <label for="tags" class="form-label">Tags (comma-separated)</label>
+              <input type="text" class="form-control" id="tags" formControlName="tags" placeholder="e.g., breakfast, healthy, quick">
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Ingredients</label>
+              <div formArrayName="ingredients">
+                <div *ngFor="let ingredient of ingredientsArray.controls; let i = index" class="row mb-2" [formGroupName]="i">
+                  <div class="col-md-4">
+                    <input type="text" class="form-control" formControlName="name" placeholder="Ingredient name">
+                  </div>
+                  <div class="col-md-2">
+                    <input type="number" class="form-control" formControlName="amountValue" placeholder="Amount">
+                  </div>
+                  <div class="col-md-2">
+                    <input type="text" class="form-control" formControlName="amountUnit" placeholder="Unit">
+                  </div>
+                  <div class="col-md-3">
+                    <input type="text" class="form-control" formControlName="type" placeholder="Type">
+                  </div>
+                  <div class="col-md-1">
+                    <button type="button" class="btn btn-outline-danger btn-sm" (click)="removeIngredient(i)">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <button type="button" class="btn btn-outline-primary btn-sm" (click)="addIngredient()">
+                <i class="fas fa-plus"></i> Add Ingredient
+              </button>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Recipe Steps</label>
+              <div formArrayName="recipeSteps">
+                <div *ngFor="let step of recipeStepsArray.controls; let i = index" class="mb-2">
+                  <div class="input-group">
+                    <span class="input-group-text">{{ i + 1 }}</span>
+                    <input type="text" class="form-control" [formControlName]="i" placeholder="Recipe step">
+                    <button type="button" class="btn btn-outline-danger" (click)="removeRecipeStep(i)">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <button type="button" class="btn btn-outline-primary btn-sm" (click)="addRecipeStep()">
+                <i class="fas fa-plus"></i> Add Step
+              </button>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="onCancel()">Cancel</button>
+          <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="createRecipeForm.invalid || creating">
+            <span *ngIf="creating" class="spinner-border spinner-border-sm me-2" role="status"></span>
+            {{ creating ? 'Creating...' : 'Create Recipe' }}
+          </button>
         </div>
       </div>
     </div>

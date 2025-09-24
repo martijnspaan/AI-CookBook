@@ -19,19 +19,6 @@ public class CreateRecipeUseCase(ICosmosDbRepository<RecipeEntity> repository)
                 Recipe = input.Recipe
             };
 
-            recipe.UpdatePartitionKey();
-            
-            // Debug: Log the ID before sending to repository
-            Console.WriteLine($"DEBUG: Recipe ID before create: '{recipe.Id}'");
-            Console.WriteLine($"DEBUG: Recipe PartitionKey: '{recipe.PartitionKey}'");
-            
-            // Debug: Serialize the entity to see what's being sent
-            var json = System.Text.Json.JsonSerializer.Serialize(recipe, new System.Text.Json.JsonSerializerOptions 
-            { 
-                WriteIndented = true 
-            });
-            Console.WriteLine($"DEBUG: Serialized entity: {json}");
-
             var createdRecipe = await repository.CreateAsync(recipe);
             return CreateRecipeUseCaseOutput.Success(createdRecipe);
         }

@@ -9,7 +9,16 @@ namespace API.Infrastructure.CosmosDb.Entities;
 public abstract class BaseCosmosDbEntity : ICosmosDbEntity
 {
     [JsonProperty("id")]
-    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public string Id 
+    { 
+        get => _id; 
+        set 
+        { 
+            _id = value;
+            PartitionKey = value; // Partition key is always the same as the ID
+        } 
+    }
+    private string _id = Guid.NewGuid().ToString();
 
     [JsonProperty("partitionKey")]
     public string PartitionKey { get; set; } = string.Empty;
@@ -35,6 +44,7 @@ public abstract class BaseCosmosDbEntity : ICosmosDbEntity
     protected BaseCosmosDbEntity()
     {
         Type = GetType().Name;
+        PartitionKey = Id; // Initialize partition key to match the ID
     }
 
     /// <summary>

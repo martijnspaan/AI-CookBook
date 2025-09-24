@@ -118,10 +118,9 @@ public class CosmosDbClientService(IOptions<CosmosDbConfiguration> configuration
         {
             _logger.LogInformation("Creating database '{DatabaseName}' if it doesn't exist...", _configuration.DatabaseName);
 
-            // Create database
+            // Create database (serverless mode - no throughput specified)
             DatabaseResponse databaseResponse = await _cosmosClient!.CreateDatabaseIfNotExistsAsync(
                 _configuration.DatabaseName,
-                _configuration.Throughput,
                 cancellationToken: cancellationToken);
 
             _database = databaseResponse.Database;
@@ -139,7 +138,6 @@ public class CosmosDbClientService(IOptions<CosmosDbConfiguration> configuration
 
             ContainerResponse containerResponse = await _database.CreateContainerIfNotExistsAsync(
                 containerProperties,
-                _configuration.Throughput,
                 cancellationToken: cancellationToken);
 
             _logger.LogInformation("Container '{ContainerName}' created or already exists", _configuration.ContainerName);

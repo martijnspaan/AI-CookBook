@@ -9,13 +9,12 @@ namespace API.Infrastructure.CosmosDb.Interfaces;
 public interface ICosmosDbRepository<T> where T : class
 {
     /// <summary>
-    /// Gets an item by its ID and partition key
+    /// Gets an item by its ID (partition key is automatically set to the ID)
     /// </summary>
     /// <param name="id">The item ID</param>
-    /// <param name="partitionKey">The partition key</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The item if found, null otherwise</returns>
-    Task<T?> GetByIdAsync(string id, string partitionKey, CancellationToken cancellationToken = default);
+    Task<T?> GetByIdAsync(string id, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets all items with optional query parameters
@@ -51,13 +50,12 @@ public interface ICosmosDbRepository<T> where T : class
     Task<T> UpsertAsync(T item, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Deletes an item by its ID and partition key
+    /// Deletes an item by its ID (partition key is automatically set to the ID)
     /// </summary>
     /// <param name="id">The item ID</param>
-    /// <param name="partitionKey">The partition key</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if deleted, false if not found</returns>
-    Task<bool> DeleteAsync(string id, string partitionKey, CancellationToken cancellationToken = default);
+    Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Executes a custom query

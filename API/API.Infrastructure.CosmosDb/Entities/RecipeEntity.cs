@@ -28,19 +28,8 @@ public class RecipeEntity : BaseCosmosDbEntity
     /// </summary>
     public RecipeEntity()
     {
-        // Use a fixed partition key to avoid issues when title changes
-        // This allows recipes to be updated without partition key conflicts
-        PartitionKey = "recipes";
-    }
-
-    /// <summary>
-    /// Updates the partition key when the title changes
-    /// Note: We use a fixed partition key to avoid conflicts when updating
-    /// </summary>
-    public void UpdatePartitionKey()
-    {
-        // Keep the partition key stable to avoid update conflicts
-        PartitionKey = "recipes";
+        // Partition key is automatically set to the same value as Id
+        // This is handled by the base class
     }
 }
 

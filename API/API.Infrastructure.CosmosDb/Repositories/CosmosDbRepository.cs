@@ -37,22 +37,21 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
     private Container Container => _cosmosDbClientService.GetContainer(_containerName);
 
     /// <summary>
-    /// Gets an item by its ID and partition key
+    /// Gets an item by its ID (partition key is automatically set to the ID)
     /// </summary>
     /// <param name="id">The item ID</param>
-    /// <param name="partitionKey">The partition key</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The item if found, null otherwise</returns>
-    public async Task<T?> GetByIdAsync(string id, string partitionKey, CancellationToken cancellationToken = default)
+    public async Task<T?> GetByIdAsync(string id, CancellationToken cancellationToken = default)
     {
         try
         {
-            _logger.LogDebug("Getting item with ID '{Id}' and partition key '{PartitionKey}' from container '{ContainerName}'", 
-                id, partitionKey, _containerName);
+            _logger.LogDebug("Getting item with ID '{Id}' from container '{ContainerName}'", 
+                id, _containerName);
 
             ItemResponse<T> response = await Container.ReadItemAsync<T>(
                 id,
-                new PartitionKey(partitionKey),
+                new PartitionKey(id),
                 cancellationToken: cancellationToken);
 
             _logger.LogDebug("Successfully retrieved item with ID '{Id}'", id);
@@ -60,12 +59,12 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
         }
         catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
         {
-            _logger.LogDebug("Item with ID '{Id}' and partition key '{PartitionKey}' not found", id, partitionKey);
+            _logger.LogDebug("Item with ID '{Id}' not found", id);
             return null;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting item with ID '{Id}' and partition key '{PartitionKey}'", id, partitionKey);
+            _logger.LogError(ex, "Error getting item with ID '{Id}'", id);
             throw;
         }
     }
@@ -150,18 +149,16 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
     {
         try
         {
-            _logger.LogDebug("Updating item with ID '{Id}' in container '{ContainerName}'", GetItemId(item), _containerName);
-
-            // Get the partition key from the item
-            string partitionKey = GetPartitionKey(item);
+            string itemId = GetItemId(item);
+            _logger.LogDebug("Updating item with ID '{Id}' in container '{ContainerName}'", itemId, _containerName);
             
             ItemResponse<T> response = await Container.ReplaceItemAsync(
                 item,
-                GetItemId(item),
-                new PartitionKey(partitionKey),
+                itemId,
+                new PartitionKey(itemId),
                 cancellationToken: cancellationToken);
 
-            _logger.LogDebug("Successfully updated item with ID '{Id}'", GetItemId(item));
+            _logger.LogDebug("Successfully updated item with ID '{Id}'", itemId);
             return response.Resource;
         }
         catch (Exception ex)
@@ -198,22 +195,21 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
     }
 
     /// <summary>
-    /// Deletes an item by its ID and partition key
+    /// Deletes an item by its ID (partition key is automatically set to the ID)
     /// </summary>
     /// <param name="id">The item ID</param>
-    /// <param name="partitionKey">The partition key</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>True if deleted, false if not found</returns>
-    public async Task<bool> DeleteAsync(string id, string partitionKey, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteAsync(string id, CancellationToken cancellationToken = default)
     {
         try
         {
-            _logger.LogDebug("Deleting item with ID '{Id}' and partition key '{PartitionKey}' from container '{ContainerName}'", 
-                id, partitionKey, _containerName);
+            _logger.LogDebug("Deleting item with ID '{Id}' from container '{ContainerName}'", 
+                id, _containerName);
 
             await Container.DeleteItemAsync<T>(
                 id,
-                new PartitionKey(partitionKey),
+                new PartitionKey(id),
                 cancellationToken: cancellationToken);
 
             _logger.LogDebug("Successfully deleted item with ID '{Id}'", id);
@@ -221,12 +217,12 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
         }
         catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
         {
-            _logger.LogDebug("Item with ID '{Id}' and partition key '{PartitionKey}' not found for deletion", id, partitionKey);
+            _logger.LogDebug("Item with ID '{Id}' not found for deletion", id);
             return false;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error deleting item with ID '{Id}' and partition key '{PartitionKey}'", id, partitionKey);
+            _logger.LogError(ex, "Error deleting item with ID '{Id}'", id);
             throw;
         }
     }
@@ -295,25 +291,4 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
         return "unknown";
     }
 
-    /// <summary>
-    /// Gets the partition key from the entity
-    /// </summary>
-    /// <param name="item">The item</param>
-    /// <returns>The partition key</returns>
-    private static string GetPartitionKey(T item)
-    {
-        if (item is ICosmosDbEntity entity)
-        {
-            return entity.PartitionKey;
-        }
-
-        // Try to get PartitionKey using reflection as fallback
-        System.Reflection.PropertyInfo? partitionKeyProperty = typeof(T).GetProperty("PartitionKey");
-        if (partitionKeyProperty != null)
-        {
-            return partitionKeyProperty.GetValue(item)?.ToString() ?? "unknown";
-        }
-
-        return "unknown";
-    }
 }
