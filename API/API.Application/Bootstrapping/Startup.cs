@@ -6,14 +6,9 @@ using API.Application.UseCases;
 
 namespace API.Application.Bootstrapping;
 
-public class Startup
+public class Startup(IConfiguration configuration)
 {
-    public IConfiguration Configuration { get; }
-
-    public Startup(IConfiguration configuration)
-    {
-        Configuration = configuration;
-    }
+    public IConfiguration Configuration { get; } = configuration;
 
     public void ConfigureServices(IServiceCollection services)
     {
@@ -26,6 +21,9 @@ public class Startup
 
         // Register use cases
         services.AddScoped<GetAllRecipesUseCase>();
+        services.AddScoped<CreateRecipeUseCase>();
+        services.AddScoped<UpdateRecipeUseCase>();
+        services.AddScoped<DeleteRecipeUseCase>();
 
         // Configure Swagger
         services.AddSwaggerGen(c =>
@@ -48,9 +46,9 @@ public class Startup
         {
             options.AddPolicy("AllowAll", policy =>
             {
-                var allowedOrigins = Environment.GetEnvironmentVariable("CORS_ALLOWED_ORIGINS");
-                var allowedMethods = Environment.GetEnvironmentVariable("CORS_ALLOWED_METHODS");
-                var allowedHeaders = Environment.GetEnvironmentVariable("CORS_ALLOWED_HEADERS");
+                string? allowedOrigins = Environment.GetEnvironmentVariable("CORS_ALLOWED_ORIGINS");
+                string? allowedMethods = Environment.GetEnvironmentVariable("CORS_ALLOWED_METHODS");
+                string? allowedHeaders = Environment.GetEnvironmentVariable("CORS_ALLOWED_HEADERS");
 
                 if (!string.IsNullOrEmpty(allowedOrigins))
                 {
@@ -85,14 +83,14 @@ public class Startup
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         // Initialize Cosmos DB
-        using (var scope = app.ApplicationServices.CreateScope())
+        using (IServiceScope scope = app.ApplicationServices.CreateScope())
         {
-            var cosmosDbClientService = scope.ServiceProvider.GetRequiredService<ICosmosDbClientService>();
+            ICosmosDbClientService cosmosDbClientService = scope.ServiceProvider.GetRequiredService<ICosmosDbClientService>();
             cosmosDbClientService.InitializeAsync().Wait();
         }
 
         // Configure the HTTP request pipeline.
-        var swaggerEnabled = Environment.GetEnvironmentVariable("SWAGGER_ENABLED") ?? "true";
+        string swaggerEnabled = Environment.GetEnvironmentVariable("SWAGGER_ENABLED") ?? "true";
         if (env.IsDevelopment() && swaggerEnabled.ToLower() == "true")
         {
             app.UseSwagger();

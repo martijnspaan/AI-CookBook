@@ -3,13 +3,13 @@ using API.Application.Bootstrapping;
 // Load environment variables from .env file
 DotNetEnv.Env.Load();
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Configure services using Startup
-var startup = new Startup(builder.Configuration);
+Startup startup = new Startup(builder.Configuration);
 startup.ConfigureServices(builder.Services);
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Configure the application using Startup
 startup.Configure(app, app.Environment);

@@ -24,7 +24,7 @@ public interface ICosmosDbRepository<T> where T : class
     /// <param name="queryParameters">Optional query parameters</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Collection of items</returns>
-    Task<IEnumerable<T>> GetAllAsync(string? query = null, Dictionary<string, object>? queryParameters = null, CancellationToken cancellationToken = default);
+    Task<ICollection<T>> GetAllAsync(string? query = null, Dictionary<string, object>? queryParameters = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Creates a new item
@@ -58,5 +58,5 @@ public interface ICosmosDbRepository<T> where T : class
     /// <param name="queryParameters">Query parameters</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Query results</returns>
-    Task<IEnumerable<T>> QueryAsync(string query, Dictionary<string, object>? queryParameters = null, CancellationToken cancellationToken = default);
+    Task<ICollection<T>> QueryAsync(string query, Dictionary<string, object>? queryParameters = null, CancellationToken cancellationToken = default);
 }

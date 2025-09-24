@@ -1,6 +1,66 @@
 @CookbookAPI_HostAddress = http://localhost:5231
 
-GET {{CookbookAPI_HostAddress}}/weatherforecast/
+### Get all recipes
+GET {{CookbookAPI_HostAddress}}/api/recipes
 Accept: application/json
+
+###
+
+### Create a new recipe
+POST {{CookbookAPI_HostAddress}}/api/recipes
+Content-Type: application/json
+
+{
+  "title": "Test Recipe",
+  "description": "A test recipe for API testing",
+  "tags": ["test", "api", "example"],
+  "ingredients": [
+    {
+      "name": "Test Ingredient",
+      "type": "vegetable",
+      "amount": {
+        "value": 1,
+        "unit": "cup"
+      }
+    }
+  ],
+  "recipe": [
+    "Step 1: Prepare ingredients",
+    "Step 2: Cook according to instructions",
+    "Step 3: Serve and enjoy"
+  ]
+}
+
+###
+
+### Update a recipe (replace {id} with actual recipe ID)
+PUT {{CookbookAPI_HostAddress}}/api/recipes/{id}
+Content-Type: application/json
+
+{
+  "title": "Updated Test Recipe",
+  "description": "An updated test recipe for API testing",
+  "tags": ["test", "api", "example", "updated"],
+  "ingredients": [
+    {
+      "name": "Updated Test Ingredient",
+      "type": "vegetable",
+      "amount": {
+        "value": 2,
+        "unit": "cups"
+      }
+    }
+  ],
+  "recipe": [
+    "Step 1: Prepare updated ingredients",
+    "Step 2: Cook according to updated instructions",
+    "Step 3: Serve and enjoy the updated recipe"
+  ]
+}
+
+###
+
+### Delete a recipe (replace {id} with actual recipe ID)
+DELETE {{CookbookAPI_HostAddress}}/api/recipes/{id}
 
 ###

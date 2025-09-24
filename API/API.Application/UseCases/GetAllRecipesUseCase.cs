@@ -4,21 +4,15 @@ using API.Infrastructure.CosmosDb.Interfaces;
 
 namespace API.Application.UseCases;
 
-public class GetAllRecipesUseCase
+public class GetAllRecipesUseCase(ICosmosDbRepository<RecipeEntity> repository)
 {
-    private readonly ICosmosDbRepository<RecipeEntity> _repository;
-
-    public GetAllRecipesUseCase(ICosmosDbRepository<RecipeEntity> repository)
-    {
-        _repository = repository;
-    }
 
     public async Task<GetAllRecipesUseCaseOutput> Execute(GetAllRecipesUseCaseInput input)
     {
         try
         {
-            var recipes = await _repository.GetAllAsync();
-            return GetAllRecipesUseCaseOutput.Success(recipes);
+            ICollection<RecipeEntity> recipes = await repository.GetAllAsync();
+            return GetAllRecipesUseCaseOutput.Success(recipes.ToList());
         }
         catch (Exception ex)
         {

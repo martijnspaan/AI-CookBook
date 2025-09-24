@@ -50,7 +50,7 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
             _logger.LogDebug("Getting item with ID '{Id}' and partition key '{PartitionKey}' from container '{ContainerName}'", 
                 id, partitionKey, _containerName);
 
-            var response = await Container.ReadItemAsync<T>(
+            ItemResponse<T> response = await Container.ReadItemAsync<T>(
                 id,
                 new PartitionKey(partitionKey),
                 cancellationToken: cancellationToken);
@@ -77,30 +77,30 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
     /// <param name="queryParameters">Optional query parameters</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Collection of items</returns>
-    public async Task<IEnumerable<T>> GetAllAsync(string? query = null, Dictionary<string, object>? queryParameters = null, CancellationToken cancellationToken = default)
+    public async Task<ICollection<T>> GetAllAsync(string? query = null, Dictionary<string, object>? queryParameters = null, CancellationToken cancellationToken = default)
     {
         try
         {
             _logger.LogDebug("Getting all items from container '{ContainerName}' with query '{Query}'", 
                 _containerName, query ?? "SELECT * FROM c");
 
-            var sqlQuery = query ?? "SELECT * FROM c";
-            var queryDefinition = new QueryDefinition(sqlQuery);
+            string sqlQuery = query ?? "SELECT * FROM c";
+            QueryDefinition queryDefinition = new QueryDefinition(sqlQuery);
 
             if (queryParameters != null)
             {
-                foreach (var parameter in queryParameters)
+                foreach (KeyValuePair<string, object> parameter in queryParameters)
                 {
                     queryDefinition.WithParameter($"@{parameter.Key}", parameter.Value);
                 }
             }
 
-            var items = new List<T>();
-            var iterator = Container.GetItemQueryIterator<T>(queryDefinition);
+            List<T> items = new List<T>();
+            FeedIterator<T> iterator = Container.GetItemQueryIterator<T>(queryDefinition);
 
             while (iterator.HasMoreResults)
             {
-                var response = await iterator.ReadNextAsync(cancellationToken);
+                FeedResponse<T> response = await iterator.ReadNextAsync(cancellationToken);
                 items.AddRange(response.ToList());
             }
 
@@ -126,7 +126,7 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
         {
             _logger.LogDebug("Creating new item in container '{ContainerName}'", _containerName);
 
-            var response = await Container.CreateItemAsync(
+            ItemResponse<T> response = await Container.CreateItemAsync(
                 item,
                 cancellationToken: cancellationToken);
 
@@ -152,7 +152,7 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
         {
             _logger.LogDebug("Updating item with ID '{Id}' in container '{ContainerName}'", GetItemId(item), _containerName);
 
-            var response = await Container.UpsertItemAsync(
+            ItemResponse<T> response = await Container.UpsertItemAsync(
                 item,
                 cancellationToken: cancellationToken);
 
@@ -207,28 +207,28 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
     /// <param name="queryParameters">Query parameters</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Query results</returns>
-    public async Task<IEnumerable<T>> QueryAsync(string query, Dictionary<string, object>? queryParameters = null, CancellationToken cancellationToken = default)
+    public async Task<ICollection<T>> QueryAsync(string query, Dictionary<string, object>? queryParameters = null, CancellationToken cancellationToken = default)
     {
         try
         {
             _logger.LogDebug("Executing query '{Query}' on container '{ContainerName}'", query, _containerName);
 
-            var queryDefinition = new QueryDefinition(query);
+            QueryDefinition queryDefinition = new QueryDefinition(query);
 
             if (queryParameters != null)
             {
-                foreach (var parameter in queryParameters)
+                foreach (KeyValuePair<string, object> parameter in queryParameters)
                 {
                     queryDefinition.WithParameter($"@{parameter.Key}", parameter.Value);
                 }
             }
 
-            var items = new List<T>();
-            var iterator = Container.GetItemQueryIterator<T>(queryDefinition);
+            List<T> items = new List<T>();
+            FeedIterator<T> iterator = Container.GetItemQueryIterator<T>(queryDefinition);
 
             while (iterator.HasMoreResults)
             {
-                var response = await iterator.ReadNextAsync(cancellationToken);
+                FeedResponse<T> response = await iterator.ReadNextAsync(cancellationToken);
                 items.AddRange(response.ToList());
             }
 
@@ -255,7 +255,7 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
         }
 
         // Try to get ID using reflection as fallback
-        var idProperty = typeof(T).GetProperty("Id");
+        System.Reflection.PropertyInfo? idProperty = typeof(T).GetProperty("Id");
         if (idProperty != null)
         {
             return idProperty.GetValue(item)?.ToString() ?? "unknown";

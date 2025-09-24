@@ -9,24 +9,18 @@ namespace API.Infrastructure.CosmosDb.Services;
 /// <summary>
 /// Service implementation for Cosmos DB client operations
 /// </summary>
-public class CosmosDbClientService : ICosmosDbClientService, IDisposable
+/// <summary>
+/// Service implementation for Cosmos DB client operations
+/// </summary>
+/// <param name="configuration">Cosmos DB configuration</param>
+/// <param name="logger">Logger instance</param>
+public class CosmosDbClientService(IOptions<CosmosDbConfiguration> configuration, ILogger<CosmosDbClientService> logger) : ICosmosDbClientService, IDisposable
 {
-    private readonly CosmosDbConfiguration _configuration;
-    private readonly ILogger<CosmosDbClientService> _logger;
+    private readonly CosmosDbConfiguration _configuration = configuration.Value;
+    private readonly ILogger<CosmosDbClientService> _logger = logger;
     private CosmosClient? _cosmosClient;
     private Database? _database;
     private bool _disposed = false;
-
-    /// <summary>
-    /// Initializes a new instance of the CosmosDbClientService
-    /// </summary>
-    /// <param name="configuration">Cosmos DB configuration</param>
-    /// <param name="logger">Logger instance</param>
-    public CosmosDbClientService(IOptions<CosmosDbConfiguration> configuration, ILogger<CosmosDbClientService> logger)
-    {
-        _configuration = configuration.Value;
-        _logger = logger;
-    }
 
     /// <summary>
     /// Gets the Cosmos DB client instance
@@ -125,7 +119,7 @@ public class CosmosDbClientService : ICosmosDbClientService, IDisposable
             _logger.LogInformation("Creating database '{DatabaseName}' if it doesn't exist...", _configuration.DatabaseName);
 
             // Create database
-            var databaseResponse = await _cosmosClient!.CreateDatabaseIfNotExistsAsync(
+            DatabaseResponse databaseResponse = await _cosmosClient!.CreateDatabaseIfNotExistsAsync(
                 _configuration.DatabaseName,
                 _configuration.Throughput,
                 cancellationToken: cancellationToken);
@@ -137,13 +131,13 @@ public class CosmosDbClientService : ICosmosDbClientService, IDisposable
             // Create container
             _logger.LogInformation("Creating container '{ContainerName}' if it doesn't exist...", _configuration.ContainerName);
 
-            var containerProperties = new ContainerProperties
+            ContainerProperties containerProperties = new ContainerProperties
             {
                 Id = _configuration.ContainerName,
                 PartitionKeyPath = _configuration.PartitionKeyPath
             };
 
-            var containerResponse = await _database.CreateContainerIfNotExistsAsync(
+            ContainerResponse containerResponse = await _database.CreateContainerIfNotExistsAsync(
                 containerProperties,
                 _configuration.Throughput,
                 cancellationToken: cancellationToken);

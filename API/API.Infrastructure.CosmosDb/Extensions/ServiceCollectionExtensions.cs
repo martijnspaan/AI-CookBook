@@ -27,38 +27,38 @@ public static class ServiceCollectionExtensions
             configuration.GetSection("CosmosDb").Bind(options);
             
             // Handle environment variable overrides
-            var connectionString = Environment.GetEnvironmentVariable("COSMOSDB_CONNECTION_STRING");
+            string? connectionString = Environment.GetEnvironmentVariable("COSMOSDB_CONNECTION_STRING");
             if (!string.IsNullOrEmpty(connectionString))
             {
                 options.ConnectionString = connectionString;
             }
             
-            var databaseName = Environment.GetEnvironmentVariable("COSMOSDB_DATABASE_NAME");
+            string? databaseName = Environment.GetEnvironmentVariable("COSMOSDB_DATABASE_NAME");
             if (!string.IsNullOrEmpty(databaseName))
             {
                 options.DatabaseName = databaseName;
             }
             
-            var containerName = Environment.GetEnvironmentVariable("COSMOSDB_CONTAINER_NAME");
+            string? containerName = Environment.GetEnvironmentVariable("COSMOSDB_CONTAINER_NAME");
             if (!string.IsNullOrEmpty(containerName))
             {
                 options.ContainerName = containerName;
             }
             
-            var partitionKeyPath = Environment.GetEnvironmentVariable("COSMOSDB_PARTITION_KEY_PATH");
+            string? partitionKeyPath = Environment.GetEnvironmentVariable("COSMOSDB_PARTITION_KEY_PATH");
             if (!string.IsNullOrEmpty(partitionKeyPath))
             {
                 options.PartitionKeyPath = partitionKeyPath;
             }
             
-            var throughputStr = Environment.GetEnvironmentVariable("COSMOSDB_THROUGHPUT");
-            if (!string.IsNullOrEmpty(throughputStr) && int.TryParse(throughputStr, out var throughput))
+            string? throughputStr = Environment.GetEnvironmentVariable("COSMOSDB_THROUGHPUT");
+            if (!string.IsNullOrEmpty(throughputStr) && int.TryParse(throughputStr, out int throughput))
             {
                 options.Throughput = throughput;
             }
             
-            var createIfNotExistsStr = Environment.GetEnvironmentVariable("COSMOSDB_CREATE_IF_NOT_EXISTS");
-            if (!string.IsNullOrEmpty(createIfNotExistsStr) && bool.TryParse(createIfNotExistsStr, out var createIfNotExists))
+            string? createIfNotExistsStr = Environment.GetEnvironmentVariable("COSMOSDB_CREATE_IF_NOT_EXISTS");
+            if (!string.IsNullOrEmpty(createIfNotExistsStr) && bool.TryParse(createIfNotExistsStr, out bool createIfNotExists))
             {
                 options.CreateIfNotExists = createIfNotExists;
             }
@@ -99,8 +99,8 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<ICosmosDbRepository<T>>(provider =>
         {
-            var cosmosDbClientService = provider.GetRequiredService<ICosmosDbClientService>();
-            var logger = provider.GetRequiredService<ILogger<CosmosDbRepository<T>>>();
+            ICosmosDbClientService cosmosDbClientService = provider.GetRequiredService<ICosmosDbClientService>();
+            ILogger<CosmosDbRepository<T>> logger = provider.GetRequiredService<ILogger<CosmosDbRepository<T>>>();
             return new CosmosDbRepository<T>(cosmosDbClientService, logger, containerName);
         });
 

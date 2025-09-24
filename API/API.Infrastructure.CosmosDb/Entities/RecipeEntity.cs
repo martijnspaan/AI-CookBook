@@ -44,26 +44,19 @@ public class RecipeEntity : BaseCosmosDbEntity
 /// <summary>
 /// Ingredient model for recipes
 /// </summary>
-public class Ingredient
-{
-    [JsonPropertyName("name")]
-    public string Name { get; set; } = string.Empty;
-
-    [JsonPropertyName("type")]
-    public string Type { get; set; } = string.Empty;
-
-    [JsonPropertyName("amount")]
-    public Amount Amount { get; set; } = new();
-}
+/// <param name="Name">The name of the ingredient</param>
+/// <param name="Type">The type of the ingredient</param>
+/// <param name="Amount">The amount of the ingredient</param>
+public record Ingredient(
+    [property: JsonPropertyName("name")] string Name = "",
+    [property: JsonPropertyName("type")] string Type = "",
+    [property: JsonPropertyName("amount")] Amount Amount = null!);
 
 /// <summary>
 /// Amount model for ingredients
 /// </summary>
-public class Amount
-{
-    [JsonPropertyName("value")]
-    public double Value { get; set; }
-
-    [JsonPropertyName("unit")]
-    public string Unit { get; set; } = string.Empty;
-}
+/// <param name="Value">The numeric value of the amount</param>
+/// <param name="Unit">The unit of measurement</param>
+public record Amount(
+    [property: JsonPropertyName("value")] double Value = 0,
+    [property: JsonPropertyName("unit")] string Unit = "");

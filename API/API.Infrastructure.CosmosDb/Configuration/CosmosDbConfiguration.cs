@@ -8,17 +8,17 @@ public class CosmosDbConfiguration
     /// <summary>
     /// The connection string for the Cosmos DB account
     /// </summary>
-    public string ConnectionString { get; set; } = string.Empty;
+    public string ConnectionString { get; set; } = "";
 
     /// <summary>
     /// The name of the database
     /// </summary>
-    public string DatabaseName { get; set; } = string.Empty;
+    public string DatabaseName { get; set; } = "";
 
     /// <summary>
     /// The name of the container
     /// </summary>
-    public string ContainerName { get; set; } = string.Empty;
+    public string ContainerName { get; set; } = "";
 
     /// <summary>
     /// The partition key path for the container
@@ -28,7 +28,7 @@ public class CosmosDbConfiguration
     /// <summary>
     /// The throughput for the container (RU/s)
     /// </summary>
-    public int? Throughput { get; set; }
+    public int? Throughput { get; set; } = null;
 
     /// <summary>
     /// Whether to create the database and container if they don't exist
