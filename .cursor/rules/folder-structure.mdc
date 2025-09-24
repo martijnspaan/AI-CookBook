@@ -1,0 +1,5 @@
+---
+description: Folder structure to maintain
+globs: When mentioning frontend, web app, web or app, make the changes in the folder 'Web'. When mentioning backend or api, make the changes in the folder 'API'. When mentioning recipe, make the changes in the folder 'API/recipes'.
+alwaysApply: true
+---

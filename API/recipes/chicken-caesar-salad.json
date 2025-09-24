@@ -1,0 +1,78 @@
+{
+  "Title": "Kip Caesar Salade",
+  "Description": "Knapperige romaine sla met Caesar dressing, gegrilde kip en croutons.",
+  "Tags": ["salade", "kip", "snel", "lunch"],
+  "Ingredients": [
+    {
+      "name": "Kipfilets",
+      "type": "eiwit",
+      "amount": {
+        "value": 2,
+        "unit": "stuk"
+      }
+    },
+    {
+      "name": "Romaine sla",
+      "type": "groente",
+      "amount": {
+        "value": 1,
+        "unit": "krop"
+      }
+    },
+    {
+      "name": "Caesar dressing",
+      "type": "saus",
+      "amount": {
+        "value": 0.25,
+        "unit": "kop"
+      }
+    },
+    {
+      "name": "Croutons",
+      "type": "brood",
+      "amount": {
+        "value": 0.5,
+        "unit": "kop"
+      }
+    },
+    {
+      "name": "Parmesan kaas",
+      "type": "zuivel",
+      "amount": {
+        "value": 0.25,
+        "unit": "kop"
+      }
+    },
+    {
+      "name": "Zwarte peper",
+      "type": "kruiderij",
+      "amount": {
+        "value": 0.25,
+        "unit": "theelepel"
+      }
+    },
+    {
+      "name": "Citroen",
+      "type": "fruit",
+      "amount": {
+        "value": 0.5,
+        "unit": "stuk"
+      }
+    },
+    {
+      "name": "Olijfolie",
+      "type": "olie",
+      "amount": {
+        "value": 1,
+        "unit": "eetlepel"
+      }
+    }
+  ],
+  "Recipe": [
+    "Grill of bak 2 kipfilets in een pan; snijd in plakjes.",
+    "Meng 1 krop gesneden romaine sla met Caesar dressing.",
+    "Voeg croutons en geraspte Parmesan toe.",
+    "Leg de kip erop; kruid met peper en citroen."
+  ]
+}
+

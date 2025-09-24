@@ -1,0 +1,32 @@
+.recipe-content {
+  max-width: 300px;
+  max-height: 200px;
+  overflow-y: auto;
+  
+  pre {
+    font-size: 0.875rem;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    background-color: #f8f9fa;
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    border: 1px solid #dee2e6;
+  }
+}
+
+.table {
+  th {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+}
+
+.badge {
+  font-size: 0.75rem;
+}
+
+.table-responsive {
+  border-radius: 0.375rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}

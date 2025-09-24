@@ -1,0 +1,111 @@
+{
+  "Title": "Groente Roerbak",
+  "Description": "Kleurrijke groenten geroerbakt in een hartige soja-gember saus.",
+  "Tags": ["vegetarisch", "veganistisch", "roerbak", "snel"],
+  "Ingredients": [
+    {
+      "name": "Wortelen",
+      "type": "groente",
+      "amount": {
+        "value": 2,
+        "unit": "stuk"
+      }
+    },
+    {
+      "name": "Paprika",
+      "type": "groente",
+      "amount": {
+        "value": 1,
+        "unit": "stuk"
+      }
+    },
+    {
+      "name": "Broccoli",
+      "type": "groente",
+      "amount": {
+        "value": 1,
+        "unit": "kop"
+      }
+    },
+    {
+      "name": "Sugarsnaps",
+      "type": "groente",
+      "amount": {
+        "value": 1,
+        "unit": "kop"
+      }
+    },
+    {
+      "name": "Sojasaus",
+      "type": "saus",
+      "amount": {
+        "value": 3,
+        "unit": "eetlepel"
+      }
+    },
+    {
+      "name": "Ahornsiroop",
+      "type": "zoetstof",
+      "amount": {
+        "value": 1,
+        "unit": "eetlepel"
+      }
+    },
+    {
+      "name": "Sesamolie",
+      "type": "olie",
+      "amount": {
+        "value": 1,
+        "unit": "theelepel"
+      }
+    },
+    {
+      "name": "Verse gember",
+      "type": "kruid",
+      "amount": {
+        "value": 1,
+        "unit": "theelepel"
+      }
+    },
+    {
+      "name": "Knoflookteentje",
+      "type": "groente",
+      "amount": {
+        "value": 1,
+        "unit": "stuk"
+      }
+    },
+    {
+      "name": "Plantaardige olie",
+      "type": "olie",
+      "amount": {
+        "value": 1,
+        "unit": "eetlepel"
+      }
+    },
+    {
+      "name": "Sesamzaadjes",
+      "type": "garnituur",
+      "amount": {
+        "value": 1,
+        "unit": "eetlepel"
+      }
+    },
+    {
+      "name": "Gekookte rijst",
+      "type": "graan",
+      "amount": {
+        "value": 2,
+        "unit": "kop"
+      }
+    }
+  ],
+  "Recipe": [
+    "Klop 3 eetlepels sojasaus, 1 eetlepel ahornsiroop, 1 theelepel sesamolie, 1 theelepel geraspte gember, 1 fijngesneden knoflookteentje en 2 eetlepels water door elkaar.",
+    "Verhit een wok met 1 eetlepel olie; voeg gesneden wortelen, paprika, broccoli en sugarsnaps toe.",
+    "Roerbak 4-5 minuten.",
+    "Giet de saus erbij; kook 1-2 minuten.",
+    "Serveer over rijst; bestrooi met sesamzaadjes."
+  ]
+}
+
