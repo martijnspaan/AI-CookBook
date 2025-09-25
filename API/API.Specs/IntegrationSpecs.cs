@@ -1,39 +1,12 @@
 using System.Net.Http.Json;
-using System.Text.Json;
 using FluentAssertions;
 using Xunit;
-using Xunit.Abstractions;
-using Xunit.Sdk;
 using API.Infrastructure.CosmosDb.Entities;
-using Microsoft.AspNetCore.Mvc.Testing;
 using API.Application.Dtos;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
-using DotNetEnv;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Hosting;
 
 namespace API.Specs;
-
-/// <summary>
-/// Custom test case orderer that enforces sequential execution based on test method names
-/// Tests are ordered by their numeric prefix (Test1_, Test2_, etc.)
-/// </summary>
-public class SequentialTestCaseOrderer : ITestCaseOrderer
-{
-    public IEnumerable<TTestCase> OrderTestCases<TTestCase>(IEnumerable<TTestCase> testCases)
-        where TTestCase : ITestCase
-    {
-        return testCases.OrderBy(testCase => GetTestOrder(testCase.DisplayName));
-    }
-
-    private static int GetTestOrder(string displayName)
-    {
-        // Extract the test number from method names like "Test1_CreateRecipe_ShouldReturnCreatedRecipe"
-        var match = System.Text.RegularExpressions.Regex.Match(displayName, @"Test(\d+)_");
-        return match.Success ? int.Parse(match.Groups[1].Value) : int.MaxValue;
-    }
-}
 
 /// <summary>
 /// Integration tests for the AI Cookbook API
@@ -42,47 +15,48 @@ public class SequentialTestCaseOrderer : ITestCaseOrderer
 [TestCaseOrderer("API.Specs.SequentialTestCaseOrderer", "API.Specs")]
 public class IntegrationSpecs : IClassFixture<ApiWebApplicationFactory>
 {
-    private readonly HttpClient _client;
-    private readonly ApiWebApplicationFactory _factory;
+    private readonly HttpClient _httpClient;
+    private readonly ApiWebApplicationFactory _webApplicationFactory;
     private string? _createdRecipeId;
 
-    public IntegrationSpecs(ApiWebApplicationFactory factory)
+    public IntegrationSpecs(ApiWebApplicationFactory webApplicationFactory)
     {
-        _factory = factory;
-        _client = factory.CreateClient();
+        _webApplicationFactory = webApplicationFactory;
+        _httpClient = webApplicationFactory.CreateClient();
     }
 
     [Fact]
     public async Task Test0_CleanDatabase_ShouldDeleteAndRecreateCollection()
     {
-        // Get CosmosDB service from the factory
-        using var scope = _factory.CreateScope();
-        var cosmosDbClientService = scope.ServiceProvider.GetRequiredService<API.Infrastructure.CosmosDb.Interfaces.ICosmosDbClientService>();
-        var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+        // Arrange
+        using var serviceScope = _webApplicationFactory.CreateScope();
+        var cosmosDbClientService = serviceScope.ServiceProvider.GetRequiredService<API.Infrastructure.CosmosDb.Interfaces.ICosmosDbClientService>();
+        var configuration = serviceScope.ServiceProvider.GetRequiredService<IConfiguration>();
         
-        // Get container name from configuration
         var containerName = configuration.GetSection("CosmosDb:ContainerName").Value ?? 
                            Environment.GetEnvironmentVariable("COSMOSDB_CONTAINER_NAME") ?? 
                            "RecipesTest";
         
-        // Get the container and delete it
-        var container = cosmosDbClientService.GetContainer(containerName);
-        await container.DeleteContainerAsync();
+        var partitionKeyPath = configuration.GetSection("CosmosDb:PartitionKeyPath").Value ?? "/id";
         
-        // Recreate the container
+        // Act
+        var cosmosContainer = cosmosDbClientService.GetContainer(containerName);
+        await cosmosContainer.DeleteContainerAsync();
+        
         var containerProperties = new Microsoft.Azure.Cosmos.ContainerProperties
         {
             Id = containerName,
-            PartitionKeyPath = configuration.GetSection("CosmosDb:PartitionKeyPath").Value ?? "/id"
+            PartitionKeyPath = partitionKeyPath
         };
         
         await cosmosDbClientService.Database.CreateContainerIfNotExistsAsync(containerProperties);
         
-        // Verify database is now empty
-        var verifyResponse = await _client.GetAsync("/api/recipes");
-        verifyResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        var verificationResponse = await _httpClient.GetAsync("/api/recipes");
         
-        var remainingRecipes = await verifyResponse.Content.ReadFromJsonAsync<List<RecipeEntity>>();
+        // Assert
+        verificationResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        
+        var remainingRecipes = await verificationResponse.Content.ReadFromJsonAsync<List<RecipeEntity>>();
         remainingRecipes.Should().NotBeNull();
         remainingRecipes.Should().BeEmpty("Database should be empty after collection recreation");
     }
@@ -91,8 +65,8 @@ public class IntegrationSpecs : IClassFixture<ApiWebApplicationFactory>
     public async Task Test1_CreateRecipe_ShouldReturnCreatedRecipe()
     {
         // Arrange
-        var newRecipe = new CreateRecipeUseCaseInput(
-            Title: "SomeRecipe",
+        var newRecipeInput = new CreateRecipeUseCaseInput(
+            Title: "TestRecipe",
             Description: "A test recipe for integration testing",
             Tags: new List<string> { "test", "integration" },
             Ingredients: new List<Ingredient>
@@ -104,42 +78,43 @@ public class IntegrationSpecs : IClassFixture<ApiWebApplicationFactory>
         );
 
         // Act
-        var response = await _client.PostAsJsonAsync("/api/recipes", newRecipe);
+        var createRecipeResponse = await _httpClient.PostAsJsonAsync("/api/recipes", newRecipeInput);
 
         // Assert
-        response.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
+        createRecipeResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
         
-        var createdRecipe = await response.Content.ReadFromJsonAsync<RecipeEntity>();
+        var createdRecipe = await createRecipeResponse.Content.ReadFromJsonAsync<RecipeEntity>();
         createdRecipe.Should().NotBeNull();
-        createdRecipe!.Title.Should().Be("SomeRecipe");
+        createdRecipe!.Title.Should().Be("TestRecipe");
         createdRecipe.Description.Should().Be("A test recipe for integration testing");
         createdRecipe.Tags.Should().Contain("test");
         createdRecipe.Tags.Should().Contain("integration");
         createdRecipe.Ingredients.Should().HaveCount(2);
         createdRecipe.Recipe.Should().HaveCount(2);
         
-        // Store the ID for subsequent tests
         _createdRecipeId = createdRecipe.Id;
     }
 
     [Fact]
     public async Task Test2_GetAllRecipes_ShouldContainCreatedRecipe()
     {
+        // Arrange
+        // No specific arrangement needed for this test
+
         // Act
-        var response = await _client.GetAsync("/api/recipes");
+        var getAllRecipesResponse = await _httpClient.GetAsync("/api/recipes");
 
         // Assert
-        response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        getAllRecipesResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         
-        var recipes = await response.Content.ReadFromJsonAsync<List<RecipeEntity>>();
-        recipes.Should().NotBeNull();
-        recipes.Should().NotBeEmpty();
+        var allRecipes = await getAllRecipesResponse.Content.ReadFromJsonAsync<List<RecipeEntity>>();
+        allRecipes.Should().NotBeNull();
+        allRecipes.Should().NotBeEmpty();
         
-        var createdRecipe = recipes!.FirstOrDefault(r => r.Title == "SomeRecipe");
+        var createdRecipe = allRecipes!.FirstOrDefault(recipe => recipe.Title == "TestRecipe");
         createdRecipe.Should().NotBeNull();
-        createdRecipe!.Title.Should().Be("SomeRecipe");
+        createdRecipe!.Title.Should().Be("TestRecipe");
         
-        // Verify the ID matches what we stored
         if (_createdRecipeId != null)
         {
             createdRecipe.Id.Should().Be(_createdRecipeId);
@@ -149,26 +124,12 @@ public class IntegrationSpecs : IClassFixture<ApiWebApplicationFactory>
     [Fact]
     public async Task Test3_UpdateRecipe_ShouldReturnUpdatedRecipe()
     {
-        // Skip if no recipe was created in previous test
-        if (_createdRecipeId == null)
-        {
-            // Try to find the recipe by title as fallback
-            var getAllResponse = await _client.GetAsync("/api/recipes");
-            var allRecipes = await getAllResponse.Content.ReadFromJsonAsync<List<RecipeEntity>>();
-            var existingRecipe = allRecipes?.FirstOrDefault(r => r.Title == "SomeRecipe");
-            
-            if (existingRecipe == null)
-            {
-                throw new InvalidOperationException("No recipe found to update. Previous test may have failed.");
-            }
-            
-            _createdRecipeId = existingRecipe.Id;
-        }
-
         // Arrange
-        var updateRecipe = new UpdateRecipeUseCaseInput(
-            Id: _createdRecipeId,
-            Title: "UpdatedRecipe",
+        await EnsureRecipeIdIsAvailable();
+        
+        var updateRecipeInput = new UpdateRecipeUseCaseInput(
+            Id: _createdRecipeId!,
+            Title: "UpdatedTestRecipe",
             Description: "An updated test recipe for integration testing",
             Tags: new List<string> { "test", "integration", "updated" },
             Ingredients: new List<Ingredient>
@@ -181,14 +142,14 @@ public class IntegrationSpecs : IClassFixture<ApiWebApplicationFactory>
         );
 
         // Act
-        var response = await _client.PutAsJsonAsync($"/api/recipes/{_createdRecipeId}", updateRecipe);
+        var updateRecipeResponse = await _httpClient.PutAsJsonAsync($"/api/recipes/{_createdRecipeId}", updateRecipeInput);
 
         // Assert
-        response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        updateRecipeResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         
-        var updatedRecipe = await response.Content.ReadFromJsonAsync<RecipeEntity>();
+        var updatedRecipe = await updateRecipeResponse.Content.ReadFromJsonAsync<RecipeEntity>();
         updatedRecipe.Should().NotBeNull();
-        updatedRecipe!.Title.Should().Be("UpdatedRecipe");
+        updatedRecipe!.Title.Should().Be("UpdatedTestRecipe");
         updatedRecipe.Description.Should().Be("An updated test recipe for integration testing");
         updatedRecipe.Tags.Should().Contain("updated");
         updatedRecipe.Ingredients.Should().HaveCount(3);
@@ -198,179 +159,72 @@ public class IntegrationSpecs : IClassFixture<ApiWebApplicationFactory>
     [Fact]
     public async Task Test4_GetRecipeById_ShouldReturnUpdatedRecipe()
     {
-        // Skip if no recipe ID available
-        if (_createdRecipeId == null)
-        {
-            // Try to find the recipe by title as fallback
-            var getAllResponse = await _client.GetAsync("/api/recipes");
-            var allRecipes = await getAllResponse.Content.ReadFromJsonAsync<List<RecipeEntity>>();
-            var existingRecipe = allRecipes?.FirstOrDefault(r => r.Title == "UpdatedRecipe");
-            
-            if (existingRecipe == null)
-            {
-                throw new InvalidOperationException("No updated recipe found. Previous test may have failed.");
-            }
-            
-            _createdRecipeId = existingRecipe.Id;
-        }
+        // Arrange
+        await EnsureRecipeIdIsAvailable();
 
         // Act
-        var response = await _client.GetAsync($"/api/recipes/{_createdRecipeId}");
+        var getRecipeByIdResponse = await _httpClient.GetAsync($"/api/recipes/{_createdRecipeId}");
 
         // Assert
-        response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        getRecipeByIdResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         
-        var recipe = await response.Content.ReadFromJsonAsync<RecipeEntity>();
-        recipe.Should().NotBeNull();
-        recipe!.Title.Should().Be("UpdatedRecipe");
-        recipe.Description.Should().Be("An updated test recipe for integration testing");
-        recipe.Tags.Should().Contain("updated");
-        recipe.Ingredients.Should().HaveCount(3);
-        recipe.Recipe.Should().HaveCount(3);
+        var retrievedRecipe = await getRecipeByIdResponse.Content.ReadFromJsonAsync<RecipeEntity>();
+        retrievedRecipe.Should().NotBeNull();
+        retrievedRecipe!.Title.Should().Be("UpdatedTestRecipe");
+        retrievedRecipe.Description.Should().Be("An updated test recipe for integration testing");
+        retrievedRecipe.Tags.Should().Contain("updated");
+        retrievedRecipe.Ingredients.Should().HaveCount(3);
+        retrievedRecipe.Recipe.Should().HaveCount(3);
     }
 
     [Fact]
     public async Task Test5_DeleteRecipe_ShouldReturnNoContent()
     {
-        // Skip if no recipe ID available
-        if (_createdRecipeId == null)
-        {
-            // Try to find the recipe by title as fallback
-            var getAllResponse = await _client.GetAsync("/api/recipes");
-            var allRecipes = await getAllResponse.Content.ReadFromJsonAsync<List<RecipeEntity>>();
-            var existingRecipe = allRecipes?.FirstOrDefault(r => r.Title == "UpdatedRecipe");
-            
-            if (existingRecipe == null)
-            {
-                throw new InvalidOperationException("No recipe found to delete. Previous test may have failed.");
-            }
-            
-            _createdRecipeId = existingRecipe.Id;
-        }
+        // Arrange
+        await EnsureRecipeIdIsAvailable();
 
         // Act
-        var response = await _client.DeleteAsync($"/api/recipes/{_createdRecipeId}");
+        var deleteRecipeResponse = await _httpClient.DeleteAsync($"/api/recipes/{_createdRecipeId}");
 
         // Assert
-        response.StatusCode.Should().Be(System.Net.HttpStatusCode.NoContent);
+        deleteRecipeResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.NoContent);
     }
 
     [Fact]
     public async Task Test6_GetAllRecipes_ShouldNotContainDeletedRecipe()
     {
+        // Arrange
+        // No specific arrangement needed for this test
+
         // Act
-        var response = await _client.GetAsync("/api/recipes");
+        var getAllRecipesAfterDeletionResponse = await _httpClient.GetAsync("/api/recipes");
 
         // Assert
-        response.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
+        getAllRecipesAfterDeletionResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.OK);
         
-        var recipes = await response.Content.ReadFromJsonAsync<List<RecipeEntity>>();
-        recipes.Should().NotBeNull();
+        var remainingRecipes = await getAllRecipesAfterDeletionResponse.Content.ReadFromJsonAsync<List<RecipeEntity>>();
+        remainingRecipes.Should().NotBeNull();
         
-        // Verify the deleted recipe is no longer present
-        var deletedRecipe = recipes?.FirstOrDefault(r => r.Title == "UpdatedRecipe" || r.Title == "SomeRecipe");
+        var deletedRecipe = remainingRecipes?.FirstOrDefault(recipe => 
+            recipe.Title == "UpdatedTestRecipe" || recipe.Title == "TestRecipe");
         deletedRecipe.Should().BeNull("The deleted recipe should not be present in the results");
     }
-}
 
-/// <summary>
-/// Web application factory for integration testing
-/// </summary>
-public class ApiWebApplicationFactory : WebApplicationFactory<Program>, IDisposable
-{
-    private bool _disposed = false;
-
-    public ApiWebApplicationFactory()
+    private async Task EnsureRecipeIdIsAvailable()
     {
-        // Load environment variables from .env file
-        LoadEnvironmentVariables();
-    }
-
-    private void LoadEnvironmentVariables()
-    {
-        // Get the directory where the test project is located
-        var testProjectDirectory = Directory.GetCurrentDirectory();
-        var envFilePath = Path.Combine(testProjectDirectory, ".env");
-
-        // Load .env file if it exists
-        if (File.Exists(envFilePath))
+        if (_createdRecipeId == null)
         {
-            DotNetEnv.Env.Load(envFilePath);
-        }
-        else
-        {
-            // If .env file doesn't exist, provide clear error message
-            throw new FileNotFoundException(
-                $"Environment file not found at: {envFilePath}\n" +
-                "Please create a .env file in the API.Specs directory with the following variables:\n" +
-                "ASPNETCORE_ENVIRONMENT=Testing\n" +
-                "COSMOSDB_CONNECTION_STRING=your_connection_string_here\n" +
-                "COSMOSDB_DATABASE_NAME=CookBookTest\n" +
-                "COSMOSDB_CONTAINER_NAME=RecipesTest\n" +
-                "COSMOSDB_PARTITION_KEY_PATH=/id\n" +
-                "COSMOSDB_CREATE_IF_NOT_EXISTS=true"
-            );
-        }
-
-        // Verify required environment variables are set
-        ValidateRequiredEnvironmentVariables();
-    }
-
-    private void ValidateRequiredEnvironmentVariables()
-    {
-        var requiredVariables = new[]
-        {
-            "ASPNETCORE_ENVIRONMENT",
-            "COSMOSDB_CONNECTION_STRING",
-            "COSMOSDB_DATABASE_NAME",
-            "COSMOSDB_CONTAINER_NAME",
-            "COSMOSDB_PARTITION_KEY_PATH"
-        };
-
-        var missingVariables = new List<string>();
-
-        foreach (var variable in requiredVariables)
-        {
-            if (string.IsNullOrEmpty(Environment.GetEnvironmentVariable(variable)))
+            var getAllRecipesResponse = await _httpClient.GetAsync("/api/recipes");
+            var allRecipes = await getAllRecipesResponse.Content.ReadFromJsonAsync<List<RecipeEntity>>();
+            var existingRecipe = allRecipes?.FirstOrDefault(recipe => 
+                recipe.Title == "UpdatedTestRecipe" || recipe.Title == "TestRecipe");
+            
+            if (existingRecipe == null)
             {
-                missingVariables.Add(variable);
+                throw new InvalidOperationException("No recipe found. Previous test may have failed.");
             }
-        }
-
-        if (missingVariables.Any())
-        {
-            throw new InvalidOperationException(
-                $"Missing required environment variables: {string.Join(", ", missingVariables)}\n" +
-                "Please ensure all required variables are set in your .env file."
-            );
-        }
-    }
-
-    protected override void ConfigureWebHost(IWebHostBuilder builder)
-    {
-        // Configure test-specific settings
-        builder.ConfigureAppConfiguration((context, config) =>
-        {
-            // Add the appsettings.Testing.json file from the test project directory
-            var testConfigPath = Path.Combine(Directory.GetCurrentDirectory(), "appsettings.Testing.json");
-            if (File.Exists(testConfigPath))
-            {
-                config.AddJsonFile(testConfigPath, optional: false, reloadOnChange: true);
-            }
-        });
-    }
-
-    public IServiceScope CreateScope()
-    {
-        return Services.CreateScope();
-    }
-
-    public new void Dispose()
-    {
-        if (!_disposed)
-        {
-            base.Dispose();
-            _disposed = true;
+            
+            _createdRecipeId = existingRecipe.Id;
         }
     }
 }
