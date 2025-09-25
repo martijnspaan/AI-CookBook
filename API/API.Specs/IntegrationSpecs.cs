@@ -41,7 +41,16 @@ public class IntegrationSpecs : IClassFixture<ApiWebApplicationFactory>
         
         // Act
         var cosmosContainer = cosmosDbClientService.GetContainer(containerName);
-        await cosmosContainer.DeleteContainerAsync();
+        
+        // Try to delete the container if it exists, ignore 404 errors
+        try
+        {
+            await cosmosContainer.DeleteContainerAsync();
+        }
+        catch (Microsoft.Azure.Cosmos.CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            // Container doesn't exist, which is fine for this test
+        }
         
         var containerProperties = new Microsoft.Azure.Cosmos.ContainerProperties
         {
@@ -215,6 +224,13 @@ public class IntegrationSpecs : IClassFixture<ApiWebApplicationFactory>
         if (_createdRecipeId == null)
         {
             var getAllRecipesResponse = await _httpClient.GetAsync("/api/recipes");
+            
+            if (!getAllRecipesResponse.IsSuccessStatusCode)
+            {
+                var errorContent = await getAllRecipesResponse.Content.ReadAsStringAsync();
+                throw new InvalidOperationException($"Failed to get recipes. Status: {getAllRecipesResponse.StatusCode}, Content: {errorContent}");
+            }
+            
             var allRecipes = await getAllRecipesResponse.Content.ReadFromJsonAsync<List<RecipeEntity>>();
             var existingRecipe = allRecipes?.FirstOrDefault(recipe => 
                 recipe.Title == "UpdatedTestRecipe" || recipe.Title == "TestRecipe");

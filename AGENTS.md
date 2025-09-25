@@ -12,7 +12,8 @@ This project is an AI powered application that works with cooking recipes and gr
 
 ## Project rules
 
-- When running scripts, never use && to concatenate commands, instead run each command separately.
+- When running scripts, never use ampersands (&&) to concatenate commands, instead run each command separately.
+- When running scripts always check in the current folder.
 
 ## Coding style
 
