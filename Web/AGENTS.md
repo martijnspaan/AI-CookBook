@@ -14,3 +14,4 @@ The frontend is build as an angular web app with a responsive design for both ta
 - Mobile devices have a maximum widht of 400px, tablets start with 400px
 - Mobile devices should never have a horizontal scrollbar, all functionality should be visible within 400px
 - Only tablet devices it is allowed to have a horizontal scrollbar
+- Always use CSS Flexbox layout for designing html pages and components

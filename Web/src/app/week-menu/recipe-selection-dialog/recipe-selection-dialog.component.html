@@ -26,48 +26,56 @@
 
       <!-- Filter Section -->
       <div class="filter-section mb-4">
-        <div class="row align-items-end">
-          <div class="col-md-4 mb-2">
-            <label for="mealTypeFilter" class="form-label">Meal Type</label>
-            <select 
-              id="mealTypeFilter"
-              class="form-select" 
-              [(ngModel)]="selectedMealTypeFilter"
-              (ngModelChange)="onMealTypeFilterChange()">
-              <option value="">All Types</option>
-              <option *ngFor="let mealType of availableMealTypes" [value]="mealType">
-                {{ mealType | titlecase }}
-              </option>
-            </select>
-          </div>
-          <div class="col-md-4 mb-2">
-            <label for="cookbookFilter" class="form-label">Cookbook</label>
-            <select 
-              id="cookbookFilter"
-              class="form-select" 
-              [(ngModel)]="selectedCookbookFilter"
-              (ngModelChange)="onCookbookFilterChange()"
-              [disabled]="isLoadingCookbooks">
-              <option value="">All Cookbooks</option>
-              <option *ngFor="let cookbook of cookbooks" [value]="cookbook.id">
-                {{ cookbook.title }}
-              </option>
-            </select>
-          </div>
-          <div class="col-md-4 mb-2">
-            <div class="d-flex gap-2 align-items-center">
-              <button 
-                type="button" 
-                class="btn btn-outline-secondary btn-sm"
-                (click)="clearFilters()"
-                [disabled]="!selectedMealTypeFilter && !selectedCookbookFilter">
-                <i class="bi bi-x-circle"></i> Clear
-              </button>
-              <span class="text-muted small" *ngIf="filteredRecipes.length !== allRecipes.length">
-                {{ filteredRecipes.length }}/{{ allRecipes.length }}
-              </span>
+        <div class="d-flex align-items-center gap-3">
+          <div class="custom-dropdown">
+            <button 
+              type="button" 
+              class="btn btn-outline-secondary btn-sm dropdown-toggle"
+              (click)="toggleMealTypeDropdown()"
+              (blur)="onMealTypeDropdownBlur()"
+              [class.active]="showMealTypeDropdown">
+              {{ getMealTypeDisplayText() }}
+            </button>
+            <div class="dropdown-menu" [class.show]="showMealTypeDropdown">
+              <div class="dropdown-item" *ngFor="let mealType of availableMealTypes">
+                <input 
+                  type="checkbox" 
+                  [checked]="isMealTypeSelected(mealType)"
+                  (change)="toggleMealTypeFilter(mealType, $event)">
+                <span class="ms-2" (click)="toggleMealTypeFilter(mealType, $event)">{{ mealType | titlecase }}</span>
+              </div>
             </div>
           </div>
+          
+          <div class="custom-dropdown">
+            <button 
+              type="button" 
+              class="btn btn-outline-secondary btn-sm dropdown-toggle"
+              (click)="toggleCookbookDropdown()"
+              (blur)="onCookbookDropdownBlur()"
+              [class.active]="showCookbookDropdown"
+              [disabled]="isLoadingCookbooks">
+              {{ getCookbookDisplayText() }}
+            </button>
+            <div class="dropdown-menu" [class.show]="showCookbookDropdown">
+              <div class="dropdown-item" *ngFor="let cookbook of cookbooks">
+                <input 
+                  type="checkbox" 
+                  [checked]="isCookbookSelected(cookbook.id)"
+                  (change)="toggleCookbookFilter(cookbook.id, $event)">
+                <span class="ms-2" (click)="toggleCookbookFilter(cookbook.id, $event)">{{ cookbook.title }}</span>
+              </div>
+            </div>
+          </div>
+          
+          <button 
+            type="button" 
+            class="btn btn-link btn-sm clear-filters-btn"
+            (click)="clearFilters()"
+            [disabled]="selectedMealTypeFilters.length === 0 && selectedCookbookFilters.length === 0"
+            title="Clear filters">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
       </div>
 
