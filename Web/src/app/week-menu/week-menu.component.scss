@@ -1,0 +1,26 @@
+// Week menu component styles
+.container-fluid {
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+  
+  @media (max-width: 400px) {
+    padding-left: 0.125rem;
+    padding-right: 0.125rem;
+  }
+  
+  @media (min-width: 401px) and (max-width: 768px) {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
+
+h1 {
+  margin-bottom: 0.5rem !important;
+  margin-top: 0.5rem !important;
+  
+  @media (max-width: 400px) {
+    margin-bottom: 0.25rem !important;
+    margin-top: 0.25rem !important;
+    font-size: 1.5rem;
+  }
+}

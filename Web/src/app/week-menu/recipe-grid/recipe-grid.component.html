@@ -1,0 +1,49 @@
+<div class="recipe-grid-container">
+  <div class="recipe-grid-header mb-3">
+    <h4 class="mb-0">Select Recipe</h4>
+    <p class="text-muted mb-0" *ngIf="selectedMealType">
+      Choose a recipe for {{ selectedMealType }}
+    </p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoadingRecipes" class="text-center py-4">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading recipes...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+    <h6 class="alert-heading">Error!</h6>
+    <p>{{ errorMessage }}</p>
+    <button class="btn btn-outline-danger btn-sm" (click)="loadAllRecipes()">Try Again</button>
+  </div>
+
+  <!-- Recipes Grid -->
+  <div *ngIf="!isLoadingRecipes && !errorMessage && recipes.length > 0" class="recipes-grid">
+    <div 
+      *ngFor="let recipe of recipes" 
+      class="recipe-card"
+      (click)="selectRecipe(recipe)">
+      <div class="recipe-card-content">
+        <h6 class="recipe-title">{{ recipe.title }}</h6>
+        <div class="recipe-tags">
+          <span *ngFor="let tag of recipe.tags" class="badge bg-secondary me-1 mb-1">
+            {{ tag }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoadingRecipes && !errorMessage && recipes.length === 0" class="text-center py-4">
+    <div class="text-muted">
+      <i class="bi bi-egg-fried"></i>
+      <h6 class="mt-2">No recipes available</h6>
+      <p class="small">There are no recipes to choose from.</p>
+    </div>
+  </div>
+</div>

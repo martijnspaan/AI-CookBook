@@ -1,0 +1,46 @@
+<div class="week-calendar-container">
+  <!-- 14-Day Horizontal Scroll -->
+  <div class="days-scroll-container" #scrollContainer>
+    <div class="days-scroll-content">
+      <div 
+        *ngFor="let day of allDays; let i = index" 
+        class="day-card"
+        [class.today]="isToday(day.date)"
+        [class.weekend]="day.isWeekend">
+        
+        <div class="day-header">
+          <div class="day-name">{{ day.dayName }}</div>
+          <div class="day-number">{{ day.dayNumber }}</div>
+        </div>
+        
+        <div class="day-month">{{ day.month }}</div>
+        
+        <div class="day-content">
+          <div class="meal-slots">
+            <div 
+              *ngFor="let meal of mealSlots" 
+              class="meal-slot"
+              [class.weekend-meal]="day.isWeekend"
+              [class.selected]="isMealSlotSelected(day.date, meal.type)">
+              <div class="meal-label">{{ meal.label }}</div>
+              <div 
+                class="meal-placeholder"
+                (click)="onMealSlotClick(meal.type, day.date)">
+                <small 
+                  *ngIf="!getRecipeForMealSlot(day.date, meal.type)" 
+                  class="text-muted">
+                  Select recipe
+                </small>
+                <small 
+                  *ngIf="getRecipeForMealSlot(day.date, meal.type)" 
+                  class="recipe-title">
+                  {{ getRecipeForMealSlot(day.date, meal.type) }}
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

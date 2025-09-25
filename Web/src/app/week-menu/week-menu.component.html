@@ -1,0 +1,23 @@
+<div class="container-fluid px-1">
+  <div class="row">
+    <div class="col-12">
+      <h1 class="text-center my-2">Create Week Menu</h1>
+      
+      <!-- Week Calendar -->
+      <app-week-calendar 
+        [selectedWeek]="selectedWeek"
+        [recipeAssignments]="recipeAssignments"
+        [selectedMealSlot]="selectedMealSlot"
+        (weekChanged)="onWeekChanged($event)"
+        (mealSlotClicked)="onMealSlotClicked($event.mealType, $event.date)">
+      </app-week-calendar>
+      
+      <!-- Recipe Grid -->
+      <app-recipe-grid 
+        *ngIf="selectedMealType"
+        [selectedMealType]="selectedMealType"
+        (recipeSelected)="onRecipeSelected($event)">
+      </app-recipe-grid>
+    </div>
+  </div>
+</div>
