@@ -4,8 +4,15 @@
   <span>Saving week menu...</span>
 </div>
 
+<!-- Loading Indicator -->
+<div *ngIf="isCalendarLoading" class="loading-indicator">
+  <i class="fas fa-spinner fa-spin"></i>
+  <span>Loading calendar...</span>
+</div>
+
 <!-- Week Calendar - Full Screen -->
 <app-week-calendar 
+  *ngIf="!isCalendarLoading"
   [selectedWeek]="selectedWeek"
   [recipeAssignments]="recipeAssignments"
   [selectedMealSlot]="selectedMealSlot"

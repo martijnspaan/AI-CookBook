@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { HamburgerMenuComponent } from './hamburger-menu/hamburger-menu.component';
 import { FooterComponent } from './footer/footer.component';
 import { PageTitleService } from './services/page-title.service';
+import { CookbookModalService } from './services/cookbook-modal.service';
 import { filter } from 'rxjs/operators';
 
 @Component({
@@ -25,7 +26,8 @@ export class AppComponent implements OnInit {
 
   constructor(
     private pageTitleService: PageTitleService,
-    private router: Router
+    private router: Router,
+    private cookbookModalService: CookbookModalService
   ) {}
 
   ngOnInit(): void {
@@ -60,6 +62,12 @@ export class AppComponent implements OnInit {
       this.footerButtonIcon = 'fas fa-shopping-cart';
       this.footerButtonClass = 'btn-success';
       this.footerButtonClickHandler = () => this.createGroceriesList();
+    } else if (currentUrl === '/cookbooks') {
+      this.showFooterButton = true;
+      this.footerButtonText = 'Create New Cookbook';
+      this.footerButtonIcon = 'fas fa-plus';
+      this.footerButtonClass = 'btn-primary';
+      this.footerButtonClickHandler = () => this.openCreateCookbookModal();
     } else {
       this.showFooterButton = false;
       this.footerButtonText = '';
@@ -96,5 +104,9 @@ export class AppComponent implements OnInit {
   private createGroceriesList(): void {
     // TODO: Implement groceries list creation functionality
     console.log('Create groceries list functionality not yet implemented');
+  }
+  
+  private openCreateCookbookModal(): void {
+    this.cookbookModalService.openCreateCookbookModal();
   }
 }

@@ -26,6 +26,11 @@ public class CosmosDbConfiguration
     public string WeekMenuContainerName { get; set; } = "WeekMenu";
 
     /// <summary>
+    /// The name of the Cookbooks container
+    /// </summary>
+    public string CookbookContainerName { get; set; } = "Cookbooks";
+
+    /// <summary>
     /// The partition key path for the container
     /// </summary>
     public string PartitionKeyPath { get; set; } = "/id";

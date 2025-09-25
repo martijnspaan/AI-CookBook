@@ -47,6 +47,20 @@ public class Startup(IConfiguration configuration)
             return new CosmosDbRepository<WeekMenuEntity>(cosmosDbClientService, logger, containerName);
         });
 
+        // Register Cookbook repository
+        services.AddScoped<ICosmosDbRepository<CookbookEntity>>(provider =>
+        {
+            ICosmosDbClientService cosmosDbClientService = provider.GetRequiredService<ICosmosDbClientService>();
+            ILogger<CosmosDbRepository<CookbookEntity>> logger = provider.GetRequiredService<ILogger<CosmosDbRepository<CookbookEntity>>>();
+            IConfiguration configuration = provider.GetRequiredService<IConfiguration>();
+            
+            string containerName = configuration.GetSection("CosmosDb:CookbookContainerName").Value ?? 
+                               Environment.GetEnvironmentVariable("COSMOSDB_COOKBOOK_CONTAINER_NAME") ?? 
+                               "Cookbooks";
+            
+            return new CosmosDbRepository<CookbookEntity>(cosmosDbClientService, logger, containerName);
+        });
+
         // Register use cases
         services.AddScoped<GetAllRecipesUseCase>();
         services.AddScoped<CreateRecipeUseCase>();
@@ -54,6 +68,10 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<DeleteRecipeUseCase>();
         services.AddScoped<CreateOrUpdateWeekMenuUseCase>();
         services.AddScoped<GetWeekMenusUseCase>();
+        services.AddScoped<GetAllCookbooksUseCase>();
+        services.AddScoped<CreateCookbookUseCase>();
+        services.AddScoped<UpdateCookbookUseCase>();
+        services.AddScoped<DeleteCookbookUseCase>();
 
         // Configure Swagger
         services.AddSwaggerGen(c =>
@@ -150,6 +168,9 @@ public class Startup(IConfiguration configuration)
             
             // Map week menu endpoints
             endpoints.MapWeekMenuEndpoints();
+            
+            // Map cookbooks endpoints
+            endpoints.MapCookbooksEndpoints();
         });
     }
 }

@@ -25,6 +25,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit {
   showRecipeDialog: boolean = false;
   currentWeekMenu: WeekMenu | null = null;
   isSaving: boolean = false;
+  isCalendarLoading: boolean = true;
 
   constructor(
     private pageTitleService: PageTitleService,
@@ -90,6 +91,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit {
   }
 
   private loadWeekMenus(): void {
+    this.isCalendarLoading = true;
     this.weekMenuService.getWeekMenus().subscribe({
       next: (weekMenus) => {
         const weekNumber = this.getWeekNumber(this.selectedWeek);
@@ -101,10 +103,14 @@ export class WeekMenuComponent implements OnInit, AfterViewInit {
         if (this.currentWeekMenu) {
           // Convert WeekDay data back to RecipeAssignments for display
           this.convertWeekDaysToRecipeAssignments();
+        } else {
+          // No week menu found, calendar is ready to show empty state
+          this.isCalendarLoading = false;
         }
       },
       error: (error) => {
         console.error('Error loading week menus:', error);
+        this.isCalendarLoading = false;
       }
     });
   }
@@ -134,8 +140,8 @@ export class WeekMenuComponent implements OnInit, AfterViewInit {
     
     console.log('Recipe IDs to fetch:', Array.from(recipeIdsToFetch));
     
-    // Create temporary assignments with Loading... titles
-    const tempAssignments: RecipeAssignment[] = [];
+    // Create assignments with actual recipe titles (no loading state)
+    const assignments: RecipeAssignment[] = [];
     
     this.currentWeekMenu.weekDays.forEach(weekDay => {
       const currentDate = new Date(startOfWeek);
@@ -156,7 +162,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit {
       console.log(`Processing dayOfWeek: ${weekDay.dayOfWeek}, dayOffset: ${dayOffset}, calculated date: ${dateString}`);
       
       if (weekDay.breakfastRecipeId) {
-        tempAssignments.push({
+        assignments.push({
           date: dateString,
           mealType: 'breakfast',
           recipeId: weekDay.breakfastRecipeId,
@@ -165,7 +171,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit {
       }
       
       if (weekDay.lunchRecipeId) {
-        tempAssignments.push({
+        assignments.push({
           date: dateString,
           mealType: 'lunch',
           recipeId: weekDay.lunchRecipeId,
@@ -174,7 +180,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit {
       }
       
       if (weekDay.dinnerRecipeId) {
-        tempAssignments.push({
+        assignments.push({
           date: dateString,
           mealType: 'dinner',
           recipeId: weekDay.dinnerRecipeId,
@@ -183,17 +189,16 @@ export class WeekMenuComponent implements OnInit, AfterViewInit {
       }
     });
     
-    console.log('Created temp assignments:', tempAssignments);
+    console.log('Created assignments:', assignments);
     
-    // Set temporary assignments immediately to show loading state
-    this.recipeAssignments = tempAssignments;
-    
-    // Fetch recipe details and update titles
+    // Fetch recipe details and update titles before showing calendar
     if (recipeIdsToFetch.size > 0) {
       console.log('Calling fetchRecipeTitlesAndUpdateAssignments with:', Array.from(recipeIdsToFetch));
-      this.fetchRecipeTitlesAndUpdateAssignments(Array.from(recipeIdsToFetch));
+      this.fetchRecipeTitlesAndUpdateAssignments(Array.from(recipeIdsToFetch), assignments);
     } else {
       console.log('No recipe IDs to fetch');
+      this.recipeAssignments = assignments;
+      this.isCalendarLoading = false;
     }
   }
 
@@ -284,7 +289,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit {
     return startOfWeek;
   }
 
-  private fetchRecipeTitlesAndUpdateAssignments(recipeIds: string[]): void {
+  private fetchRecipeTitlesAndUpdateAssignments(recipeIds: string[], assignments: RecipeAssignment[]): void {
     console.log('=== DEBUG: fetchRecipeTitlesAndUpdateAssignments ===');
     console.log('Fetching recipe details for IDs:', recipeIds);
     
@@ -305,23 +310,30 @@ export class WeekMenuComponent implements OnInit, AfterViewInit {
         });
         
         console.log('Recipe title map:', recipeTitleMap);
-        console.log('Before update - assignments:', this.recipeAssignments);
+        console.log('Before update - assignments:', assignments);
         
         // Update the recipe assignments with actual titles
-        this.recipeAssignments = this.recipeAssignments.map(assignment => ({
+        const updatedAssignments = assignments.map(assignment => ({
           ...assignment,
           recipeTitle: recipeTitleMap.get(assignment.recipeId) || 'Recipe not found'
         }));
         
-        console.log('After update - assignments:', this.recipeAssignments);
+        console.log('After update - assignments:', updatedAssignments);
+        
+        // Set the final assignments and mark calendar as ready
+        this.recipeAssignments = updatedAssignments;
+        this.isCalendarLoading = false;
       },
       error: (error) => {
         console.error('Error fetching recipe details:', error);
         // Update assignments to show error state
-        this.recipeAssignments = this.recipeAssignments.map(assignment => ({
+        const errorAssignments = assignments.map(assignment => ({
           ...assignment,
           recipeTitle: 'Error loading recipe'
         }));
+        
+        this.recipeAssignments = errorAssignments;
+        this.isCalendarLoading = false;
       }
     });
   }

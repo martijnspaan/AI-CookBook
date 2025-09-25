@@ -51,6 +51,12 @@ public static class ServiceCollectionExtensions
                 options.WeekMenuContainerName = weekMenuContainerName;
             }
             
+            string? cookbookContainerName = Environment.GetEnvironmentVariable("COSMOSDB_COOKBOOK_CONTAINER_NAME");
+            if (!string.IsNullOrEmpty(cookbookContainerName))
+            {
+                options.CookbookContainerName = cookbookContainerName;
+            }
+            
             string? partitionKeyPath = Environment.GetEnvironmentVariable("COSMOSDB_PARTITION_KEY_PATH");
             if (!string.IsNullOrEmpty(partitionKeyPath))
             {
