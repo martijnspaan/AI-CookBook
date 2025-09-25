@@ -1,7 +1,65 @@
 <div class="grocery-list-container">
   <div class="grocery-list-content">
-    <div class="text-center">
-      <p class="text-muted">Your grocery list will appear here</p>
+    <div class="grocery-list-header">
+      <h2>Grocery Lists</h2>
+      <button 
+        class="btn btn-primary refresh-btn" 
+        (click)="refreshGroceryLists()"
+        [disabled]="isLoading">
+        <i class="refresh-icon" [class.spinning]="isLoading">↻</i>
+        {{ isLoading ? 'Loading...' : 'Refresh' }}
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading grocery lists...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="errorMessage && !isLoading" class="error-state">
+      <div class="error-icon">⚠️</div>
+      <p>{{ errorMessage }}</p>
+      <button class="btn btn-secondary" (click)="refreshGroceryLists()">
+        Try Again
+      </button>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!isLoading && !errorMessage && groceryLists.length === 0" class="empty-state">
+      <div class="empty-icon">🛒</div>
+      <h3>No Grocery Lists Yet</h3>
+      <p>Create your first grocery list by planning meals in the Week Menu.</p>
+    </div>
+
+    <!-- Grocery Lists -->
+    <div *ngIf="!isLoading && !errorMessage && groceryLists.length > 0" class="grocery-lists">
+      <div *ngFor="let groceryList of groceryLists" class="grocery-list-card">
+        <div class="grocery-list-card-header">
+          <h3>{{ getFormattedDate(groceryList.dayOfShopping) }}</h3>
+          <span class="meal-count">{{ groceryList.meals.length }} meal{{ groceryList.meals.length !== 1 ? 's' : '' }}</span>
+        </div>
+        
+        <div class="grocery-list-card-content">
+          <div class="meals-section">
+            <h4>Meals</h4>
+            <div class="meals-list">
+              <div *ngFor="let meal of groceryList.meals" class="meal-item">
+                <span class="meal-day">{{ getDayOfWeekLabel(meal.dayOfMeal) }}</span>
+                <span class="meal-type">{{ getMealTypeLabel(meal.mealType) }}</span>
+                <span *ngIf="meal.recipeId" class="recipe-id">Recipe ID: {{ meal.recipeId }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="grocery-list-card-footer">
+          <small class="created-date">
+            Created: {{ getFormattedDate(groceryList.createdAt) }}
+          </small>
+        </div>
+      </div>
     </div>
   </div>
 </div>

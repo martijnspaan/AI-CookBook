@@ -61,6 +61,20 @@ public class Startup(IConfiguration configuration)
             return new CosmosDbRepository<CookbookEntity>(cosmosDbClientService, logger, containerName);
         });
 
+        // Register GroceryList repository
+        services.AddScoped<ICosmosDbRepository<GroceryListEntity>>(provider =>
+        {
+            ICosmosDbClientService cosmosDbClientService = provider.GetRequiredService<ICosmosDbClientService>();
+            ILogger<CosmosDbRepository<GroceryListEntity>> logger = provider.GetRequiredService<ILogger<CosmosDbRepository<GroceryListEntity>>>();
+            IConfiguration configuration = provider.GetRequiredService<IConfiguration>();
+            
+            string containerName = configuration.GetSection("CosmosDb:GroceryListContainerName").Value ?? 
+                               Environment.GetEnvironmentVariable("COSMOSDB_GROCERYLIST_CONTAINER_NAME") ?? 
+                               "GroceryLists";
+            
+            return new CosmosDbRepository<GroceryListEntity>(cosmosDbClientService, logger, containerName);
+        });
+
         // Register use cases
         services.AddScoped<GetAllRecipesUseCase>();
         services.AddScoped<CreateRecipeUseCase>();
@@ -72,6 +86,8 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<CreateCookbookUseCase>();
         services.AddScoped<UpdateCookbookUseCase>();
         services.AddScoped<DeleteCookbookUseCase>();
+        services.AddScoped<CreateGroceryListUseCase>();
+        services.AddScoped<GetAllGroceryListsUseCase>();
 
         // Configure Swagger
         services.AddSwaggerGen(c =>
@@ -171,6 +187,9 @@ public class Startup(IConfiguration configuration)
             
             // Map cookbooks endpoints
             endpoints.MapCookbooksEndpoints();
+            
+            // Map grocery list endpoints
+            endpoints.MapGroceryListEndpoints();
         });
     }
 }

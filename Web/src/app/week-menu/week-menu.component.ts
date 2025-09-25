@@ -1,5 +1,6 @@
 import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { WeekCalendarComponent, RecipeAssignment } from './week-calendar/week-calendar.component';
 import { RecipeSelectionDialogComponent } from './recipe-selection-dialog/recipe-selection-dialog.component';
 import { GroceryShoppingDialogComponent, MealSelection } from './grocery-shopping-dialog/grocery-shopping-dialog.component';
@@ -8,6 +9,7 @@ import { PageTitleService } from '../services/page-title.service';
 import { WeekMenuService } from '../services/week-menu.service';
 import { RecipeService } from '../services/recipe.service';
 import { GroceryShoppingDialogService } from '../services/grocery-shopping-dialog.service';
+import { GroceryListService } from '../services/grocery-list.service';
 import { WeekMenu, WeekDay, CreateOrUpdateWeekMenuRequest } from '../models/week-menu.model';
 import { forkJoin, Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -37,7 +39,9 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     private pageTitleService: PageTitleService,
     private weekMenuService: WeekMenuService,
     private recipeService: RecipeService,
-    private groceryShoppingDialogService: GroceryShoppingDialogService
+    private groceryShoppingDialogService: GroceryShoppingDialogService,
+    private groceryListService: GroceryListService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -401,14 +405,41 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onGroceryShoppingListCreated(event: { selectedDay: Date; selectedMeals: MealSelection[] }): void {
     console.log('Grocery shopping list created:', event);
-    // TODO: Implement actual grocery list creation logic here
-    // This could involve:
-    // 1. Extracting ingredients from selected meals
-    // 2. Aggregating ingredients by type
-    // 3. Creating a shopping list
-    // 4. Saving to backend or navigating to grocery list page
     
-    this.groceryShoppingDialogService.closeGroceryShoppingDialog();
+    // Convert MealSelection to Meal format for the API
+    const meals = event.selectedMeals.map(meal => {
+      return {
+        dayOfMeal: this.getDayOfWeekFromDate(meal.date),
+        mealType: meal.mealType,
+        recipeId: meal.recipeId
+      };
+    });
+
+    const groceryListRequest = {
+      dayOfShopping: event.selectedDay.toISOString(),
+      meals: meals
+    };
+
+    console.log('Sending grocery list request:', groceryListRequest);
+
+    this.groceryListService.createGroceryList(groceryListRequest).subscribe({
+      next: (groceryList) => {
+        console.log('Grocery list created successfully:', groceryList);
+        alert('Grocery list created successfully!');
+        this.groceryShoppingDialogService.closeGroceryShoppingDialog();
+        this.router.navigate(['/grocery-list']);
+      },
+      error: (error) => {
+        console.error('Error creating grocery list:', error);
+        alert('Error creating grocery list. Please try again.');
+      }
+    });
+  }
+
+  private getDayOfWeekFromDate(dateString: string): string {
+    const date = new Date(dateString);
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    return days[date.getDay()];
   }
 
   onGroceryShoppingDialogClosed(): void {

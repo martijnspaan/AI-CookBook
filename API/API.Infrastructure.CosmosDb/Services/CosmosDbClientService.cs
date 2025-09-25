@@ -171,6 +171,21 @@ public class CosmosDbClientService(IOptions<CosmosDbConfiguration> configuration
                 cancellationToken: cancellationToken);
 
             _logger.LogInformation("Container '{CookbookContainerName}' created or already exists", _configuration.CookbookContainerName);
+
+            // Create GroceryLists container
+            _logger.LogInformation("Creating container '{GroceryListContainerName}' if it doesn't exist...", _configuration.GroceryListContainerName);
+
+            ContainerProperties groceryListContainerProperties = new ContainerProperties
+            {
+                Id = _configuration.GroceryListContainerName,
+                PartitionKeyPath = _configuration.PartitionKeyPath
+            };
+
+            ContainerResponse groceryListContainerResponse = await _database.CreateContainerIfNotExistsAsync(
+                groceryListContainerProperties,
+                cancellationToken: cancellationToken);
+
+            _logger.LogInformation("Container '{GroceryListContainerName}' created or already exists", _configuration.GroceryListContainerName);
         }
         catch (Exception ex)
         {

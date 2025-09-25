@@ -1,0 +1,35 @@
+### Create a new grocery list
+POST https://localhost:7149/api/grocerylists
+Content-Type: application/json
+
+{
+  "dayOfShopping": "2024-01-15T10:00:00.000Z",
+  "meals": [
+    {
+      "dayOfMeal": "Monday",
+      "mealType": "breakfast",
+      "recipeId": "recipe-id-1"
+    },
+    {
+      "dayOfMeal": "Monday",
+      "mealType": "lunch",
+      "recipeId": "recipe-id-2"
+    },
+    {
+      "dayOfMeal": "Monday",
+      "mealType": "dinner",
+      "recipeId": "recipe-id-3"
+    },
+    {
+      "dayOfMeal": "Tuesday",
+      "mealType": "breakfast",
+      "recipeId": "recipe-id-4"
+    }
+  ]
+}
+
+### Get all grocery lists
+GET https://localhost:7149/api/grocerylists
+
+### Get a specific grocery list by ID
+GET https://localhost:7149/api/grocerylists/{{groceryListId}}

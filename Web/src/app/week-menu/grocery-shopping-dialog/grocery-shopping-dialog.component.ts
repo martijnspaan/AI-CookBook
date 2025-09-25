@@ -12,6 +12,7 @@ export interface MealSelection {
   date: string;
   mealType: 'breakfast' | 'lunch' | 'dinner';
   recipeTitle: string;
+  recipeId: string;
   isSelected: boolean;
 }
 
@@ -84,6 +85,7 @@ export class GroceryShoppingDialogComponent implements OnInit, OnChanges {
           date: assignment.date,
           mealType: assignment.mealType,
           recipeTitle: assignment.recipeTitle,
+          recipeId: assignment.recipeId,
           isSelected: true
         });
       }
