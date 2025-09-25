@@ -18,9 +18,9 @@ public class CreateGroceryListUseCase(ICosmosDbRepository<GroceryListEntity> rep
 
             // Convert GroceryListMealInput to Meal entities
             List<Meal> meals = input.Meals.Select(mealInput => new Meal(
-                DayOfMeal: ParseDayOfWeek(mealInput.DayOfMeal),
-                MealType: mealInput.MealType,
-                RecipeId: mealInput.RecipeId
+                ParseDateTime(mealInput.DayOfMeal),
+                mealInput.MealType,
+                mealInput.RecipeId
             )).ToList();
 
             GroceryListEntity groceryList = new GroceryListEntity
@@ -38,18 +38,12 @@ public class CreateGroceryListUseCase(ICosmosDbRepository<GroceryListEntity> rep
         }
     }
 
-    private static DayOfWeek ParseDayOfWeek(string dayOfWeekString)
+    private static DateTime ParseDateTime(string dateString)
     {
-        return dayOfWeekString.ToLower() switch
+        if (!DateTime.TryParse(dateString, out DateTime date))
         {
-            "sunday" => DayOfWeek.Sunday,
-            "monday" => DayOfWeek.Monday,
-            "tuesday" => DayOfWeek.Tuesday,
-            "wednesday" => DayOfWeek.Wednesday,
-            "thursday" => DayOfWeek.Thursday,
-            "friday" => DayOfWeek.Friday,
-            "saturday" => DayOfWeek.Saturday,
-            _ => throw new ArgumentException($"Invalid day of week: {dayOfWeekString}")
-        };
+            throw new ArgumentException($"Invalid date format: {dateString}. Expected ISO 8601 format.");
+        }
+        return date;
     }
 }

@@ -69,7 +69,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   getCurrentRecipe(): Recipe | null {
     if (!this.selectedDate || !this.selectedMealType) return null;
     
-    const dateString = this.selectedDate.toISOString().split('T')[0];
+    const dateString = this.formatDateAsString(this.selectedDate);
     const assignment = this.recipeAssignments.find(
       assignment => assignment.date === dateString && assignment.mealType === this.selectedMealType
     );
@@ -82,7 +82,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onRecipeSelected(event: { recipe: Recipe; mealType: string }) {
     if (this.selectedDate) {
-      const dateString = this.selectedDate.toISOString().split('T')[0];
+      const dateString = this.formatDateAsString(this.selectedDate);
       
       // Remove existing assignment for this meal slot
       this.recipeAssignments = this.recipeAssignments.filter(
@@ -107,7 +107,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onRecipeRemoved(event: { mealType: string; date: Date }): void {
-    const dateString = event.date.toISOString().split('T')[0];
+    const dateString = this.formatDateAsString(event.date);
     
     // Remove the assignment for this meal slot
     this.recipeAssignments = this.recipeAssignments.filter(
@@ -209,7 +209,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       
       currentDate.setDate(startOfWeek.getDate() + dayOffset);
-      const dateString = currentDate.toISOString().split('T')[0];
+      const dateString = this.formatDateAsString(currentDate);
       
       console.log(`Processing dayOfWeek: ${weekDay.dayOfWeek}, dayOffset: ${dayOffset}, calculated date: ${dateString}`);
       
@@ -315,7 +315,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     for (let i = 0; i < 7; i++) {
       const currentDate = new Date(startOfWeek);
       currentDate.setDate(startOfWeek.getDate() + i);
-      const dateString = currentDate.toISOString().split('T')[0];
+      const dateString = this.formatDateAsString(currentDate);
       
       const dayAssignments = assignmentsByDate.get(dateString) || [];
       
@@ -339,6 +339,14 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     startOfWeek.setDate(diff);
     startOfWeek.setHours(0, 0, 0, 0);
     return startOfWeek;
+  }
+
+  private formatDateAsString(date: Date): string {
+    // Format date as YYYY-MM-DD without timezone conversion
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   private fetchRecipeTitlesAndUpdateAssignments(recipeIds: string[], assignments: RecipeAssignment[]): void {
@@ -409,7 +417,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     // Convert MealSelection to Meal format for the API
     const meals = event.selectedMeals.map(meal => {
       return {
-        dayOfMeal: this.getDayOfWeekFromDate(meal.date),
+        dayOfMeal: meal.date, // Store the actual date instead of just day name
         mealType: meal.mealType,
         recipeId: meal.recipeId
       };

@@ -6,22 +6,22 @@ Content-Type: application/json
   "dayOfShopping": "2024-01-15T10:00:00.000Z",
   "meals": [
     {
-      "dayOfMeal": "Monday",
+      "dayOfMeal": "2024-01-15T00:00:00.000Z",
       "mealType": "breakfast",
       "recipeId": "recipe-id-1"
     },
     {
-      "dayOfMeal": "Monday",
+      "dayOfMeal": "2024-01-15T00:00:00.000Z",
       "mealType": "lunch",
       "recipeId": "recipe-id-2"
     },
     {
-      "dayOfMeal": "Monday",
+      "dayOfMeal": "2024-01-15T00:00:00.000Z",
       "mealType": "dinner",
       "recipeId": "recipe-id-3"
     },
     {
-      "dayOfMeal": "Tuesday",
+      "dayOfMeal": "2024-01-16T00:00:00.000Z",
       "mealType": "breakfast",
       "recipeId": "recipe-id-4"
     }

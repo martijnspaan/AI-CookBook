@@ -77,7 +77,16 @@ export class GroceryShoppingDialogComponent implements OnInit, OnChanges {
     today.setHours(0, 0, 0, 0);
     
     this.recipeAssignments.forEach(assignment => {
-      const mealDate = new Date(assignment.date);
+      // Parse assignment.date (which is in YYYY-MM-DD format) as local date to avoid timezone issues
+      let mealDate: Date;
+      if (assignment.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        // Parse YYYY-MM-DD as local date
+        const [year, month, day] = assignment.date.split('-').map(Number);
+        mealDate = new Date(year, month - 1, day); // month is 0-indexed
+      } else {
+        // Fallback to normal parsing
+        mealDate = new Date(assignment.date);
+      }
       mealDate.setHours(0, 0, 0, 0);
       
       if (mealDate >= today) {
@@ -142,11 +151,32 @@ export class GroceryShoppingDialogComponent implements OnInit, OnChanges {
         const mealOrder = { 'breakfast': 1, 'lunch': 2, 'dinner': 3 };
         return mealOrder[a.mealType] - mealOrder[b.mealType];
       })
-    })).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    })).sort((a, b) => {
+      // Parse dates properly for sorting to avoid timezone issues
+      const parseDate = (dateStr: string): Date => {
+        if (dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          const [year, month, day] = dateStr.split('-').map(Number);
+          return new Date(year, month - 1, day);
+        } else {
+          return new Date(dateStr);
+        }
+      };
+      return parseDate(a.date).getTime() - parseDate(b.date).getTime();
+    });
   }
 
   getDisplayDate(dateString: string): string {
-    const date = new Date(dateString);
+    // Parse date string properly to avoid timezone issues
+    let date: Date;
+    if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      // Parse YYYY-MM-DD as local date
+      const [year, month, day] = dateString.split('-').map(Number);
+      date = new Date(year, month - 1, day); // month is 0-indexed
+    } else {
+      // Fallback to normal parsing
+      date = new Date(dateString);
+    }
+    
     const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
     const dateStringFormatted = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     return `${dayName}, ${dateStringFormatted}`;

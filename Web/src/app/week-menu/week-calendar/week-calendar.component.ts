@@ -136,11 +136,19 @@ export class WeekCalendarComponent implements AfterViewInit, OnChanges {
   }
 
   getRecipeForMealSlot(date: Date, mealType: 'breakfast' | 'lunch' | 'dinner'): string | null {
-    const dateString = date.toISOString().split('T')[0];
+    const dateString = this.formatDateAsString(date);
     const assignment = this.recipeAssignments.find(
       assignment => assignment.date === dateString && assignment.mealType === mealType
     );
     return assignment ? assignment.recipeTitle : null;
+  }
+
+  private formatDateAsString(date: Date): string {
+    // Format date as YYYY-MM-DD without timezone conversion
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   isMealSlotSelected(date: Date, mealType: 'breakfast' | 'lunch' | 'dinner'): boolean {

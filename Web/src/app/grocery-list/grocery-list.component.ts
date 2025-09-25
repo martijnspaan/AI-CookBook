@@ -156,11 +156,27 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
 
   getMealsGroupedByDay(meals: MealWithRecipe[]): DayGroup[] {
     const grouped = meals.reduce((groups, meal) => {
-      const day = meal.dayOfMeal;
-      if (!groups[day]) {
-        groups[day] = [];
+      // Handle date string properly to avoid timezone issues
+      // If dayOfMeal is already a date string (YYYY-MM-DD), use it directly
+      // Otherwise, parse it and extract just the date part
+      let normalizedDate: string;
+      
+      if (typeof meal.dayOfMeal === 'string' && meal.dayOfMeal.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        // Already in YYYY-MM-DD format
+        normalizedDate = meal.dayOfMeal;
+      } else {
+        // Parse the date and extract just the date part in YYYY-MM-DD format
+        const mealDate = new Date(meal.dayOfMeal);
+        const year = mealDate.getFullYear();
+        const month = String(mealDate.getMonth() + 1).padStart(2, '0');
+        const day = String(mealDate.getDate()).padStart(2, '0');
+        normalizedDate = `${year}-${month}-${day}`;
       }
-      groups[day].push(meal);
+      
+      if (!groups[normalizedDate]) {
+        groups[normalizedDate] = [];
+      }
+      groups[normalizedDate].push(meal);
       return groups;
     }, {} as Record<string, MealWithRecipe[]>);
 
@@ -173,7 +189,18 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
   }
 
   getFormattedDayDate(dateString: string): string {
-    const date = new Date(dateString);
+    // Handle date string properly to avoid timezone issues
+    let date: Date;
+    
+    if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      // If it's in YYYY-MM-DD format, parse it as local date to avoid timezone issues
+      const [year, month, day] = dateString.split('-').map(Number);
+      date = new Date(year, month - 1, day); // month is 0-indexed
+    } else {
+      // Otherwise, parse normally
+      date = new Date(dateString);
+    }
+    
     return date.toLocaleDateString('en-US', {
       weekday: 'short',
       month: 'short',
