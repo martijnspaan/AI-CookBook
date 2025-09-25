@@ -2,12 +2,12 @@
   <div class="row">
     <div class="col-12">
       <!-- Back Button -->
-      <button class="btn btn-outline-secondary mb-3" (click)="goBack()">
+      <button class="btn btn-outline-secondary mb-3" (click)="navigateBackToRecipesList()">
         <i class="fas fa-arrow-left"></i> Back to Recipes
       </button>
 
       <!-- Loading State -->
-      <div *ngIf="loading" class="text-center">
+      <div *ngIf="isLoadingRecipe" class="text-center py-5">
         <div class="spinner-border text-primary" role="status">
           <span class="visually-hidden">Loading...</span>
         </div>
@@ -15,28 +15,29 @@
       </div>
 
       <!-- Error State -->
-      <div *ngIf="error" class="alert alert-danger" role="alert">
+      <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
         <h4 class="alert-heading">Error!</h4>
-        <p>{{ error }}</p>
+        <p>{{ errorMessage }}</p>
         <hr>
-        <button class="btn btn-outline-danger" (click)="goBack()">Go Back</button>
+        <button class="btn btn-outline-danger" (click)="navigateBackToRecipesList()">Go Back</button>
       </div>
 
       <!-- Recipe Details -->
-      <div *ngIf="!loading && !error && recipe" class="recipe-detail">
+      <div *ngIf="!isLoadingRecipe && !errorMessage && recipe" class="recipe-detail">
         <div class="card">
           <div class="card-header d-flex justify-content-between align-items-center">
             <h3 class="mb-0">Recipe Details</h3>
-            <div *ngIf="!isEditing">
-              <button class="btn btn-primary" (click)="startEditing()">
+            <div *ngIf="!isEditingMode">
+              <button class="btn btn-primary" (click)="enableEditingMode()">
                 <i class="fas fa-edit"></i> Edit Recipe
               </button>
             </div>
-            <div *ngIf="isEditing">
-              <button class="btn btn-success me-2" (click)="saveChanges()" [disabled]="loading">
-                <i class="fas fa-save"></i> Save Changes
+            <div *ngIf="isEditingMode">
+              <button class="btn btn-success me-2" (click)="saveRecipeChanges()" [disabled]="isUpdatingRecipe">
+                <span *ngIf="isUpdatingRecipe" class="spinner-border spinner-border-sm me-1" role="status"></span>
+                <i class="fas fa-save"></i> {{ isUpdatingRecipe ? 'Saving...' : 'Save Changes' }}
               </button>
-              <button class="btn btn-secondary" (click)="cancelEditing()">
+              <button class="btn btn-secondary" (click)="cancelEditingMode()">
                 <i class="fas fa-times"></i> Cancel
               </button>
             </div>
@@ -46,12 +47,12 @@
             <div class="mb-4">
               <label class="form-label fw-bold">Title</label>
               <input 
-                *ngIf="isEditing" 
+                *ngIf="isEditingMode" 
                 type="text" 
                 class="form-control" 
                 [(ngModel)]="editedRecipe!.title"
                 placeholder="Recipe title">
-              <div *ngIf="!isEditing" class="recipe-field">
+              <div *ngIf="!isEditingMode" class="recipe-field">
                 {{ recipe.title }}
               </div>
             </div>
@@ -60,12 +61,12 @@
             <div class="mb-4">
               <label class="form-label fw-bold">Description</label>
               <textarea 
-                *ngIf="isEditing" 
+                *ngIf="isEditingMode" 
                 class="form-control" 
                 rows="3"
                 [(ngModel)]="editedRecipe!.description"
                 placeholder="Recipe description"></textarea>
-              <div *ngIf="!isEditing" class="recipe-field">
+              <div *ngIf="!isEditingMode" class="recipe-field">
                 {{ recipe.description }}
               </div>
             </div>
@@ -73,7 +74,7 @@
             <!-- Tags -->
             <div class="mb-4">
               <label class="form-label fw-bold">Tags</label>
-              <div *ngIf="isEditing">
+              <div *ngIf="isEditingMode">
                 <div class="d-flex flex-wrap gap-2 mb-2">
                   <div *ngFor="let tag of editedRecipe!.tags; let i = index" class="input-group" style="width: auto;">
                     <input 
@@ -81,16 +82,16 @@
                       class="form-control" 
                       [(ngModel)]="editedRecipe!.tags[i]"
                       placeholder="Tag">
-                    <button class="btn btn-outline-danger" type="button" (click)="removeTag(i)">
+                    <button class="btn btn-outline-danger" type="button" (click)="removeTagAtIndex(i)" [disabled]="editedRecipe!.tags.length <= 1">
                       <i class="fas fa-times"></i>
                     </button>
                   </div>
                 </div>
-                <button class="btn btn-outline-primary btn-sm" (click)="addTag()">
+                <button class="btn btn-outline-primary btn-sm" (click)="addEmptyTag()">
                   <i class="fas fa-plus"></i> Add Tag
                 </button>
               </div>
-              <div *ngIf="!isEditing" class="recipe-field">
+              <div *ngIf="!isEditingMode" class="recipe-field">
                 <div class="d-flex flex-wrap gap-1">
                   <span *ngFor="let tag of recipe.tags" class="badge bg-secondary">
                     {{ tag }}
@@ -103,7 +104,7 @@
             <!-- Recipe Content -->
             <div class="mb-4">
               <label class="form-label fw-bold">Recipe</label>
-              <div *ngIf="isEditing">
+              <div *ngIf="isEditingMode">
                 <div class="d-flex flex-column gap-2 mb-2">
                   <div *ngFor="let step of editedRecipe!.recipe; let i = index" class="input-group">
                     <span class="input-group-text">{{ i + 1 }}.</span>
@@ -112,16 +113,16 @@
                       class="form-control" 
                       [(ngModel)]="editedRecipe!.recipe[i]"
                       placeholder="Recipe step">
-                    <button class="btn btn-outline-danger" type="button" (click)="removeRecipeStep(i)">
+                    <button class="btn btn-outline-danger" type="button" (click)="removeRecipeStepAtIndex(i)" [disabled]="editedRecipe!.recipe.length <= 1">
                       <i class="fas fa-times"></i>
                     </button>
                   </div>
                 </div>
-                <button class="btn btn-outline-primary btn-sm" (click)="addRecipeStep()">
+                <button class="btn btn-outline-primary btn-sm" (click)="addEmptyRecipeStep()">
                   <i class="fas fa-plus"></i> Add Step
                 </button>
               </div>
-              <div *ngIf="!isEditing" class="recipe-field">
+              <div *ngIf="!isEditingMode" class="recipe-field">
                 <ol class="mb-0">
                   <li *ngFor="let step of recipe.recipe" class="recipe-step">{{ step }}</li>
                   <li *ngIf="recipe.recipe.length === 0" class="text-muted">No recipe steps</li>

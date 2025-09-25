@@ -1,33 +1,57 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { Recipe } from '../models/recipe.model';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { Recipe, CreateRecipeRequest, UpdateRecipeRequest } from '../models/recipe.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RecipeService {
-  private apiUrl = 'https://localhost:7149/api/recipes';
+  private readonly apiBaseUrl = 'https://localhost:7149/api/recipes';
 
-  constructor(private http: HttpClient) { }
+  constructor(private readonly httpClient: HttpClient) { }
 
-  getRecipes(): Observable<Recipe[]> {
-    return this.http.get<Recipe[]>(this.apiUrl);
+  getAllRecipes(): Observable<Recipe[]> {
+    return this.httpClient.get<Recipe[]>(this.apiBaseUrl).pipe(
+      catchError(this.handleError)
+    );
   }
 
-  getRecipe(id: string): Observable<Recipe> {
-    return this.http.get<Recipe>(`${this.apiUrl}/${id}`);
+  getRecipeById(recipeId: string): Observable<Recipe> {
+    return this.httpClient.get<Recipe>(`${this.apiBaseUrl}/${recipeId}`).pipe(
+      catchError(this.handleError)
+    );
   }
 
-  updateRecipe(recipe: Recipe): Observable<Recipe> {
-    return this.http.put<Recipe>(`${this.apiUrl}/${recipe.id}`, recipe);
+  createNewRecipe(recipeRequest: CreateRecipeRequest): Observable<Recipe> {
+    return this.httpClient.post<Recipe>(this.apiBaseUrl, recipeRequest).pipe(
+      catchError(this.handleError)
+    );
   }
 
-  deleteRecipe(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  updateExistingRecipe(recipeId: string, recipeRequest: UpdateRecipeRequest): Observable<Recipe> {
+    return this.httpClient.put<Recipe>(`${this.apiBaseUrl}/${recipeId}`, recipeRequest).pipe(
+      catchError(this.handleError)
+    );
   }
 
-  createRecipe(recipe: Omit<Recipe, 'id'>): Observable<Recipe> {
-    return this.http.post<Recipe>(this.apiUrl, recipe);
+  deleteRecipeById(recipeId: string): Observable<void> {
+    return this.httpClient.delete<void>(`${this.apiBaseUrl}/${recipeId}`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  private handleError(error: HttpErrorResponse): Observable<never> {
+    let errorMessage = 'An unknown error occurred';
+    
+    if (error.error instanceof ErrorEvent) {
+      errorMessage = `Client error: ${error.error.message}`;
+    } else {
+      errorMessage = `Server error: ${error.status} - ${error.message}`;
+    }
+    
+    console.error('Recipe service error:', errorMessage);
+    return throwError(() => new Error(errorMessage));
   }
 }

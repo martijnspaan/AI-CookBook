@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { RecipeService } from '../../services/recipe.service';
-import { Recipe } from '../../models/recipe.model';
+import { Recipe, UpdateRecipeRequest } from '../../models/recipe.model';
 
 @Component({
   selector: 'app-recipe-detail',
@@ -12,99 +14,119 @@ import { Recipe } from '../../models/recipe.model';
   templateUrl: './recipe-detail.component.html',
   styleUrl: './recipe-detail.component.scss'
 })
-export class RecipeDetailComponent implements OnInit {
+export class RecipeDetailComponent implements OnInit, OnDestroy {
   recipe: Recipe | null = null;
-  loading = false;
-  error: string | null = null;
-  isEditing = false;
+  isLoadingRecipe = false;
+  isUpdatingRecipe = false;
+  errorMessage: string | null = null;
+  isEditingMode = false;
   editedRecipe: Recipe | null = null;
+  private readonly destroySubject = new Subject<void>();
 
   constructor(
-    private route: ActivatedRoute,
-    private router: Router,
-    private recipeService: RecipeService
+    private readonly activatedRoute: ActivatedRoute,
+    private readonly router: Router,
+    private readonly recipeService: RecipeService
   ) { }
 
   ngOnInit(): void {
-    const recipeId = this.route.snapshot.paramMap.get('id');
+    const recipeId = this.activatedRoute.snapshot.paramMap.get('id');
     if (recipeId) {
-      this.loadRecipe(recipeId);
+      this.loadRecipeById(recipeId);
     } else {
-      this.error = 'No recipe ID provided';
+      this.errorMessage = 'No recipe ID provided';
     }
   }
 
-  loadRecipe(id: string): void {
-    this.loading = true;
-    this.error = null;
+  ngOnDestroy(): void {
+    this.destroySubject.next();
+    this.destroySubject.complete();
+  }
+
+  private loadRecipeById(recipeId: string): void {
+    this.isLoadingRecipe = true;
+    this.errorMessage = null;
     
-    this.recipeService.getRecipe(id).subscribe({
-      next: (recipe) => {
-        this.recipe = recipe;
-        this.editedRecipe = { ...recipe };
-        this.loading = false;
-      },
-      error: (error) => {
-        this.error = 'Failed to load recipe details';
-        this.loading = false;
-        console.error('Error loading recipe:', error);
-      }
-    });
+    this.recipeService.getRecipeById(recipeId)
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe({
+        next: (recipe) => {
+          this.recipe = recipe;
+          this.editedRecipe = { ...recipe };
+          this.isLoadingRecipe = false;
+        },
+        error: (error) => {
+          this.errorMessage = 'Failed to load recipe details';
+          this.isLoadingRecipe = false;
+          console.error('Error loading recipe:', error);
+        }
+      });
   }
 
-  startEditing(): void {
-    this.isEditing = true;
+  enableEditingMode(): void {
+    this.isEditingMode = true;
   }
 
-  cancelEditing(): void {
-    this.isEditing = false;
+  cancelEditingMode(): void {
+    this.isEditingMode = false;
     if (this.recipe) {
       this.editedRecipe = { ...this.recipe };
     }
   }
 
-  saveChanges(): void {
-    if (!this.editedRecipe) return;
+  saveRecipeChanges(): void {
+    if (!this.editedRecipe || !this.recipe) return;
 
-    this.loading = true;
-    this.error = null;
+    this.isUpdatingRecipe = true;
+    this.errorMessage = null;
 
-    this.recipeService.updateRecipe(this.editedRecipe).subscribe({
-      next: (updatedRecipe) => {
-        this.recipe = updatedRecipe;
-        this.editedRecipe = { ...updatedRecipe };
-        this.isEditing = false;
-        this.loading = false;
-      },
-      error: (error) => {
-        this.error = 'Failed to update recipe';
-        this.loading = false;
-        console.error('Error updating recipe:', error);
-      }
-    });
+    const updateRequest: UpdateRecipeRequest = {
+      title: this.editedRecipe.title,
+      description: this.editedRecipe.description,
+      tags: this.editedRecipe.tags,
+      ingredients: this.editedRecipe.ingredients,
+      recipe: this.editedRecipe.recipe
+    };
+
+    this.recipeService.updateExistingRecipe(this.recipe.id, updateRequest)
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe({
+        next: (updatedRecipe) => {
+          this.recipe = updatedRecipe;
+          this.editedRecipe = { ...updatedRecipe };
+          this.isEditingMode = false;
+          this.isUpdatingRecipe = false;
+        },
+        error: (error) => {
+          this.errorMessage = 'Failed to update recipe';
+          this.isUpdatingRecipe = false;
+          console.error('Error updating recipe:', error);
+        }
+      });
   }
 
-  addTag(): void {
+  addEmptyTag(): void {
     if (!this.editedRecipe) return;
     this.editedRecipe.tags.push('');
   }
 
-  removeTag(index: number): void {
-    if (!this.editedRecipe) return;
+  removeTagAtIndex(index: number): void {
+    if (!this.editedRecipe || this.editedRecipe.tags.length <= 1) return;
     this.editedRecipe.tags.splice(index, 1);
   }
 
-  addRecipeStep(): void {
+  addEmptyRecipeStep(): void {
     if (!this.editedRecipe) return;
     this.editedRecipe.recipe.push('');
   }
 
-  removeRecipeStep(index: number): void {
-    if (!this.editedRecipe) return;
+  removeRecipeStepAtIndex(index: number): void {
+    if (!this.editedRecipe || this.editedRecipe.recipe.length <= 1) return;
     this.editedRecipe.recipe.splice(index, 1);
   }
 
-  goBack(): void {
+  navigateBackToRecipesList(): void {
     this.router.navigate(['/recipes']);
   }
 }
+

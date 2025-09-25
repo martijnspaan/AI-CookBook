@@ -1,9 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormArray, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { RecipeService } from '../services/recipe.service';
-import { Recipe, Ingredient } from '../models/recipe.model';
+import { Recipe, Ingredient, CreateRecipeRequest } from '../models/recipe.model';
 
 @Component({
   selector: 'app-recipes',
@@ -12,203 +14,240 @@ import { Recipe, Ingredient } from '../models/recipe.model';
   templateUrl: './recipes.component.html',
   styleUrl: './recipes.component.scss'
 })
-export class RecipesComponent implements OnInit {
+export class RecipesComponent implements OnInit, OnDestroy {
   recipes: Recipe[] = [];
-  loading = false;
-  error: string | null = null;
-  creating = false;
+  isLoadingRecipes = false;
+  isCreatingRecipe = false;
+  errorMessage: string | null = null;
   createRecipeForm: FormGroup;
+  private readonly destroySubject = new Subject<void>();
 
   constructor(
-    private recipeService: RecipeService,
-    private router: Router,
-    private fb: FormBuilder
+    private readonly recipeService: RecipeService,
+    private readonly router: Router,
+    private readonly formBuilder: FormBuilder
   ) {
-    this.createRecipeForm = this.fb.group({
-      title: ['', Validators.required],
-      description: ['', Validators.required],
+    this.createRecipeForm = this.formBuilder.group({
+      title: ['', [Validators.required, Validators.minLength(3)]],
+      description: ['', [Validators.required, Validators.minLength(10)]],
       tags: [''],
-      ingredients: this.fb.array([]),
-      recipeSteps: this.fb.array([])
+      ingredients: this.formBuilder.array([]),
+      recipeSteps: this.formBuilder.array([])
     });
   }
 
   ngOnInit(): void {
-    this.loadRecipes();
+    this.loadAllRecipes();
   }
 
-  get ingredientsArray(): FormArray {
+  ngOnDestroy(): void {
+    this.destroySubject.next();
+    this.destroySubject.complete();
+  }
+
+  get ingredientsFormArray(): FormArray {
     return this.createRecipeForm.get('ingredients') as FormArray;
   }
 
-  get recipeStepsArray(): FormArray {
+  get recipeStepsFormArray(): FormArray {
     return this.createRecipeForm.get('recipeSteps') as FormArray;
   }
 
-  loadRecipes(): void {
-    this.loading = true;
-    this.error = null;
+  loadAllRecipes(): void {
+    this.isLoadingRecipes = true;
+    this.errorMessage = null;
     
-    this.recipeService.getRecipes().subscribe({
-      next: (recipes) => {
-        this.recipes = recipes;
-        this.loading = false;
-      },
-      error: (error) => {
-        this.error = 'Failed to load recipes. Please make sure the API is running.';
-        this.loading = false;
-        console.error('Error loading recipes:', error);
-      }
-    });
+    this.recipeService.getAllRecipes()
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe({
+        next: (recipes) => {
+          this.recipes = recipes;
+          this.isLoadingRecipes = false;
+        },
+        error: (error) => {
+          this.errorMessage = 'Failed to load recipes. Please make sure the API is running.';
+          this.isLoadingRecipes = false;
+          console.error('Error loading recipes:', error);
+        }
+      });
   }
 
-  getTagsAsString(tags: string[]): string {
+  getTagsAsCommaSeparatedString(tags: string[]): string {
     return tags.join(', ');
   }
 
-  viewRecipe(recipe: Recipe): void {
+  navigateToRecipeDetails(recipe: Recipe): void {
     this.router.navigate(['/recipes', recipe.id]);
   }
 
-  deleteRecipe(recipe: Recipe, event: Event): void {
-    event.stopPropagation(); // Prevent row click event
+  deleteRecipeWithConfirmation(recipe: Recipe, event: Event): void {
+    event.stopPropagation();
     
-    if (confirm(`Are you sure you want to delete "${recipe.title}"?`)) {
-      this.recipeService.deleteRecipe(recipe.id).subscribe({
-        next: () => {
-          // Remove the recipe from the local array
-          this.recipes = this.recipes.filter(r => r.id !== recipe.id);
-        },
-        error: (error) => {
-          console.error('Error deleting recipe:', error);
-          alert('Failed to delete recipe. Please try again.');
-        }
-      });
+    const confirmationMessage = `Are you sure you want to delete "${recipe.title}"?`;
+    if (confirm(confirmationMessage)) {
+      this.recipeService.deleteRecipeById(recipe.id)
+        .pipe(takeUntil(this.destroySubject))
+        .subscribe({
+          next: () => {
+            this.recipes = this.recipes.filter(existingRecipe => existingRecipe.id !== recipe.id);
+          },
+          error: (error) => {
+            console.error('Error deleting recipe:', error);
+            alert('Failed to delete recipe. Please try again.');
+          }
+        });
     }
   }
 
-  openCreateModal(): void {
+  openCreateRecipeModal(): void {
+    this.resetCreateRecipeForm();
+    this.addEmptyIngredient();
+    this.addEmptyRecipeStep();
+    this.showBootstrapModal();
+  }
+
+  private resetCreateRecipeForm(): void {
     this.createRecipeForm.reset();
-    this.ingredientsArray.clear();
-    this.recipeStepsArray.clear();
-    // Add one empty ingredient and one empty recipe step by default
-    this.addIngredient();
-    this.addRecipeStep();
-    
-    // Open the modal using jQuery or native DOM manipulation
-    const modal = document.getElementById('createRecipeModal');
-    if (modal) {
-      // Try Bootstrap 5 approach first
-      if ((window as any).bootstrap) {
-        const modalInstance = new (window as any).bootstrap.Modal(modal);
+    this.ingredientsFormArray.clear();
+    this.recipeStepsFormArray.clear();
+  }
+
+  private showBootstrapModal(): void {
+    const modalElement = document.getElementById('createRecipeModal');
+    if (modalElement) {
+      const bootstrapModal = (window as any).bootstrap?.Modal;
+      if (bootstrapModal) {
+        const modalInstance = new bootstrapModal(modalElement);
         modalInstance.show();
       } else {
-        // Fallback: manually show the modal
-        modal.classList.add('show');
-        modal.style.display = 'block';
-        modal.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('modal-open');
-        
-        // Add backdrop
-        const backdrop = document.createElement('div');
-        backdrop.className = 'modal-backdrop fade show';
-        backdrop.id = 'modal-backdrop';
-        document.body.appendChild(backdrop);
+        this.showModalFallback(modalElement);
       }
     }
   }
 
-  addIngredient(): void {
-    const ingredientGroup = this.fb.group({
-      name: ['', Validators.required],
-      amountValue: [0, [Validators.required, Validators.min(0)]],
-      amountUnit: ['', Validators.required],
-      type: ['', Validators.required]
+  private showModalFallback(modalElement: HTMLElement): void {
+    modalElement.classList.add('show');
+    modalElement.style.display = 'block';
+    modalElement.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+    
+    const backdropElement = document.createElement('div');
+    backdropElement.className = 'modal-backdrop fade show';
+    backdropElement.id = 'modal-backdrop';
+    document.body.appendChild(backdropElement);
+  }
+
+  addEmptyIngredient(): void {
+    const ingredientFormGroup = this.formBuilder.group({
+      name: ['', [Validators.required, Validators.minLength(2)]],
+      amountValue: [0, [Validators.required, Validators.min(0.1)]],
+      amountUnit: ['', [Validators.required, Validators.minLength(1)]],
+      type: ['', [Validators.required, Validators.minLength(2)]]
     });
-    this.ingredientsArray.push(ingredientGroup);
+    this.ingredientsFormArray.push(ingredientFormGroup);
   }
 
-  removeIngredient(index: number): void {
-    this.ingredientsArray.removeAt(index);
-  }
-
-  addRecipeStep(): void {
-    this.recipeStepsArray.push(this.fb.control('', Validators.required));
-  }
-
-  removeRecipeStep(index: number): void {
-    this.recipeStepsArray.removeAt(index);
-  }
-
-  onSubmit(): void {
-    if (this.createRecipeForm.valid) {
-      this.creating = true;
-      
-      const formValue = this.createRecipeForm.value;
-      
-      // Parse tags
-      const tags = formValue.tags ? formValue.tags.split(',').map((tag: string) => tag.trim()).filter((tag: string) => tag) : [];
-      
-      // Transform ingredients
-      const ingredients: Ingredient[] = formValue.ingredients.map((ingredient: any) => ({
-        name: ingredient.name,
-        type: ingredient.type,
-        amount: {
-          value: ingredient.amountValue,
-          unit: ingredient.amountUnit
-        }
-      }));
-
-      const newRecipe: Omit<Recipe, 'id'> = {
-        title: formValue.title,
-        description: formValue.description,
-        tags: tags,
-        ingredients: ingredients,
-        recipe: formValue.recipeSteps
-      };
-
-      this.recipeService.createRecipe(newRecipe).subscribe({
-        next: (createdRecipe) => {
-          this.recipes.unshift(createdRecipe); // Add to beginning of list
-          this.creating = false;
-          // Close modal
-          this.closeModal();
-        },
-        error: (error) => {
-          console.error('Error creating recipe:', error);
-          this.creating = false;
-          alert('Failed to create recipe. Please try again.');
-        }
-      });
+  removeIngredientAtIndex(index: number): void {
+    if (this.ingredientsFormArray.length > 1) {
+      this.ingredientsFormArray.removeAt(index);
     }
   }
 
-  closeModal(): void {
-    const modal = document.getElementById('createRecipeModal');
-    if (modal) {
-      // Try Bootstrap 5 approach first
-      if ((window as any).bootstrap) {
-        const modalInstance = (window as any).bootstrap.Modal.getInstance(modal);
+  addEmptyRecipeStep(): void {
+    const recipeStepControl = this.formBuilder.control('', [Validators.required, Validators.minLength(5)]);
+    this.recipeStepsFormArray.push(recipeStepControl);
+  }
+
+  removeRecipeStepAtIndex(index: number): void {
+    if (this.recipeStepsFormArray.length > 1) {
+      this.recipeStepsFormArray.removeAt(index);
+    }
+  }
+
+  submitCreateRecipeForm(): void {
+    if (this.createRecipeForm.valid) {
+      this.isCreatingRecipe = true;
+      
+      const formData = this.createRecipeForm.value;
+      const createRecipeRequest = this.buildCreateRecipeRequest(formData);
+
+      this.recipeService.createNewRecipe(createRecipeRequest)
+        .pipe(takeUntil(this.destroySubject))
+        .subscribe({
+          next: (createdRecipe) => {
+            this.recipes.unshift(createdRecipe);
+            this.isCreatingRecipe = false;
+            this.hideCreateRecipeModal();
+          },
+          error: (error) => {
+            console.error('Error creating recipe:', error);
+            this.isCreatingRecipe = false;
+            alert('Failed to create recipe. Please try again.');
+          }
+        });
+    }
+  }
+
+  private buildCreateRecipeRequest(formData: any): CreateRecipeRequest {
+    const tags = this.parseTagsFromString(formData.tags);
+    const ingredients = this.transformFormIngredientsToModel(formData.ingredients);
+
+    return {
+      title: formData.title,
+      description: formData.description,
+      tags: tags,
+      ingredients: ingredients,
+      recipe: formData.recipeSteps
+    };
+  }
+
+  private parseTagsFromString(tagsString: string): string[] {
+    if (!tagsString) return [];
+    return tagsString
+      .split(',')
+      .map(tag => tag.trim())
+      .filter(tag => tag.length > 0);
+  }
+
+  private transformFormIngredientsToModel(formIngredients: any[]): Ingredient[] {
+    return formIngredients.map(ingredient => ({
+      name: ingredient.name,
+      type: ingredient.type,
+      amount: {
+        value: ingredient.amountValue,
+        unit: ingredient.amountUnit
+      }
+    }));
+  }
+
+  hideCreateRecipeModal(): void {
+    const modalElement = document.getElementById('createRecipeModal');
+    if (modalElement) {
+      const bootstrapModal = (window as any).bootstrap?.Modal;
+      if (bootstrapModal) {
+        const modalInstance = bootstrapModal.getInstance(modalElement);
         if (modalInstance) {
           modalInstance.hide();
         }
       } else {
-        // Fallback: manually hide the modal
-        modal.classList.remove('show');
-        modal.style.display = 'none';
-        modal.setAttribute('aria-hidden', 'true');
-        document.body.classList.remove('modal-open');
-        
-        // Remove backdrop
-        const backdrop = document.getElementById('modal-backdrop');
-        if (backdrop) {
-          backdrop.remove();
-        }
+        this.hideModalFallback(modalElement);
       }
     }
   }
 
-  onCancel(): void {
-    this.closeModal();
+  private hideModalFallback(modalElement: HTMLElement): void {
+    modalElement.classList.remove('show');
+    modalElement.style.display = 'none';
+    modalElement.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+    
+    const backdropElement = document.getElementById('modal-backdrop');
+    if (backdropElement) {
+      backdropElement.remove();
+    }
+  }
+
+  cancelCreateRecipe(): void {
+    this.hideCreateRecipeModal();
   }
 }

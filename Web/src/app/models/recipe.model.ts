@@ -1,17 +1,37 @@
+export interface IngredientAmount {
+  value: number;
+  unit: string;
+}
+
 export interface Ingredient {
   name: string;
   type: string;
-  amount: {
-    value: number;
-    unit: string;
-  };
+  amount: IngredientAmount;
 }
 
 export interface Recipe {
-  id: string;
+  readonly id: string;
   title: string;
   description: string;
   tags: string[];
   ingredients: Ingredient[];
   recipe: string[];
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+export interface CreateRecipeRequest {
+  title: string;
+  description: string;
+  tags: string[];
+  ingredients: Ingredient[];
+  recipe: string[];
+}
+
+export interface UpdateRecipeRequest {
+  title?: string;
+  description?: string;
+  tags?: string[];
+  ingredients?: Ingredient[];
+  recipe?: string[];
 }
