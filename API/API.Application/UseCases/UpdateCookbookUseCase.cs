@@ -19,6 +19,7 @@ public class UpdateCookbookUseCase(ICosmosDbRepository<CookbookEntity> repositor
             }
 
             existingCookbook.Title = input.Title;
+            existingCookbook.Author = input.Author;
             existingCookbook.UpdateTimestamp();
 
             CookbookEntity updatedCookbook = await repository.UpdateAsync(existingCookbook);

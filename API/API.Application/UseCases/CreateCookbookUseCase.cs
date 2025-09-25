@@ -12,7 +12,8 @@ public class CreateCookbookUseCase(ICosmosDbRepository<CookbookEntity> repositor
         {
             CookbookEntity cookbook = new CookbookEntity
             {
-                Title = input.Title
+                Title = input.Title,
+                Author = input.Author
             };
 
             CookbookEntity createdCookbook = await repository.CreateAsync(cookbook);

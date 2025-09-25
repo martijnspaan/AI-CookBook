@@ -32,7 +32,8 @@ export class CookbooksComponent implements OnInit, OnDestroy, AfterViewInit {
     private readonly cookbookModalService: CookbookModalService
   ) {
     this.cookbookForm = this.formBuilder.group({
-      title: ['', [Validators.required, Validators.minLength(3)]]
+      title: ['', [Validators.required, Validators.minLength(3)]],
+      author: ['', [Validators.required, Validators.minLength(2)]]
     });
   }
 
@@ -85,7 +86,8 @@ export class CookbooksComponent implements OnInit, OnDestroy, AfterViewInit {
     this.isEditingCookbook = true;
     this.currentEditingCookbook = cookbook;
     this.cookbookForm.patchValue({
-      title: cookbook.title
+      title: cookbook.title,
+      author: cookbook.author
     });
     this.showBootstrapModal();
   }
@@ -113,7 +115,8 @@ export class CookbooksComponent implements OnInit, OnDestroy, AfterViewInit {
       
       if (this.isEditingCookbook && this.currentEditingCookbook) {
         const updateRequest: UpdateCookbookRequest = {
-          title: this.cookbookForm.value.title
+          title: this.cookbookForm.value.title,
+          author: this.cookbookForm.value.author
         };
 
         this.cookbookService.updateExistingCookbook(this.currentEditingCookbook.id, updateRequest)
@@ -136,7 +139,8 @@ export class CookbooksComponent implements OnInit, OnDestroy, AfterViewInit {
           });
       } else {
         const createRequest: CreateCookbookRequest = {
-          title: this.cookbookForm.value.title
+          title: this.cookbookForm.value.title,
+          author: this.cookbookForm.value.author
         };
 
         this.cookbookService.createNewCookbook(createRequest)

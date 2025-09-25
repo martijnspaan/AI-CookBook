@@ -64,3 +64,36 @@ Content-Type: application/json
 DELETE {{CookbookAPI_HostAddress}}/api/recipes/{id}
 
 ###
+
+### Get all cookbooks
+GET {{CookbookAPI_HostAddress}}/api/cookbooks
+Accept: application/json
+
+###
+
+### Create a new cookbook
+POST {{CookbookAPI_HostAddress}}/api/cookbooks
+Content-Type: application/json
+
+{
+  "title": "Test Cookbook",
+  "author": "Test Author"
+}
+
+###
+
+### Update a cookbook (replace {id} with actual cookbook ID)
+PUT {{CookbookAPI_HostAddress}}/api/cookbooks/{id}
+Content-Type: application/json
+
+{
+  "title": "Updated Test Cookbook",
+  "author": "Updated Test Author"
+}
+
+###
+
+### Delete a cookbook (replace {id} with actual cookbook ID)
+DELETE {{CookbookAPI_HostAddress}}/api/cookbooks/{id}
+
+###

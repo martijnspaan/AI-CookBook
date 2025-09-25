@@ -8,6 +8,9 @@ public class CookbookEntity : BaseCosmosDbEntity
     [JsonProperty("title")]
     public string Title { get; set; } = string.Empty;
 
+    [JsonProperty("author")]
+    public string Author { get; set; } = string.Empty;
+
     public CookbookEntity()
     {
     }
