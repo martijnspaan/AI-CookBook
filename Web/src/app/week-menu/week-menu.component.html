@@ -27,7 +27,9 @@
       [isVisible]="showRecipeDialog"
       [selectedMealType]="selectedMealType"
       [selectedDate]="selectedDate"
+      [currentRecipe]="getCurrentRecipe()"
       (recipeSelected)="onRecipeSelected($event)"
+      (recipeRemoved)="onRecipeRemoved($event)"
       (dialogClosed)="onDialogClosed()">
     </app-recipe-selection-dialog>
   </div>

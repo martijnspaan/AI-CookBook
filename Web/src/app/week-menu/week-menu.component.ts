@@ -22,6 +22,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit {
   selectedDate: Date | null = null;
   selectedMealSlot: { mealType: 'breakfast' | 'lunch' | 'dinner'; date: Date } | null = null;
   recipeAssignments: RecipeAssignment[] = [];
+  recipes: Recipe[] = [];
   showRecipeDialog: boolean = false;
   currentWeekMenu: WeekMenu | null = null;
   isSaving: boolean = false;
@@ -35,6 +36,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     this.loadWeekMenus();
+    this.loadAllRecipes();
   }
 
   ngAfterViewInit(): void {
@@ -51,6 +53,20 @@ export class WeekMenuComponent implements OnInit, AfterViewInit {
     this.selectedDate = date;
     this.selectedMealSlot = { mealType, date };
     this.showRecipeDialog = true;
+  }
+
+  getCurrentRecipe(): Recipe | null {
+    if (!this.selectedDate || !this.selectedMealType) return null;
+    
+    const dateString = this.selectedDate.toISOString().split('T')[0];
+    const assignment = this.recipeAssignments.find(
+      assignment => assignment.date === dateString && assignment.mealType === this.selectedMealType
+    );
+    
+    if (!assignment) return null;
+    
+    // Find the recipe by ID
+    return this.recipes.find(recipe => recipe.id === assignment.recipeId) || null;
   }
 
   onRecipeSelected(event: { recipe: Recipe; mealType: string }) {
@@ -79,6 +95,20 @@ export class WeekMenuComponent implements OnInit, AfterViewInit {
     this.resetSelection();
   }
 
+  onRecipeRemoved(event: { mealType: string; date: Date }): void {
+    const dateString = event.date.toISOString().split('T')[0];
+    
+    // Remove the assignment for this meal slot
+    this.recipeAssignments = this.recipeAssignments.filter(
+      assignment => !(assignment.date === dateString && assignment.mealType === event.mealType)
+    );
+    
+    // Save to API
+    this.saveWeekMenuToApi();
+    
+    this.resetSelection();
+  }
+
   onDialogClosed(): void {
     this.resetSelection();
   }
@@ -88,6 +118,17 @@ export class WeekMenuComponent implements OnInit, AfterViewInit {
     this.selectedDate = null;
     this.selectedMealSlot = null;
     this.showRecipeDialog = false;
+  }
+
+  private loadAllRecipes(): void {
+    this.recipeService.getAllRecipes().subscribe({
+      next: (recipes) => {
+        this.recipes = recipes;
+      },
+      error: (error) => {
+        console.error('Error loading recipes:', error);
+      }
+    });
   }
 
   private loadWeekMenus(): void {

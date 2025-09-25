@@ -16,7 +16,9 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy {
   @Input() isVisible: boolean = false;
   @Input() selectedMealType: 'breakfast' | 'lunch' | 'dinner' | null = null;
   @Input() selectedDate: Date | null = null;
+  @Input() currentRecipe: Recipe | null = null;
   @Output() recipeSelected = new EventEmitter<{ recipe: Recipe; mealType: string }>();
+  @Output() recipeRemoved = new EventEmitter<{ mealType: string; date: Date }>();
   @Output() dialogClosed = new EventEmitter<void>();
 
   recipes: Recipe[] = [];
@@ -67,6 +69,16 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy {
       this.recipeSelected.emit({
         recipe: recipe,
         mealType: this.selectedMealType
+      });
+      this.closeDialog();
+    }
+  }
+
+  removeRecipe(): void {
+    if (this.selectedMealType && this.selectedDate) {
+      this.recipeRemoved.emit({
+        mealType: this.selectedMealType,
+        date: this.selectedDate
       });
       this.closeDialog();
     }

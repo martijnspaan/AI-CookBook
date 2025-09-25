@@ -59,6 +59,34 @@
               </div>
             </div>
 
+            <!-- Meal Types -->
+            <div class="mb-2">
+              <label class="form-label fw-bold">Meal Types</label>
+              <div *ngIf="isEditingMode">
+                <div class="d-flex flex-wrap gap-3">
+                  <div *ngFor="let mealType of availableMealTypes" class="form-check">
+                    <input 
+                      class="form-check-input" 
+                      type="checkbox" 
+                      [id]="'mealType-' + mealType"
+                      [checked]="isMealTypeSelected(mealType)"
+                      (change)="toggleMealType(mealType)">
+                    <label class="form-check-label" [for]="'mealType-' + mealType">
+                      {{ mealType }}
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="!isEditingMode" class="recipe-field">
+                <div class="d-flex flex-wrap gap-1">
+                  <span *ngFor="let mealType of recipe.mealTypes" class="badge bg-primary">
+                    {{ mealType }}
+                  </span>
+                  <span *ngIf="recipe.mealTypes.length === 0" class="text-muted">No meal types selected</span>
+                </div>
+              </div>
+            </div>
+
             <!-- Tags -->
             <div class="mb-2">
               <label class="form-label fw-bold">Tags</label>

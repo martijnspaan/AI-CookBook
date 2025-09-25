@@ -25,6 +25,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   isCreatingRecipe = false;
   errorMessage: string | null = null;
   createRecipeForm: FormGroup;
+  availableMealTypes = ['Breakfast', 'Lunch', 'Dinner'];
   private readonly destroySubject = new Subject<void>();
 
   constructor(
@@ -39,6 +40,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
       description: ['', [Validators.required, Validators.minLength(10)]],
       tags: [''],
       cookbookId: [''],
+      mealTypes: this.formBuilder.array([]),
       ingredients: this.formBuilder.array([]),
       recipeSteps: this.formBuilder.array([])
     });
@@ -64,6 +66,10 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   get recipeStepsFormArray(): FormArray {
     return this.createRecipeForm.get('recipeSteps') as FormArray;
+  }
+
+  get mealTypesFormArray(): FormArray {
+    return this.createRecipeForm.get('mealTypes') as FormArray;
   }
 
   loadAllRecipes(): void {
@@ -139,6 +145,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.resetCreateRecipeForm();
     this.addEmptyIngredient();
     this.addEmptyRecipeStep();
+    this.initializeMealTypes();
     this.showBootstrapModal();
   }
 
@@ -146,6 +153,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.createRecipeForm.reset();
     this.ingredientsFormArray.clear();
     this.recipeStepsFormArray.clear();
+    this.mealTypesFormArray.clear();
   }
 
   private showBootstrapModal(): void {
@@ -200,6 +208,22 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  initializeMealTypes(): void {
+    this.mealTypesFormArray.clear();
+    this.availableMealTypes.forEach(mealType => {
+      this.mealTypesFormArray.push(this.formBuilder.control(false));
+    });
+  }
+
+  toggleMealType(index: number): void {
+    const control = this.mealTypesFormArray.at(index);
+    control.setValue(!control.value);
+  }
+
+  isMealTypeSelected(index: number): boolean {
+    return this.mealTypesFormArray.at(index).value;
+  }
+
   submitCreateRecipeForm(): void {
     if (this.createRecipeForm.valid) {
       this.isCreatingRecipe = true;
@@ -227,6 +251,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   private buildCreateRecipeRequest(formData: any): CreateRecipeRequest {
     const tags = this.parseTagsFromString(formData.tags);
     const ingredients = this.transformFormIngredientsToModel(formData.ingredients);
+    const mealTypes = this.getSelectedMealTypes();
 
     return {
       title: formData.title,
@@ -234,8 +259,19 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
       tags: tags,
       ingredients: ingredients,
       recipe: formData.recipeSteps,
-      cookbookId: formData.cookbookId || undefined
+      cookbookId: formData.cookbookId || undefined,
+      mealTypes: mealTypes
     };
+  }
+
+  private getSelectedMealTypes(): string[] {
+    const selectedMealTypes: string[] = [];
+    this.mealTypesFormArray.controls.forEach((control, index) => {
+      if (control.value) {
+        selectedMealTypes.push(this.availableMealTypes[index]);
+      }
+    });
+    return selectedMealTypes;
   }
 
   private parseTagsFromString(tagsString: string): string[] {

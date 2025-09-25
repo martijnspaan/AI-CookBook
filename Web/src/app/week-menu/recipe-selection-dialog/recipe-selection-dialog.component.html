@@ -24,6 +24,24 @@
         Choose a recipe for {{ selectedMealType }} on {{ getDateDisplayString() }}
       </p>
 
+      <!-- Current Recipe Section -->
+      <div *ngIf="currentRecipe" class="current-recipe-section mb-4">
+        <div class="alert alert-info">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="alert-heading mb-1">Current Recipe</h6>
+              <p class="mb-0">{{ currentRecipe.title }}</p>
+            </div>
+            <button 
+              type="button" 
+              class="btn btn-outline-danger btn-sm"
+              (click)="removeRecipe()">
+              <i class="bi bi-trash"></i> Remove
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Loading State -->
       <div *ngIf="isLoadingRecipes" class="text-center py-4">
         <div class="spinner-border text-primary" role="status">

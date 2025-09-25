@@ -27,6 +27,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
   errorMessage: string | null = null;
   isEditingMode = false;
   editedRecipe: Recipe | null = null;
+  availableMealTypes = ['Breakfast', 'Lunch', 'Dinner'];
   private readonly destroySubject = new Subject<void>();
 
 
@@ -40,7 +41,6 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
   ) { }
 
   ngOnInit(): void {
-    this.setupFooterButtons();
     this.loadAllCookbooks();
     
     const recipeId = this.activatedRoute.snapshot.paramMap.get('id');
@@ -86,9 +86,10 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         next: (recipe) => {
           this.recipe = recipe;
           this.editedRecipe = { ...recipe };
-          // Use setTimeout to defer page title setting to next change detection cycle
+          // Use setTimeout to defer page title and footer setup to next change detection cycle
           setTimeout(() => {
             this.pageTitleService.setPageTitle(recipe.title);
+            this.setupFooterButtons();
           }, 0);
           this.isLoadingRecipe = false;
         },
@@ -166,7 +167,8 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
       tags: this.editedRecipe.tags,
       ingredients: this.editedRecipe.ingredients,
       recipe: this.editedRecipe.recipe,
-      cookbookId: this.editedRecipe.cookbookId
+      cookbookId: this.editedRecipe.cookbookId,
+      mealTypes: this.editedRecipe.mealTypes
     };
 
     this.recipeService.updateExistingRecipe(this.recipe.id, updateRequest)
@@ -222,6 +224,22 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
   removeIngredientAtIndex(index: number): void {
     if (!this.editedRecipe || this.editedRecipe.ingredients.length <= 1) return;
     this.editedRecipe.ingredients.splice(index, 1);
+  }
+
+  toggleMealType(mealType: string): void {
+    if (!this.editedRecipe) return;
+    
+    const index = this.editedRecipe.mealTypes.indexOf(mealType);
+    if (index > -1) {
+      this.editedRecipe.mealTypes.splice(index, 1);
+    } else {
+      this.editedRecipe.mealTypes.push(mealType);
+    }
+  }
+
+  isMealTypeSelected(mealType: string): boolean {
+    if (!this.editedRecipe) return false;
+    return this.editedRecipe.mealTypes.includes(mealType);
   }
 
   getCookbookTitle(cookbookId?: string): string {

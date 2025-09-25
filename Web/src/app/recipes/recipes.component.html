@@ -40,6 +40,11 @@
                     <strong>{{ getCookbookTitle(recipe.cookbookId) }}</strong>
                   </span>
                 </p>
+                <div class="meal-types-container mb-2" *ngIf="recipe.mealTypes && recipe.mealTypes.length > 0">
+                  <span *ngFor="let mealType of recipe.mealTypes" class="badge bg-primary me-1 mb-1">
+                    {{ mealType }}
+                  </span>
+                </div>
                 <div class="tags-container">
                   <span *ngFor="let tag of recipe.tags" class="badge bg-secondary me-1 mb-1">
                     {{ tag }}
@@ -58,6 +63,7 @@
                 <th scope="col">Title</th>
                 <th scope="col">Description</th>
                 <th scope="col">Cookbook</th>
+                <th scope="col">Meal Types</th>
                 <th scope="col">Tags</th>
                 <th scope="col">Actions</th>
               </tr>
@@ -76,6 +82,14 @@
                     <strong>{{ getCookbookTitle(recipe.cookbookId) }}</strong>
                   </span>
                   <span *ngIf="!recipe.cookbookId" class="text-muted">—</span>
+                </td>
+                <td>
+                  <div class="d-flex flex-wrap gap-1">
+                    <span *ngFor="let mealType of recipe.mealTypes" class="badge bg-primary">
+                      {{ mealType }}
+                    </span>
+                    <span *ngIf="!recipe.mealTypes || recipe.mealTypes.length === 0" class="text-muted">—</span>
+                  </div>
                 </td>
                 <td>
                   <div class="d-flex flex-wrap gap-1">
@@ -140,6 +154,25 @@
                 <option value="">No cookbook selected</option>
                 <option *ngFor="let cookbook of cookbooks" [value]="cookbook.id">{{ cookbook.title }}</option>
               </select>
+            </div>
+            
+            <div class="mb-3">
+              <label class="form-label">Meal Types</label>
+              <div formArrayName="mealTypes">
+                <div class="d-flex flex-wrap gap-3">
+                  <div *ngFor="let mealType of availableMealTypes; let i = index" class="form-check">
+                    <input 
+                      class="form-check-input" 
+                      type="checkbox" 
+                      [id]="'createMealType-' + mealType"
+                      [formControlName]="i"
+                      (change)="toggleMealType(i)">
+                    <label class="form-check-label" [for]="'createMealType-' + mealType">
+                      {{ mealType }}
+                    </label>
+                  </div>
+                </div>
+              </div>
             </div>
             
             <div class="mb-3">
