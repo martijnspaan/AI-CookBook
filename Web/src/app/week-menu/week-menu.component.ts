@@ -5,7 +5,9 @@ import { RecipeSelectionDialogComponent } from './recipe-selection-dialog/recipe
 import { Recipe } from '../models/recipe.model';
 import { PageTitleService } from '../services/page-title.service';
 import { WeekMenuService } from '../services/week-menu.service';
+import { RecipeService } from '../services/recipe.service';
 import { WeekMenu, WeekDay, CreateOrUpdateWeekMenuRequest } from '../models/week-menu.model';
+import { forkJoin, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-week-menu',
@@ -26,7 +28,8 @@ export class WeekMenuComponent implements OnInit, AfterViewInit {
 
   constructor(
     private pageTitleService: PageTitleService,
-    private weekMenuService: WeekMenuService
+    private weekMenuService: WeekMenuService,
+    private recipeService: RecipeService
   ) {}
 
   ngOnInit(): void {
@@ -107,27 +110,62 @@ export class WeekMenuComponent implements OnInit, AfterViewInit {
   }
 
   private convertWeekDaysToRecipeAssignments(): void {
-    if (!this.currentWeekMenu) return;
+    if (!this.currentWeekMenu) {
+      console.log('No current week menu found');
+      return;
+    }
+    
+    console.log('=== DEBUG: convertWeekDaysToRecipeAssignments ===');
+    console.log('Current week menu:', this.currentWeekMenu);
+    console.log('Selected week:', this.selectedWeek);
     
     this.recipeAssignments = [];
     const startOfWeek = this.getStartOfWeek(this.selectedWeek);
+    console.log('Start of week:', startOfWeek);
+    
+    // Collect all unique recipe IDs to fetch
+    const recipeIdsToFetch = new Set<string>();
+    
+    this.currentWeekMenu.weekDays.forEach(weekDay => {
+      if (weekDay.breakfastRecipeId) recipeIdsToFetch.add(weekDay.breakfastRecipeId);
+      if (weekDay.lunchRecipeId) recipeIdsToFetch.add(weekDay.lunchRecipeId);
+      if (weekDay.dinnerRecipeId) recipeIdsToFetch.add(weekDay.dinnerRecipeId);
+    });
+    
+    console.log('Recipe IDs to fetch:', Array.from(recipeIdsToFetch));
+    
+    // Create temporary assignments with Loading... titles
+    const tempAssignments: RecipeAssignment[] = [];
     
     this.currentWeekMenu.weekDays.forEach(weekDay => {
       const currentDate = new Date(startOfWeek);
-      currentDate.setDate(startOfWeek.getDate() + weekDay.dayOfWeek - 1); // Adjust for Monday start
+      // API uses: 1=Monday, 2=Tuesday, ..., 6=Saturday, 0=Sunday
+      // JavaScript uses: 0=Sunday, 1=Monday, ..., 6=Saturday
+      let dayOffset = weekDay.dayOfWeek;
+      if (weekDay.dayOfWeek === 0) {
+        // Sunday in API (0) should be day 6 in JavaScript week (Sunday)
+        dayOffset = 6;
+      } else {
+        // Monday-Saturday in API (1-6) should be Monday-Saturday in JavaScript (1-6)
+        dayOffset = weekDay.dayOfWeek - 1;
+      }
+      
+      currentDate.setDate(startOfWeek.getDate() + dayOffset);
       const dateString = currentDate.toISOString().split('T')[0];
       
+      console.log(`Processing dayOfWeek: ${weekDay.dayOfWeek}, dayOffset: ${dayOffset}, calculated date: ${dateString}`);
+      
       if (weekDay.breakfastRecipeId) {
-        this.recipeAssignments.push({
+        tempAssignments.push({
           date: dateString,
           mealType: 'breakfast',
           recipeId: weekDay.breakfastRecipeId,
-          recipeTitle: 'Loading...' // We'd need to fetch recipe details for the full title
+          recipeTitle: 'Loading...'
         });
       }
       
       if (weekDay.lunchRecipeId) {
-        this.recipeAssignments.push({
+        tempAssignments.push({
           date: dateString,
           mealType: 'lunch',
           recipeId: weekDay.lunchRecipeId,
@@ -136,7 +174,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit {
       }
       
       if (weekDay.dinnerRecipeId) {
-        this.recipeAssignments.push({
+        tempAssignments.push({
           date: dateString,
           mealType: 'dinner',
           recipeId: weekDay.dinnerRecipeId,
@@ -144,6 +182,19 @@ export class WeekMenuComponent implements OnInit, AfterViewInit {
         });
       }
     });
+    
+    console.log('Created temp assignments:', tempAssignments);
+    
+    // Set temporary assignments immediately to show loading state
+    this.recipeAssignments = tempAssignments;
+    
+    // Fetch recipe details and update titles
+    if (recipeIdsToFetch.size > 0) {
+      console.log('Calling fetchRecipeTitlesAndUpdateAssignments with:', Array.from(recipeIdsToFetch));
+      this.fetchRecipeTitlesAndUpdateAssignments(Array.from(recipeIdsToFetch));
+    } else {
+      console.log('No recipe IDs to fetch');
+    }
   }
 
   private saveWeekMenuToApi(): void {
@@ -231,5 +282,47 @@ export class WeekMenuComponent implements OnInit, AfterViewInit {
     startOfWeek.setDate(diff);
     startOfWeek.setHours(0, 0, 0, 0);
     return startOfWeek;
+  }
+
+  private fetchRecipeTitlesAndUpdateAssignments(recipeIds: string[]): void {
+    console.log('=== DEBUG: fetchRecipeTitlesAndUpdateAssignments ===');
+    console.log('Fetching recipe details for IDs:', recipeIds);
+    
+    // Create observables for each recipe fetch
+    const recipeObservables: Observable<Recipe>[] = recipeIds.map(id => 
+      this.recipeService.getRecipeById(id)
+    );
+    
+    // Fetch all recipes in parallel
+    forkJoin(recipeObservables).subscribe({
+      next: (recipes) => {
+        console.log('Successfully fetched recipes:', recipes);
+        
+        // Create a map of recipe ID to recipe title for quick lookup
+        const recipeTitleMap = new Map<string, string>();
+        recipes.forEach(recipe => {
+          recipeTitleMap.set(recipe.id, recipe.title);
+        });
+        
+        console.log('Recipe title map:', recipeTitleMap);
+        console.log('Before update - assignments:', this.recipeAssignments);
+        
+        // Update the recipe assignments with actual titles
+        this.recipeAssignments = this.recipeAssignments.map(assignment => ({
+          ...assignment,
+          recipeTitle: recipeTitleMap.get(assignment.recipeId) || 'Recipe not found'
+        }));
+        
+        console.log('After update - assignments:', this.recipeAssignments);
+      },
+      error: (error) => {
+        console.error('Error fetching recipe details:', error);
+        // Update assignments to show error state
+        this.recipeAssignments = this.recipeAssignments.map(assignment => ({
+          ...assignment,
+          recipeTitle: 'Error loading recipe'
+        }));
+      }
+    });
   }
 }
