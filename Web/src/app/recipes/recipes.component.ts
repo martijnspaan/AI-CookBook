@@ -6,6 +6,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { RecipeService } from '../services/recipe.service';
 import { Recipe, Ingredient, CreateRecipeRequest } from '../models/recipe.model';
+import { PageTitleService } from '../services/page-title.service';
 
 @Component({
   selector: 'app-recipes',
@@ -25,7 +26,8 @@ export class RecipesComponent implements OnInit, OnDestroy {
   constructor(
     private readonly recipeService: RecipeService,
     private readonly router: Router,
-    private readonly formBuilder: FormBuilder
+    private readonly formBuilder: FormBuilder,
+    private readonly pageTitleService: PageTitleService
   ) {
     this.createRecipeForm = this.formBuilder.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
@@ -37,6 +39,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.pageTitleService.setPageTitle('Recipe Collection');
     this.loadAllRecipes();
   }
 

@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { WeekCalendarComponent, RecipeAssignment } from './week-calendar/week-calendar.component';
 import { RecipeGridComponent } from './recipe-grid/recipe-grid.component';
 import { Recipe } from '../models/recipe.model';
+import { PageTitleService } from '../services/page-title.service';
 
 @Component({
   selector: 'app-week-menu',
@@ -11,12 +12,18 @@ import { Recipe } from '../models/recipe.model';
   templateUrl: './week-menu.component.html',
   styleUrl: './week-menu.component.scss'
 })
-export class WeekMenuComponent {
+export class WeekMenuComponent implements OnInit {
   selectedWeek: Date = new Date();
   selectedMealType: 'breakfast' | 'lunch' | 'dinner' | null = null;
   selectedDate: Date | null = null;
   selectedMealSlot: { mealType: 'breakfast' | 'lunch' | 'dinner'; date: Date } | null = null;
   recipeAssignments: RecipeAssignment[] = [];
+
+  constructor(private pageTitleService: PageTitleService) {}
+
+  ngOnInit(): void {
+    this.pageTitleService.setPageTitle('Create Week Menu');
+  }
 
   onWeekChanged(week: Date) {
     this.selectedWeek = week;

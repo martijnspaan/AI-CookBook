@@ -6,6 +6,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { RecipeService } from '../../services/recipe.service';
 import { Recipe, UpdateRecipeRequest } from '../../models/recipe.model';
+import { PageTitleService } from '../../services/page-title.service';
 
 @Component({
   selector: 'app-recipe-detail',
@@ -26,7 +27,8 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
   constructor(
     private readonly activatedRoute: ActivatedRoute,
     private readonly router: Router,
-    private readonly recipeService: RecipeService
+    private readonly recipeService: RecipeService,
+    private readonly pageTitleService: PageTitleService
   ) { }
 
   ngOnInit(): void {
@@ -53,6 +55,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
         next: (recipe) => {
           this.recipe = recipe;
           this.editedRecipe = { ...recipe };
+          this.pageTitleService.setPageTitle(recipe.title);
           this.isLoadingRecipe = false;
         },
         error: (error) => {

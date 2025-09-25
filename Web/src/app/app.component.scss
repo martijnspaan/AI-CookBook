@@ -1,0 +1,32 @@
+.navbar-brand {
+  font-size: 1.25rem;
+  font-weight: 600;
+  
+  @media (max-width: 400px) {
+    font-size: 1rem;
+  }
+}
+
+.navbar {
+  min-height: 56px;
+  
+  @media (max-width: 400px) {
+    min-height: 48px;
+    padding: 0.5rem 1rem;
+  }
+}
+
+.container-fluid {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+main.container-fluid {
+  padding-left: 1rem;
+  padding-right: 1rem;
+  
+  @media (max-width: 400px) {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
+}
