@@ -24,6 +24,53 @@
         Choose a recipe for {{ selectedMealType }} on {{ getDateDisplayString() }}
       </p>
 
+      <!-- Filter Section -->
+      <div class="filter-section mb-4">
+        <div class="row align-items-end">
+          <div class="col-md-4 mb-2">
+            <label for="mealTypeFilter" class="form-label">Meal Type</label>
+            <select 
+              id="mealTypeFilter"
+              class="form-select" 
+              [(ngModel)]="selectedMealTypeFilter"
+              (ngModelChange)="onMealTypeFilterChange()">
+              <option value="">All Types</option>
+              <option *ngFor="let mealType of availableMealTypes" [value]="mealType">
+                {{ mealType | titlecase }}
+              </option>
+            </select>
+          </div>
+          <div class="col-md-4 mb-2">
+            <label for="cookbookFilter" class="form-label">Cookbook</label>
+            <select 
+              id="cookbookFilter"
+              class="form-select" 
+              [(ngModel)]="selectedCookbookFilter"
+              (ngModelChange)="onCookbookFilterChange()"
+              [disabled]="isLoadingCookbooks">
+              <option value="">All Cookbooks</option>
+              <option *ngFor="let cookbook of cookbooks" [value]="cookbook.id">
+                {{ cookbook.title }}
+              </option>
+            </select>
+          </div>
+          <div class="col-md-4 mb-2">
+            <div class="d-flex gap-2 align-items-center">
+              <button 
+                type="button" 
+                class="btn btn-outline-secondary btn-sm"
+                (click)="clearFilters()"
+                [disabled]="!selectedMealTypeFilter && !selectedCookbookFilter">
+                <i class="bi bi-x-circle"></i> Clear
+              </button>
+              <span class="text-muted small" *ngIf="filteredRecipes.length !== allRecipes.length">
+                {{ filteredRecipes.length }}/{{ allRecipes.length }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Current Recipe Section -->
       <div *ngIf="currentRecipe" class="current-recipe-section mb-4">
         <div class="alert alert-info">
