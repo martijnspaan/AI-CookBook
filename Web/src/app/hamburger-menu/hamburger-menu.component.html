@@ -1,0 +1,42 @@
+<div class="hamburger-menu">
+  <!-- Hamburger Button -->
+  <button 
+    class="hamburger-button" 
+    type="button" 
+    (click)="toggleMenu()"
+    [class.active]="isMenuOpen"
+    aria-label="Toggle navigation menu">
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+    <span class="hamburger-line"></span>
+  </button>
+
+  <!-- Menu Overlay -->
+  <div 
+    class="menu-overlay" 
+    [class.show]="isMenuOpen"
+    (click)="closeMenu()">
+  </div>
+
+  <!-- Menu Items -->
+  <div class="menu-items" [class.show]="isMenuOpen">
+    <div class="menu-content">
+      <a 
+        class="menu-item" 
+        routerLink="/recipes" 
+        (click)="closeMenu()"
+        routerLinkActive="active">
+        <i class="fas fa-utensils me-2"></i>
+        All Recipes
+      </a>
+      <a 
+        class="menu-item" 
+        routerLink="/grocery-list" 
+        (click)="closeMenu()"
+        routerLinkActive="active">
+        <i class="fas fa-shopping-cart me-2"></i>
+        Grocery List
+      </a>
+    </div>
+  </div>
+</div>
