@@ -7,6 +7,7 @@ import { takeUntil } from 'rxjs/operators';
 import { RecipeService } from '../../services/recipe.service';
 import { Recipe, UpdateRecipeRequest } from '../../models/recipe.model';
 import { PageTitleService } from '../../services/page-title.service';
+import { FooterService } from '../../services/footer.service';
 
 @Component({
   selector: 'app-recipe-detail',
@@ -24,14 +25,18 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
   editedRecipe: Recipe | null = null;
   private readonly destroySubject = new Subject<void>();
 
+
   constructor(
     private readonly activatedRoute: ActivatedRoute,
     private readonly router: Router,
     private readonly recipeService: RecipeService,
-    private readonly pageTitleService: PageTitleService
+    private readonly pageTitleService: PageTitleService,
+    private readonly footerService: FooterService
   ) { }
 
   ngOnInit(): void {
+    this.setupFooterButtons();
+    
     const recipeId = this.activatedRoute.snapshot.paramMap.get('id');
     if (recipeId) {
       this.loadRecipeById(recipeId);
@@ -47,6 +52,22 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnDestroy(): void {
     this.destroySubject.next();
     this.destroySubject.complete();
+    this.footerService.resetFooterConfig();
+  }
+
+  private setupFooterButtons(): void {
+    this.footerService.setFooterConfig({
+      showLeftButton: true,
+      leftButtonText: 'Back to Recipes',
+      leftButtonIcon: 'fas fa-arrow-left',
+      leftButtonClass: 'btn-outline-secondary',
+      leftButtonClickHandler: () => this.navigateBackToRecipesList(),
+      showRightButton: true,
+      rightButtonText: 'Edit Recipe',
+      rightButtonIcon: 'fas fa-edit',
+      rightButtonClass: 'btn-primary',
+      rightButtonClickHandler: () => this.onRightButtonClick()
+    });
   }
 
   private loadRecipeById(recipeId: string): void {
@@ -75,12 +96,38 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
 
   enableEditingMode(): void {
     this.isEditingMode = true;
+    this.updateFooterButtons();
   }
 
   cancelEditingMode(): void {
     this.isEditingMode = false;
     if (this.recipe) {
       this.editedRecipe = { ...this.recipe };
+    }
+    this.updateFooterButtons();
+  }
+
+  private updateFooterButtons(): void {
+    if (this.isEditingMode) {
+      this.footerService.setFooterConfig({
+        rightButtonText: 'Save Changes',
+        rightButtonIcon: 'fas fa-save',
+        rightButtonClass: 'btn-success'
+      });
+    } else {
+      this.footerService.setFooterConfig({
+        rightButtonText: 'Edit Recipe',
+        rightButtonIcon: 'fas fa-edit',
+        rightButtonClass: 'btn-primary'
+      });
+    }
+  }
+
+  onRightButtonClick(): void {
+    if (this.isEditingMode) {
+      this.saveRecipeChanges();
+    } else {
+      this.enableEditingMode();
     }
   }
 
@@ -106,6 +153,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
           this.editedRecipe = { ...updatedRecipe };
           this.isEditingMode = false;
           this.isUpdatingRecipe = false;
+          this.updateFooterButtons();
         },
         error: (error) => {
           this.errorMessage = 'Failed to update recipe';

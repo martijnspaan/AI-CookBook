@@ -1,11 +1,13 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HamburgerMenuComponent } from './hamburger-menu/hamburger-menu.component';
 import { FooterComponent } from './footer/footer.component';
 import { PageTitleService } from './services/page-title.service';
 import { CookbookModalService } from './services/cookbook-modal.service';
-import { filter } from 'rxjs/operators';
+import { FooterService, FooterButtonConfig } from './services/footer.service';
+import { filter, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -14,10 +16,25 @@ import { filter } from 'rxjs/operators';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   readonly applicationTitle = 'AI Cookbook';
   currentPageTitle = 'AI Cookbook';
+  private readonly destroySubject = new Subject<void>();
   
+  // Footer button configuration
+  showLeftButton = false;
+  leftButtonText = '';
+  leftButtonIcon = '';
+  leftButtonClass = 'btn-outline-secondary';
+  private leftButtonClickHandler: (() => void) | null = null;
+
+  showRightButton = false;
+  rightButtonText = '';
+  rightButtonIcon = '';
+  rightButtonClass = 'btn-primary';
+  private rightButtonClickHandler: (() => void) | null = null;
+
+  // Legacy single button support (deprecated)
   showFooterButton = false;
   footerButtonText = '';
   footerButtonIcon = '';
@@ -27,7 +44,8 @@ export class AppComponent implements OnInit {
   constructor(
     private pageTitleService: PageTitleService,
     private router: Router,
-    private cookbookModalService: CookbookModalService
+    private cookbookModalService: CookbookModalService,
+    private footerService: FooterService
   ) {}
 
   ngOnInit(): void {
@@ -44,42 +62,102 @@ export class AppComponent implements OnInit {
         this.updateFooterForCurrentRoute();
       });
     
+    // Subscribe to footer service changes
+    this.footerService.footerConfig$
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe(config => {
+        this.updateFooterFromService(config);
+      });
+    
     this.updateFooterForCurrentRoute();
+  }
+
+  ngOnDestroy(): void {
+    this.destroySubject.next();
+    this.destroySubject.complete();
   }
   
   private updateFooterForCurrentRoute(): void {
     const currentUrl = this.router.url;
     
-    if (currentUrl === '/recipes') {
-      this.showFooterButton = true;
-      this.footerButtonText = 'Create New Recipe';
-      this.footerButtonIcon = 'fas fa-plus';
-      this.footerButtonClass = 'btn-primary';
-      this.footerButtonClickHandler = () => this.openCreateRecipeModal();
-    } else if (currentUrl === '/week-menu') {
-      this.showFooterButton = true;
-      this.footerButtonText = 'Create Groceries List';
-      this.footerButtonIcon = 'fas fa-shopping-cart';
-      this.footerButtonClass = 'btn-success';
-      this.footerButtonClickHandler = () => this.createGroceriesList();
-    } else if (currentUrl === '/cookbooks') {
-      this.showFooterButton = true;
-      this.footerButtonText = 'Create New Cookbook';
-      this.footerButtonIcon = 'fas fa-plus';
-      this.footerButtonClass = 'btn-primary';
-      this.footerButtonClickHandler = () => this.openCreateCookbookModal();
-    } else {
-      this.showFooterButton = false;
-      this.footerButtonText = '';
-      this.footerButtonIcon = '';
-      this.footerButtonClass = 'btn-primary';
-      this.footerButtonClickHandler = null;
+    // Only update footer for non-recipe-detail pages
+    if (!currentUrl.startsWith('/recipes/')) {
+      // Reset all button configurations
+      this.resetFooterButtons();
+      
+      if (currentUrl === '/recipes') {
+        this.showRightButton = true;
+        this.rightButtonText = 'Create New Recipe';
+        this.rightButtonIcon = 'fas fa-plus';
+        this.rightButtonClass = 'btn-primary';
+        this.rightButtonClickHandler = () => this.openCreateRecipeModal();
+      } else if (currentUrl === '/week-menu') {
+        this.showRightButton = true;
+        this.rightButtonText = 'Create Groceries List';
+        this.rightButtonIcon = 'fas fa-shopping-cart';
+        this.rightButtonClass = 'btn-success';
+        this.rightButtonClickHandler = () => this.createGroceriesList();
+      } else if (currentUrl === '/cookbooks') {
+        this.showRightButton = true;
+        this.rightButtonText = 'Create New Cookbook';
+        this.rightButtonIcon = 'fas fa-plus';
+        this.rightButtonClass = 'btn-primary';
+        this.rightButtonClickHandler = () => this.openCreateCookbookModal();
+      }
     }
+  }
+
+  private updateFooterFromService(config: FooterButtonConfig): void {
+    this.showLeftButton = config.showLeftButton;
+    this.leftButtonText = config.leftButtonText;
+    this.leftButtonIcon = config.leftButtonIcon;
+    this.leftButtonClass = config.leftButtonClass;
+    this.leftButtonClickHandler = config.leftButtonClickHandler;
+
+    this.showRightButton = config.showRightButton;
+    this.rightButtonText = config.rightButtonText;
+    this.rightButtonIcon = config.rightButtonIcon;
+    this.rightButtonClass = config.rightButtonClass;
+    this.rightButtonClickHandler = config.rightButtonClickHandler;
+  }
+
+  private resetFooterButtons(): void {
+    // Reset legacy single button
+    this.showFooterButton = false;
+    this.footerButtonText = '';
+    this.footerButtonIcon = '';
+    this.footerButtonClass = 'btn-primary';
+    this.footerButtonClickHandler = null;
+
+    // Reset new dual buttons
+    this.showLeftButton = false;
+    this.leftButtonText = '';
+    this.leftButtonIcon = '';
+    this.leftButtonClass = 'btn-outline-secondary';
+    this.leftButtonClickHandler = null;
+
+    this.showRightButton = false;
+    this.rightButtonText = '';
+    this.rightButtonIcon = '';
+    this.rightButtonClass = 'btn-primary';
+    this.rightButtonClickHandler = null;
   }
   
   onFooterButtonClick(): void {
     if (this.footerButtonClickHandler) {
       this.footerButtonClickHandler();
+    }
+  }
+
+  onLeftButtonClick(): void {
+    if (this.leftButtonClickHandler) {
+      this.leftButtonClickHandler();
+    }
+  }
+
+  onRightButtonClick(): void {
+    if (this.rightButtonClickHandler) {
+      this.rightButtonClickHandler();
     }
   }
   

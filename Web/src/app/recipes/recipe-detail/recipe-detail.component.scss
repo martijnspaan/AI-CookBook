@@ -1,4 +1,22 @@
+.recipe-detail-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.recipe-detail-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
 .recipe-detail {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  
   .recipe-field {
     padding: 0.75rem;
     background-color: #f8f9fa;
@@ -24,6 +42,7 @@
   .card-header {
     background-color: #f8f9fa;
     border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    flex-shrink: 0;
   }
 
   .form-label {

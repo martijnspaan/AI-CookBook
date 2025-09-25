@@ -1,3 +1,17 @@
+.cookbooks-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.cookbooks-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
 // Mobile-specific styles (≤400px)
 @media (max-width: 400px) {
   .cookbook-card {

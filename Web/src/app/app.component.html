@@ -20,6 +20,16 @@
   
   <!-- Fixed Footer -->
   <app-footer 
+    [showLeftButton]="showLeftButton"
+    [leftButtonText]="leftButtonText"
+    [leftButtonIcon]="leftButtonIcon"
+    [leftButtonClass]="leftButtonClass"
+    (leftButtonClick)="onLeftButtonClick()"
+    [showRightButton]="showRightButton"
+    [rightButtonText]="rightButtonText"
+    [rightButtonIcon]="rightButtonIcon"
+    [rightButtonClass]="rightButtonClass"
+    (rightButtonClick)="onRightButtonClick()"
     [showButton]="showFooterButton"
     [buttonText]="footerButtonText"
     [buttonIcon]="footerButtonIcon"

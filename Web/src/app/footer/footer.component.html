@@ -1,15 +1,30 @@
 <footer class="app-footer">
   <div class="container-fluid">
     <div class="row">
-      <div class="col-12 d-flex justify-content-center">
-        <button 
-          *ngIf="showButton"
-          class="btn"
-          [class]="buttonClass"
-          (click)="onButtonClick()">
-          <i *ngIf="buttonIcon" [class]="buttonIcon"></i>
-          {{ buttonText }}
-        </button>
+      <div class="col-12 d-flex justify-content-between align-items-center">
+        <!-- Left Button (Optional) -->
+        <div class="footer-left">
+          <button 
+            *ngIf="showLeftButton"
+            class="btn"
+            [class]="leftButtonClass"
+            (click)="onLeftButtonClick()">
+            <i *ngIf="leftButtonIcon" [class]="leftButtonIcon"></i>
+            {{ leftButtonText }}
+          </button>
+        </div>
+        
+        <!-- Right Button (Action) -->
+        <div class="footer-right">
+          <button 
+            *ngIf="showRightButton"
+            class="btn"
+            [class]="rightButtonClass"
+            (click)="onRightButtonClick()">
+            <i *ngIf="rightButtonIcon" [class]="rightButtonIcon"></i>
+            {{ rightButtonText }}
+          </button>
+        </div>
       </div>
     </div>
   </div>

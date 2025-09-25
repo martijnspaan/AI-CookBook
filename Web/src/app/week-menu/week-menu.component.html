@@ -1,30 +1,34 @@
-<!-- Saving Indicator -->
-<div *ngIf="isSaving" class="saving-indicator">
-  <i class="fas fa-spinner fa-spin"></i>
-  <span>Saving week menu...</span>
+<div class="week-menu-container">
+  <div class="week-menu-content">
+    <!-- Saving Indicator -->
+    <div *ngIf="isSaving" class="saving-indicator">
+      <i class="fas fa-spinner fa-spin"></i>
+      <span>Saving week menu...</span>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div *ngIf="isCalendarLoading" class="loading-indicator">
+      <i class="fas fa-spinner fa-spin"></i>
+      <span>Loading calendar...</span>
+    </div>
+
+    <!-- Week Calendar -->
+    <app-week-calendar 
+      *ngIf="!isCalendarLoading"
+      [selectedWeek]="selectedWeek"
+      [recipeAssignments]="recipeAssignments"
+      [selectedMealSlot]="selectedMealSlot"
+      (weekChanged)="onWeekChanged($event)"
+      (mealSlotClicked)="onMealSlotClicked($event.mealType, $event.date)">
+    </app-week-calendar>
+
+    <!-- Recipe Selection Dialog -->
+    <app-recipe-selection-dialog
+      [isVisible]="showRecipeDialog"
+      [selectedMealType]="selectedMealType"
+      [selectedDate]="selectedDate"
+      (recipeSelected)="onRecipeSelected($event)"
+      (dialogClosed)="onDialogClosed()">
+    </app-recipe-selection-dialog>
+  </div>
 </div>
-
-<!-- Loading Indicator -->
-<div *ngIf="isCalendarLoading" class="loading-indicator">
-  <i class="fas fa-spinner fa-spin"></i>
-  <span>Loading calendar...</span>
-</div>
-
-<!-- Week Calendar - Full Screen -->
-<app-week-calendar 
-  *ngIf="!isCalendarLoading"
-  [selectedWeek]="selectedWeek"
-  [recipeAssignments]="recipeAssignments"
-  [selectedMealSlot]="selectedMealSlot"
-  (weekChanged)="onWeekChanged($event)"
-  (mealSlotClicked)="onMealSlotClicked($event.mealType, $event.date)">
-</app-week-calendar>
-
-<!-- Recipe Selection Dialog -->
-<app-recipe-selection-dialog
-  [isVisible]="showRecipeDialog"
-  [selectedMealType]="selectedMealType"
-  [selectedDate]="selectedDate"
-  (recipeSelected)="onRecipeSelected($event)"
-  (dialogClosed)="onDialogClosed()">
-</app-recipe-selection-dialog>
