@@ -5,7 +5,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { RecipeService } from '../../services/recipe.service';
+import { CookbookService } from '../../services/cookbook.service';
 import { Recipe, UpdateRecipeRequest } from '../../models/recipe.model';
+import { Cookbook } from '../../models/cookbook.model';
 import { PageTitleService } from '../../services/page-title.service';
 import { FooterService } from '../../services/footer.service';
 
@@ -18,7 +20,9 @@ import { FooterService } from '../../services/footer.service';
 })
 export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
   recipe: Recipe | null = null;
+  cookbooks: Cookbook[] = [];
   isLoadingRecipe = false;
+  isLoadingCookbooks = false;
   isUpdatingRecipe = false;
   errorMessage: string | null = null;
   isEditingMode = false;
@@ -30,12 +34,14 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     private readonly activatedRoute: ActivatedRoute,
     private readonly router: Router,
     private readonly recipeService: RecipeService,
+    private readonly cookbookService: CookbookService,
     private readonly pageTitleService: PageTitleService,
     private readonly footerService: FooterService
   ) { }
 
   ngOnInit(): void {
     this.setupFooterButtons();
+    this.loadAllCookbooks();
     
     const recipeId = this.activatedRoute.snapshot.paramMap.get('id');
     if (recipeId) {
@@ -94,6 +100,23 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
       });
   }
 
+  loadAllCookbooks(): void {
+    this.isLoadingCookbooks = true;
+    
+    this.cookbookService.getAllCookbooks()
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe({
+        next: (cookbooks) => {
+          this.cookbooks = cookbooks;
+          this.isLoadingCookbooks = false;
+        },
+        error: (error) => {
+          this.isLoadingCookbooks = false;
+          console.error('Error loading cookbooks:', error);
+        }
+      });
+  }
+
   enableEditingMode(): void {
     this.isEditingMode = true;
     this.updateFooterButtons();
@@ -142,7 +165,8 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
       description: this.editedRecipe.description,
       tags: this.editedRecipe.tags,
       ingredients: this.editedRecipe.ingredients,
-      recipe: this.editedRecipe.recipe
+      recipe: this.editedRecipe.recipe,
+      cookbookId: this.editedRecipe.cookbookId
     };
 
     this.recipeService.updateExistingRecipe(this.recipe.id, updateRequest)
@@ -181,6 +205,12 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
   removeRecipeStepAtIndex(index: number): void {
     if (!this.editedRecipe || this.editedRecipe.recipe.length <= 1) return;
     this.editedRecipe.recipe.splice(index, 1);
+  }
+
+  getCookbookTitle(cookbookId?: string): string {
+    if (!cookbookId) return 'No cookbook';
+    const cookbook = this.cookbooks.find(cb => cb.id === cookbookId);
+    return cookbook ? cookbook.title : 'Unknown cookbook';
   }
 
   navigateBackToRecipesList(): void {

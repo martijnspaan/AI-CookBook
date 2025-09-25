@@ -5,7 +5,9 @@ import { FormBuilder, FormGroup, FormArray, FormControl, Validators, ReactiveFor
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { RecipeService } from '../services/recipe.service';
+import { CookbookService } from '../services/cookbook.service';
 import { Recipe, Ingredient, CreateRecipeRequest } from '../models/recipe.model';
+import { Cookbook } from '../models/cookbook.model';
 import { PageTitleService } from '../services/page-title.service';
 
 @Component({
@@ -17,7 +19,9 @@ import { PageTitleService } from '../services/page-title.service';
 })
 export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   recipes: Recipe[] = [];
+  cookbooks: Cookbook[] = [];
   isLoadingRecipes = false;
+  isLoadingCookbooks = false;
   isCreatingRecipe = false;
   errorMessage: string | null = null;
   createRecipeForm: FormGroup;
@@ -25,6 +29,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   constructor(
     private readonly recipeService: RecipeService,
+    private readonly cookbookService: CookbookService,
     private readonly router: Router,
     private readonly formBuilder: FormBuilder,
     private readonly pageTitleService: PageTitleService
@@ -33,6 +38,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
       title: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.minLength(10)]],
       tags: [''],
+      cookbookId: [''],
       ingredients: this.formBuilder.array([]),
       recipeSteps: this.formBuilder.array([])
     });
@@ -40,6 +46,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnInit(): void {
     this.loadAllRecipes();
+    this.loadAllCookbooks();
   }
 
   ngAfterViewInit(): void {
@@ -78,8 +85,31 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
       });
   }
 
+  loadAllCookbooks(): void {
+    this.isLoadingCookbooks = true;
+    
+    this.cookbookService.getAllCookbooks()
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe({
+        next: (cookbooks) => {
+          this.cookbooks = cookbooks;
+          this.isLoadingCookbooks = false;
+        },
+        error: (error) => {
+          this.isLoadingCookbooks = false;
+          console.error('Error loading cookbooks:', error);
+        }
+      });
+  }
+
   getTagsAsCommaSeparatedString(tags: string[]): string {
     return tags.join(', ');
+  }
+
+  getCookbookTitle(cookbookId?: string): string {
+    if (!cookbookId) return 'No cookbook';
+    const cookbook = this.cookbooks.find(cb => cb.id === cookbookId);
+    return cookbook ? cookbook.title : 'Unknown cookbook';
   }
 
   navigateToRecipeDetails(recipe: Recipe): void {
@@ -203,7 +233,8 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
       description: formData.description,
       tags: tags,
       ingredients: ingredients,
-      recipe: formData.recipeSteps
+      recipe: formData.recipeSteps,
+      cookbookId: formData.cookbookId || undefined
     };
   }
 

@@ -22,6 +22,7 @@ public class UpdateRecipeUseCase(ICosmosDbRepository<RecipeEntity> repository)
             existingRecipe.Tags = input.Tags;
             existingRecipe.Ingredients = input.Ingredients;
             existingRecipe.Recipe = input.Recipe;
+            existingRecipe.CookbookId = input.CookbookId;
             existingRecipe.UpdateTimestamp();
             
             RecipeEntity updatedRecipe = await repository.UpdateAsync(existingRecipe);

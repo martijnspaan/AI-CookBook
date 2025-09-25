@@ -49,17 +49,25 @@ export class AppComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.pageTitleService.pageTitle$.subscribe(title => {
-      // Use setTimeout to defer the update to the next change detection cycle
-      setTimeout(() => {
-        this.currentPageTitle = title;
-      }, 0);
-    });
+    this.pageTitleService.pageTitle$
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe(title => {
+        // Use setTimeout to defer the update to the next change detection cycle
+        setTimeout(() => {
+          this.currentPageTitle = title;
+        }, 0);
+      });
     
     this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
+      .pipe(
+        filter(event => event instanceof NavigationEnd),
+        takeUntil(this.destroySubject)
+      )
       .subscribe(() => {
-        this.updateFooterForCurrentRoute();
+        // Defer footer update to avoid change detection issues
+        setTimeout(() => {
+          this.updateFooterForCurrentRoute();
+        }, 0);
       });
     
     // Subscribe to footer service changes
@@ -69,7 +77,10 @@ export class AppComponent implements OnInit, OnDestroy {
         this.updateFooterFromService(config);
       });
     
-    this.updateFooterForCurrentRoute();
+    // Defer initial footer update to avoid change detection issues
+    setTimeout(() => {
+      this.updateFooterForCurrentRoute();
+    }, 0);
   }
 
   ngOnDestroy(): void {

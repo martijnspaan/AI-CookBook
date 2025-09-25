@@ -34,6 +34,12 @@
                   </button>
                 </div>
                 <p class="card-text text-muted small">{{ recipe.description }}</p>
+                <p class="card-text small" *ngIf="recipe.cookbookId">
+                  <span class="cookbook-label">
+                    <i class="fas fa-book me-1"></i>
+                    <strong>{{ getCookbookTitle(recipe.cookbookId) }}</strong>
+                  </span>
+                </p>
                 <div class="tags-container">
                   <span *ngFor="let tag of recipe.tags" class="badge bg-secondary me-1 mb-1">
                     {{ tag }}
@@ -51,6 +57,7 @@
               <tr>
                 <th scope="col">Title</th>
                 <th scope="col">Description</th>
+                <th scope="col">Cookbook</th>
                 <th scope="col">Tags</th>
                 <th scope="col">Actions</th>
               </tr>
@@ -62,6 +69,13 @@
                 </td>
                 <td>
                   <span class="text-muted">{{ recipe.description }}</span>
+                </td>
+                <td>
+                  <span *ngIf="recipe.cookbookId" class="cookbook-label">
+                    <i class="fas fa-book me-1"></i>
+                    <strong>{{ getCookbookTitle(recipe.cookbookId) }}</strong>
+                  </span>
+                  <span *ngIf="!recipe.cookbookId" class="text-muted">—</span>
                 </td>
                 <td>
                   <div class="d-flex flex-wrap gap-1">
@@ -118,6 +132,14 @@
             <div class="mb-3">
               <label for="tags" class="form-label">Tags (comma-separated)</label>
               <input type="text" class="form-control" id="tags" formControlName="tags" placeholder="e.g., breakfast, healthy, quick">
+            </div>
+            
+            <div class="mb-3">
+              <label for="cookbookId" class="form-label">Cookbook (optional)</label>
+              <select class="form-select" id="cookbookId" formControlName="cookbookId">
+                <option value="">No cookbook selected</option>
+                <option *ngFor="let cookbook of cookbooks" [value]="cookbook.id">{{ cookbook.title }}</option>
+              </select>
             </div>
             
             <div class="mb-3">

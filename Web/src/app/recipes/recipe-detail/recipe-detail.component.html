@@ -19,24 +19,20 @@
 
       <!-- Recipe Details -->
       <div *ngIf="!isLoadingRecipe && !errorMessage && recipe" class="recipe-detail">
-        <div class="card flex-card">
-          <div class="card-body">
-            <!-- Title -->
-            <div class="mb-4">
+        <div class="recipe-content-wrapper">
+          <div class="recipe-body">
+            <!-- Title (only shown when editing) -->
+            <div class="mb-2" *ngIf="isEditingMode">
               <label class="form-label fw-bold">Title</label>
               <input 
-                *ngIf="isEditingMode" 
                 type="text" 
                 class="form-control" 
                 [(ngModel)]="editedRecipe!.title"
                 placeholder="Recipe title">
-              <div *ngIf="!isEditingMode" class="recipe-field">
-                {{ recipe.title }}
-              </div>
             </div>
 
             <!-- Description -->
-            <div class="mb-4">
+            <div class="mb-2">
               <label class="form-label fw-bold">Description</label>
               <textarea 
                 *ngIf="isEditingMode" 
@@ -49,8 +45,22 @@
               </div>
             </div>
 
+            <!-- Cookbook -->
+            <div class="mb-2">
+              <label class="form-label fw-bold">Cookbook</label>
+              <div *ngIf="isEditingMode">
+                <select class="form-select" [(ngModel)]="editedRecipe!.cookbookId">
+                  <option value="">No cookbook selected</option>
+                  <option *ngFor="let cookbook of cookbooks" [value]="cookbook.id">{{ cookbook.title }}</option>
+                </select>
+              </div>
+              <div *ngIf="!isEditingMode" class="recipe-field">
+                {{ getCookbookTitle(recipe.cookbookId) }}
+              </div>
+            </div>
+
             <!-- Tags -->
-            <div class="mb-4">
+            <div class="mb-2">
               <label class="form-label fw-bold">Tags</label>
               <div *ngIf="isEditingMode">
                 <div class="d-flex flex-wrap gap-2 mb-2">
@@ -80,7 +90,7 @@
             </div>
 
             <!-- Recipe Content -->
-            <div class="mb-4">
+            <div class="mb-2">
               <label class="form-label fw-bold">Recipe</label>
               <div *ngIf="isEditingMode">
                 <div class="d-flex flex-column gap-2 mb-2">
