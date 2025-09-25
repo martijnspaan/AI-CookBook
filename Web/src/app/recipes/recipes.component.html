@@ -121,8 +121,8 @@
             <div class="mb-3">
               <label class="form-label fw-bold">Tags</label>
               <div formArrayName="tags">
-                <div class="d-flex flex-wrap gap-2 mb-2">
-                  <div *ngFor="let tag of tagsFormArray.controls; let i = index" class="input-group" style="width: auto;">
+                <div class="tags-container">
+                  <div *ngFor="let tag of tagsFormArray.controls; let i = index" class="tag-input-group">
                     <input 
                       type="text" 
                       class="form-control" 
@@ -150,7 +150,7 @@
             <div class="mb-3" *ngIf="mealTypesFormArray.controls.length > 0">
               <label class="form-label fw-bold">Meal Types</label>
               <div formArrayName="mealTypes">
-                <div class="d-flex flex-wrap gap-3">
+                <div class="meal-types-container">
                   <div *ngFor="let mealType of availableMealTypes; let i = index" class="form-check">
                     <input 
                       class="form-check-input" 
@@ -242,9 +242,9 @@
             <div class="mb-3">
               <label class="form-label fw-bold">Recipe</label>
               <div formArrayName="recipeSteps">
-                <div class="d-flex flex-column gap-2 mb-2">
-                  <div *ngFor="let step of recipeStepsFormArray.controls; let i = index" class="input-group">
-                    <span class="input-group-text">{{ i + 1 }}.</span>
+                <div class="recipe-steps-container">
+                  <div *ngFor="let step of recipeStepsFormArray.controls; let i = index" class="recipe-step-input-group">
+                    <span class="step-number">{{ i + 1 }}.</span>
                     <input 
                       type="text" 
                       class="form-control" 

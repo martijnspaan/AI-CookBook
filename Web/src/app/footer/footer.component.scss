@@ -9,6 +9,18 @@
   right: 0;
   z-index: 1000;
   
+  .footer-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 1.5rem;
+    
+    @media (max-width: 400px) {
+      padding: 0 1rem;
+    }
+  }
+  
   .footer-left {
     flex: 0 0 auto;
   }

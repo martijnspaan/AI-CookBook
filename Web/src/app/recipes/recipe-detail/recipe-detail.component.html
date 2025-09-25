@@ -102,8 +102,8 @@
             <div class="mb-2">
               <label class="form-label fw-bold">Tags</label>
               <div *ngIf="isEditingMode">
-                <div class="d-flex flex-wrap gap-2 mb-2">
-                  <div *ngFor="let tag of editedRecipe!.tags; let i = index; trackBy: trackByIndex" class="input-group" style="width: auto;">
+                <div class="tags-container">
+                  <div *ngFor="let tag of editedRecipe!.tags; let i = index; trackBy: trackByIndex" class="tag-input-group">
                     <input 
                       type="text" 
                       class="form-control" 
@@ -226,9 +226,9 @@
             <div class="mb-2">
               <label class="form-label fw-bold">Recipe</label>
               <div *ngIf="isEditingMode">
-                <div class="d-flex flex-column gap-2 mb-2">
-                  <div *ngFor="let step of editedRecipe!.recipe; let i = index; trackBy: trackByIndex" class="input-group">
-                    <span class="input-group-text">{{ i + 1 }}.</span>
+                <div class="recipe-steps-container">
+                  <div *ngFor="let step of editedRecipe!.recipe; let i = index; trackBy: trackByIndex" class="recipe-step-input-group">
+                    <span class="step-number">{{ i + 1 }}.</span>
                     <input 
                       type="text" 
                       class="form-control" 

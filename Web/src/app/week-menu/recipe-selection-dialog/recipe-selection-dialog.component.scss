@@ -227,8 +227,8 @@
 }
 
 .recipes-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
   max-height: 400px;
   overflow-y: auto;
@@ -242,6 +242,8 @@
   cursor: pointer;
   transition: all 0.2s ease;
   min-height: 80px;
+  flex: 1 1 200px;
+  max-width: 300px;
 
   &:hover {
     background: #e9ecef;
@@ -351,7 +353,7 @@
   }
 
   .recipes-grid {
-    grid-template-columns: 1fr;
+    flex-direction: column;
     gap: 0.75rem;
     max-height: 300px;
   }
@@ -359,6 +361,8 @@
   .recipe-card {
     padding: 0.75rem;
     min-height: 70px;
+    flex: 1 1 100%;
+    max-width: 100%;
   }
 
   .recipe-card-content {
@@ -382,11 +386,12 @@
   }
 
   .recipes-grid {
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 0.75rem;
   }
 
   .recipe-card {
     padding: 0.875rem;
+    flex: 1 1 180px;
+    max-width: 250px;
   }
 }
