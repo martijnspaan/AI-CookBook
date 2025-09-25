@@ -207,10 +207,45 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     this.editedRecipe.recipe.splice(index, 1);
   }
 
+  addEmptyIngredient(): void {
+    if (!this.editedRecipe) return;
+    this.editedRecipe.ingredients.push({
+      name: '',
+      type: '',
+      amount: {
+        value: 0,
+        unit: ''
+      }
+    });
+  }
+
+  removeIngredientAtIndex(index: number): void {
+    if (!this.editedRecipe || this.editedRecipe.ingredients.length <= 1) return;
+    this.editedRecipe.ingredients.splice(index, 1);
+  }
+
   getCookbookTitle(cookbookId?: string): string {
     if (!cookbookId) return 'No cookbook';
     const cookbook = this.cookbooks.find(cb => cb.id === cookbookId);
     return cookbook ? cookbook.title : 'Unknown cookbook';
+  }
+
+  getIngredientsByType(): { type: string; ingredients: any[] }[] {
+    if (!this.recipe || !this.recipe.ingredients) return [];
+    
+    const grouped = this.recipe.ingredients.reduce((groups: { [key: string]: any[] }, ingredient) => {
+      const type = ingredient.type || 'Overig';
+      if (!groups[type]) {
+        groups[type] = [];
+      }
+      groups[type].push(ingredient);
+      return groups;
+    }, {});
+
+    return Object.keys(grouped).map(type => ({
+      type: type,
+      ingredients: grouped[type]
+    }));
   }
 
   navigateBackToRecipesList(): void {

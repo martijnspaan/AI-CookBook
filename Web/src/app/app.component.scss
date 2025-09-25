@@ -13,12 +13,29 @@
   z-index: 1001;
 }
 
-.navbar-brand {
+.navbar h1.navbar-brand {
   font-size: 1.25rem;
   font-weight: 600;
+  margin-top: 0.25rem !important;
+  margin-bottom: 0.25rem !important;
+  padding-top: 0.25rem !important;
+  padding-bottom: 0.25rem !important;
   
   @media (max-width: 400px) {
     font-size: 1rem;
+    margin-top: 0.125rem !important;
+    margin-bottom: 0.125rem !important;
+    padding-top: 0.125rem !important;
+    padding-bottom: 0.125rem !important;
+  }
+}
+
+// Override Bootstrap's mb-0 class specifically
+.navbar h1.navbar-brand.mb-0 {
+  margin-bottom: 0.25rem !important;
+  
+  @media (max-width: 400px) {
+    margin-bottom: 0.125rem !important;
   }
 }
 

@@ -89,6 +89,100 @@
               </div>
             </div>
 
+            <!-- Ingredients -->
+            <div class="mb-2">
+              <label class="form-label fw-bold">Ingredients</label>
+              <div *ngIf="isEditingMode">
+                <div class="ingredients-table-container mb-2">
+                  <table class="table table-sm ingredients-table">
+                    <tbody>
+                      <tr *ngFor="let ingredient of editedRecipe!.ingredients; let i = index">
+                        <td colspan="5">
+                          <input 
+                            type="text" 
+                            class="form-control form-control-sm mb-1" 
+                            [(ngModel)]="editedRecipe!.ingredients[i].name"
+                            placeholder="Ingredient name">
+                          <div class="row g-1">
+                            <div class="col-3">
+                              <input 
+                                type="number" 
+                                class="form-control form-control-sm" 
+                                [(ngModel)]="editedRecipe!.ingredients[i].amount.value"
+                                placeholder="Amount"
+                                step="0.1">
+                            </div>
+                            <div class="col-3">
+                              <select 
+                                class="form-select form-select-sm" 
+                                [(ngModel)]="editedRecipe!.ingredients[i].amount.unit">
+                                <option value="">Select unit</option>
+                                <option value="mg">mg</option>
+                                <option value="g">g</option>
+                                <option value="kg">kg</option>
+                                <option value="ml">ml</option>
+                                <option value="dl">dl</option>
+                                <option value="l">l</option>
+                                <option value="tbsp">tbsp</option>
+                                <option value="tsp">tsp</option>
+                                <option value="cup">cup</option>
+                                <option value="piece">piece</option>
+                                <option value="pinch">pinch</option>
+                              </select>
+                            </div>
+                            <div class="col-4">
+                              <select 
+                                class="form-select form-select-sm" 
+                                [(ngModel)]="editedRecipe!.ingredients[i].type">
+                                <option value="">Select type</option>
+                                <option value="groente">groente</option>
+                                <option value="fruit">fruit</option>
+                                <option value="olie">olie</option>
+                                <option value="zuivel">zuivel</option>
+                                <option value="kruid">kruid</option>
+                                <option value="anders">anders</option>
+                              </select>
+                            </div>
+                            <div class="col-2 text-center">
+                              <button 
+                                class="btn btn-outline-danger btn-sm" 
+                                type="button" 
+                                (click)="removeIngredientAtIndex(i)" 
+                                [disabled]="editedRecipe!.ingredients.length <= 1"
+                                title="Remove ingredient">
+                                <i class="fas fa-times"></i>
+                              </button>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <button class="btn btn-outline-primary btn-sm" (click)="addEmptyIngredient()">
+                  <i class="fas fa-plus"></i> Add Ingredient
+                </button>
+              </div>
+              <div *ngIf="!isEditingMode" class="recipe-field">
+                <div *ngIf="recipe.ingredients.length > 0" class="ingredients-list">
+                  <div *ngFor="let typeGroup of getIngredientsByType()" class="ingredient-type-group mb-3">
+                    <h6 class="ingredient-type-header text-muted mb-2">
+                      <i class="fas fa-tag me-1"></i>{{ typeGroup.type || 'Overig' }}
+                    </h6>
+                    <div class="ingredient-items">
+                      <div *ngFor="let ingredient of typeGroup.ingredients" class="ingredient-item mb-1">
+                        <div class="ingredient-content">
+                          <span class="ingredient-amount text-muted">{{ ingredient.amount.value }} {{ ingredient.amount.unit }}</span>
+                          <span class="ingredient-name fw-bold">{{ ingredient.name }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div *ngIf="recipe.ingredients.length === 0" class="text-muted">No ingredients</div>
+              </div>
+            </div>
+
             <!-- Recipe Content -->
             <div class="mb-2">
               <label class="form-label fw-bold">Recipe</label>
