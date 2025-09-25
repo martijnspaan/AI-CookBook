@@ -102,7 +102,7 @@ export class RecipesComponent implements OnInit, OnDestroy {
     }
   }
 
-  openCreateRecipeModal(): void {
+  public openCreateRecipeModal(): void {
     this.resetCreateRecipeForm();
     this.addEmptyIngredient();
     this.addEmptyRecipeStep();

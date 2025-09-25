@@ -52,10 +52,10 @@ export class WeekCalendarComponent implements AfterViewInit, OnChanges {
   }
 
   ngAfterViewInit() {
-    // Initialize scroll position to start at the beginning
+    // Initialize scroll position to start at the top
     if (this.scrollContainer) {
       setTimeout(() => {
-        this.scrollContainer.nativeElement.scrollLeft = 0;
+        this.scrollContainer.nativeElement.scrollTop = 0;
       }, 0);
     }
   }

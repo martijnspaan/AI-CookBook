@@ -1,14 +1,29 @@
-﻿<div class="container-fluid">
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid d-flex justify-content-between align-items-center">
-      <div class="d-flex align-items-center">
-        <app-hamburger-menu></app-hamburger-menu>
-        <h1 class="navbar-brand ms-3 mb-0">{{ currentPageTitle }}</h1>
+﻿<div class="app-container">
+  <!-- Fixed Header -->
+  <header class="app-header">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid d-flex justify-content-between align-items-center">
+        <div class="d-flex align-items-center">
+          <app-hamburger-menu></app-hamburger-menu>
+          <h1 class="navbar-brand ms-3 mb-0">{{ currentPageTitle }}</h1>
+        </div>
       </div>
-    </div>
-  </nav>
+    </nav>
+  </header>
   
-  <main class="container-fluid">
-    <router-outlet></router-outlet>
+  <!-- Scrollable Content Area -->
+  <main class="main-content">
+    <div class="content-wrapper">
+      <router-outlet></router-outlet>
+    </div>
   </main>
+  
+  <!-- Fixed Footer -->
+  <app-footer 
+    [showButton]="showFooterButton"
+    [buttonText]="footerButtonText"
+    [buttonIcon]="footerButtonIcon"
+    [buttonClass]="footerButtonClass"
+    (buttonClick)="onFooterButtonClick()">
+  </app-footer>
 </div>

@@ -1,5 +1,5 @@
 <div class="week-calendar-container">
-  <!-- 14-Day Horizontal Scroll -->
+  <!-- 14-Day Vertical Scroll -->
   <div class="days-scroll-container" #scrollContainer>
     <div class="days-scroll-content">
       <div 
@@ -9,11 +9,10 @@
         [class.weekend]="day.isWeekend">
         
         <div class="day-header">
-          <div class="day-name">{{ day.dayName }}</div>
-          <div class="day-number">{{ day.dayNumber }}</div>
+          <span class="day-name">{{ day.dayName }}</span>
+          <span class="day-number">{{ day.dayNumber }}</span>
+          <span class="day-month">{{ day.month }}</span>
         </div>
-        
-        <div class="day-month">{{ day.month }}</div>
         
         <div class="day-content">
           <div class="meal-slots">

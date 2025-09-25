@@ -1,14 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { WeekCalendarComponent, RecipeAssignment } from './week-calendar/week-calendar.component';
-import { RecipeGridComponent } from './recipe-grid/recipe-grid.component';
+import { RecipeSelectionDialogComponent } from './recipe-selection-dialog/recipe-selection-dialog.component';
 import { Recipe } from '../models/recipe.model';
 import { PageTitleService } from '../services/page-title.service';
 
 @Component({
   selector: 'app-week-menu',
   standalone: true,
-  imports: [CommonModule, WeekCalendarComponent, RecipeGridComponent],
+  imports: [CommonModule, WeekCalendarComponent, RecipeSelectionDialogComponent],
   templateUrl: './week-menu.component.html',
   styleUrl: './week-menu.component.scss'
 })
@@ -18,6 +18,7 @@ export class WeekMenuComponent implements OnInit {
   selectedDate: Date | null = null;
   selectedMealSlot: { mealType: 'breakfast' | 'lunch' | 'dinner'; date: Date } | null = null;
   recipeAssignments: RecipeAssignment[] = [];
+  showRecipeDialog: boolean = false;
 
   constructor(private pageTitleService: PageTitleService) {}
 
@@ -33,6 +34,7 @@ export class WeekMenuComponent implements OnInit {
     this.selectedMealType = mealType;
     this.selectedDate = date;
     this.selectedMealSlot = { mealType, date };
+    this.showRecipeDialog = true;
   }
 
   onRecipeSelected(event: { recipe: Recipe; mealType: string }) {
@@ -55,8 +57,17 @@ export class WeekMenuComponent implements OnInit {
       this.recipeAssignments.push(newAssignment);
     }
     
+    this.resetSelection();
+  }
+
+  onDialogClosed(): void {
+    this.resetSelection();
+  }
+
+  private resetSelection(): void {
     this.selectedMealType = null;
     this.selectedDate = null;
     this.selectedMealSlot = null;
+    this.showRecipeDialog = false;
   }
 }

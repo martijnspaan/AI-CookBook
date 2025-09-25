@@ -1,0 +1,16 @@
+<footer class="app-footer">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-12 d-flex justify-content-center">
+        <button 
+          *ngIf="showButton"
+          class="btn"
+          [class]="buttonClass"
+          (click)="onButtonClick()">
+          <i *ngIf="buttonIcon" [class]="buttonIcon"></i>
+          {{ buttonText }}
+        </button>
+      </div>
+    </div>
+  </div>
+</footer>

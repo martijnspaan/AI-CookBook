@@ -1,3 +1,18 @@
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1001;
+}
+
 .navbar-brand {
   font-size: 1.25rem;
   font-weight: 600;
@@ -16,17 +31,28 @@
   }
 }
 
+.main-content {
+  flex: 1;
+  margin-top: 56px; // Height of fixed header
+  margin-bottom: 80px; // Height of fixed footer
+  overflow-y: auto;
+  overflow-x: hidden;
+  
+  @media (max-width: 400px) {
+    margin-top: 48px; // Height of fixed header on mobile
+    margin-bottom: 70px; // Height of fixed footer on mobile
+  }
+}
+
+.content-wrapper {
+  padding: 1rem;
+  
+  @media (max-width: 400px) {
+    padding: 0.5rem;
+  }
+}
+
 .container-fluid {
   padding-left: 0;
   padding-right: 0;
-}
-
-main.container-fluid {
-  padding-left: 1rem;
-  padding-right: 1rem;
-  
-  @media (max-width: 400px) {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-  }
 }

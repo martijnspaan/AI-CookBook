@@ -1,0 +1,69 @@
+<!-- Dialog Backdrop -->
+<div 
+  *ngIf="isVisible" 
+  class="dialog-backdrop"
+  (click)="onBackdropClick($event)">
+  
+  <!-- Dialog Content -->
+  <div class="dialog-content">
+    <!-- Dialog Header -->
+    <div class="dialog-header">
+      <h4 class="dialog-title">Select Recipe</h4>
+      <button 
+        type="button" 
+        class="btn-close" 
+        aria-label="Close"
+        (click)="closeDialog()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    
+    <!-- Dialog Body -->
+    <div class="dialog-body">
+      <p class="text-muted mb-3" *ngIf="selectedMealType && selectedDate">
+        Choose a recipe for {{ selectedMealType }} on {{ getDateDisplayString() }}
+      </p>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoadingRecipes" class="text-center py-4">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">Loading recipes...</p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+        <h6 class="alert-heading">Error!</h6>
+        <p>{{ errorMessage }}</p>
+        <button class="btn btn-outline-danger btn-sm" (click)="loadAllRecipes()">Try Again</button>
+      </div>
+
+      <!-- Recipes Grid -->
+      <div *ngIf="!isLoadingRecipes && !errorMessage && recipes.length > 0" class="recipes-grid">
+        <div 
+          *ngFor="let recipe of recipes" 
+          class="recipe-card"
+          (click)="selectRecipe(recipe)">
+          <div class="recipe-card-content">
+            <h6 class="recipe-title">{{ recipe.title }}</h6>
+            <div class="recipe-tags">
+              <span *ngFor="let tag of recipe.tags" class="badge bg-secondary me-1 mb-1">
+                {{ tag }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!isLoadingRecipes && !errorMessage && recipes.length === 0" class="text-center py-4">
+        <div class="text-muted">
+          <i class="bi bi-egg-fried"></i>
+          <h6 class="mt-2">No recipes available</h6>
+          <p class="small">There are no recipes to choose from.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

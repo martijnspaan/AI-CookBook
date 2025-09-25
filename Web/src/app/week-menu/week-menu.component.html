@@ -1,21 +1,17 @@
-<div class="container-fluid px-1">
-  <div class="row">
-    <div class="col-12">
-      <!-- Week Calendar -->
-      <app-week-calendar 
-        [selectedWeek]="selectedWeek"
-        [recipeAssignments]="recipeAssignments"
-        [selectedMealSlot]="selectedMealSlot"
-        (weekChanged)="onWeekChanged($event)"
-        (mealSlotClicked)="onMealSlotClicked($event.mealType, $event.date)">
-      </app-week-calendar>
-      
-      <!-- Recipe Grid -->
-      <app-recipe-grid 
-        *ngIf="selectedMealType"
-        [selectedMealType]="selectedMealType"
-        (recipeSelected)="onRecipeSelected($event)">
-      </app-recipe-grid>
-    </div>
-  </div>
-</div>
+<!-- Week Calendar - Full Screen -->
+<app-week-calendar 
+  [selectedWeek]="selectedWeek"
+  [recipeAssignments]="recipeAssignments"
+  [selectedMealSlot]="selectedMealSlot"
+  (weekChanged)="onWeekChanged($event)"
+  (mealSlotClicked)="onMealSlotClicked($event.mealType, $event.date)">
+</app-week-calendar>
+
+<!-- Recipe Selection Dialog -->
+<app-recipe-selection-dialog
+  [isVisible]="showRecipeDialog"
+  [selectedMealType]="selectedMealType"
+  [selectedDate]="selectedDate"
+  (recipeSelected)="onRecipeSelected($event)"
+  (dialogClosed)="onDialogClosed()">
+</app-recipe-selection-dialog>

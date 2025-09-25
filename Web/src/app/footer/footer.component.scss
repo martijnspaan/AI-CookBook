@@ -1,0 +1,51 @@
+.app-footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+  padding: 1rem 0;
+  margin-top: auto;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  
+  .btn {
+    min-width: 120px;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease-in-out;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+// Mobile-specific styles (≤400px)
+@media (max-width: 400px) {
+  .app-footer {
+    padding: 0.75rem 0;
+    
+    .btn {
+      min-width: 100px;
+      font-size: 0.875rem;
+      padding: 0.5rem 1rem;
+    }
+  }
+}
+
+// Tablet and Desktop styles (>400px)
+@media (min-width: 401px) {
+  .app-footer {
+    .btn {
+      min-width: 140px;
+      font-size: 1rem;
+      padding: 0.75rem 1.5rem;
+    }
+  }
+}
