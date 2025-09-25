@@ -28,7 +28,14 @@
       class="recipe-card"
       (click)="selectRecipe(recipe)">
       <div class="recipe-card-content">
-        <h6 class="recipe-title">{{ recipe.title }}</h6>
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <h6 class="recipe-title mb-0">{{ recipe.title }}</h6>
+          <div class="meal-types-container" *ngIf="recipe.mealTypes && recipe.mealTypes.length > 0">
+            <span *ngFor="let mealType of recipe.mealTypes" class="badge bg-primary me-1" style="font-size: 0.6em;">
+              {{ mealType }}
+            </span>
+          </div>
+        </div>
         <div class="recipe-tags">
           <span *ngFor="let tag of recipe.tags" class="badge bg-secondary me-1 mb-1">
             {{ tag }}

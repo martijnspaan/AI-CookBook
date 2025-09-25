@@ -1,0 +1,128 @@
+.recipe-card {
+  background: #f8f9fa;
+  border: 2px solid #dee2e6;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out, border-color 0.15s ease-in-out;
+
+  &.clickable {
+    cursor: pointer;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+      border-color: #007bff;
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  &.compact-mode {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    border: 2px solid transparent;
+    
+    .recipe-card-content {
+      .recipe-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+      
+      .recipe-description {
+        font-size: 0.8rem;
+        margin-bottom: 0.5rem;
+      }
+      
+      .cookbook-info {
+        font-size: 0.75rem;
+        margin-bottom: 0.5rem;
+      }
+      
+      .compact-badge {
+        font-size: 0.7em;
+        padding: 0.25em 0.5em;
+      }
+      
+      .badge {
+        font-size: 0.75em;
+        padding: 0.25em 0.5em;
+      }
+    }
+  }
+}
+
+.recipe-card-content {
+  .recipe-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #212529;
+    line-height: 1.2;
+  }
+  
+  .recipe-description {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin-bottom: 0.75rem;
+  }
+  
+  .cookbook-info {
+    font-size: 0.85rem;
+    margin-bottom: 0.75rem;
+    
+    .fas {
+      color: #6c757d;
+    }
+  }
+  
+  .meal-types-container {
+    margin-bottom: 0.75rem;
+    
+    .badge {
+      font-size: 0.8em;
+      padding: 0.35em 0.65em;
+    }
+  }
+  
+  .tags-container {
+    .badge {
+      font-size: 0.75em;
+      padding: 0.3em 0.6em;
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 400px) {
+  .recipe-card {
+    padding: 0.75rem;
+    
+    &.compact-mode {
+      padding: 0.5rem;
+    }
+  }
+  
+  .recipe-card-content {
+    .recipe-title {
+      font-size: 1rem;
+    }
+    
+    .recipe-description {
+      font-size: 0.85rem;
+    }
+    
+    .cookbook-info {
+      font-size: 0.8rem;
+    }
+  }
+}
+
+@media (min-width: 768px) {
+  .recipe-card {
+    &.compact-mode {
+      padding: 0.875rem;
+    }
+  }
+}

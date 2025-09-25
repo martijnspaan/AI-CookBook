@@ -1,0 +1,48 @@
+<div 
+  class="recipe-card" 
+  [class.clickable]="clickable"
+  [class.compact-mode]="compactMode"
+  (click)="onCardClick()">
+  
+  <div class="recipe-card-content">
+    <!-- Header with title and delete button -->
+    <div class="d-flex justify-content-between align-items-start mb-2">
+      <h5 class="recipe-title mb-0" [class.compact-title]="compactMode">{{ recipe.title }}</h5>
+      <button 
+        *ngIf="showDeleteButton"
+        class="btn btn-danger btn-sm" 
+        (click)="onDeleteClick($event)"
+        title="Delete recipe">
+        <i class="fas fa-trash"></i>
+      </button>
+    </div>
+
+    <!-- Description (optional) -->
+    <p *ngIf="showDescription" class="recipe-description text-muted small">{{ recipe.description }}</p>
+
+    <!-- Cookbook information -->
+    <div class="cookbook-info mb-2" *ngIf="recipe.cookbookId">
+      <span class="text-muted small">
+        <i class="fas fa-book me-1"></i>
+        {{ getCookbookTitle(recipe.cookbookId) }}
+      </span>
+    </div>
+
+    <!-- Meal types -->
+    <div class="meal-types-container mb-2" *ngIf="recipe.mealTypes && recipe.mealTypes.length > 0">
+      <span 
+        *ngFor="let mealType of recipe.mealTypes" 
+        class="badge bg-primary me-1 mb-1"
+        [class.compact-badge]="compactMode">
+        {{ mealType }}
+      </span>
+    </div>
+
+    <!-- Tags -->
+    <div class="tags-container">
+      <span *ngFor="let tag of recipe.tags" class="badge bg-secondary me-1 mb-1">
+        {{ tag }}
+      </span>
+    </div>
+  </div>
+</div>

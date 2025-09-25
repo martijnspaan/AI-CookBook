@@ -9,11 +9,12 @@ import { CookbookService } from '../services/cookbook.service';
 import { Recipe, Ingredient, CreateRecipeRequest } from '../models/recipe.model';
 import { Cookbook } from '../models/cookbook.model';
 import { PageTitleService } from '../services/page-title.service';
+import { RecipeCardComponent } from '../shared/recipe-card/recipe-card.component';
 
 @Component({
   selector: 'app-recipes',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RecipeCardComponent],
   templateUrl: './recipes.component.html',
   styleUrl: './recipes.component.scss'
 })
@@ -49,6 +50,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnInit(): void {
     this.loadAllRecipes();
     this.loadAllCookbooks();
+    this.initializeMealTypes();
   }
 
   ngAfterViewInit(): void {
@@ -141,11 +143,27 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  onRecipeDeleteClicked(recipe: Recipe): void {
+    const confirmationMessage = `Are you sure you want to delete "${recipe.title}"?`;
+    if (confirm(confirmationMessage)) {
+      this.recipeService.deleteRecipeById(recipe.id)
+        .pipe(takeUntil(this.destroySubject))
+        .subscribe({
+          next: () => {
+            this.recipes = this.recipes.filter(existingRecipe => existingRecipe.id !== recipe.id);
+          },
+          error: (error) => {
+            console.error('Error deleting recipe:', error);
+            alert('Failed to delete recipe. Please try again.');
+          }
+        });
+    }
+  }
+
   public openCreateRecipeModal(): void {
     this.resetCreateRecipeForm();
     this.addEmptyIngredient();
     this.addEmptyRecipeStep();
-    this.initializeMealTypes();
     this.showBootstrapModal();
   }
 
@@ -153,7 +171,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.createRecipeForm.reset();
     this.ingredientsFormArray.clear();
     this.recipeStepsFormArray.clear();
-    this.mealTypesFormArray.clear();
+    this.initializeMealTypes();
   }
 
   private showBootstrapModal(): void {

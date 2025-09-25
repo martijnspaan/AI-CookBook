@@ -21,38 +21,15 @@
       <div *ngIf="!isLoadingRecipes && !errorMessage && recipes.length > 0">
         <!-- Mobile Card Layout (≤400px) -->
         <div class="d-block d-md-none">
-          <div *ngFor="let recipe of recipes" class="recipe-card mb-3" (click)="navigateToRecipeDetails(recipe)">
-            <div class="card">
-              <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                  <h5 class="card-title mb-0">{{ recipe.title }}</h5>
-                  <button 
-                    class="btn btn-danger btn-sm" 
-                    (click)="deleteRecipeWithConfirmation(recipe, $event)"
-                    title="Delete recipe">
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </div>
-                <p class="card-text text-muted small">{{ recipe.description }}</p>
-                <p class="card-text small" *ngIf="recipe.cookbookId">
-                  <span class="cookbook-label">
-                    <i class="fas fa-book me-1"></i>
-                    <strong>{{ getCookbookTitle(recipe.cookbookId) }}</strong>
-                  </span>
-                </p>
-                <div class="meal-types-container mb-2" *ngIf="recipe.mealTypes && recipe.mealTypes.length > 0">
-                  <span *ngFor="let mealType of recipe.mealTypes" class="badge bg-primary me-1 mb-1">
-                    {{ mealType }}
-                  </span>
-                </div>
-                <div class="tags-container">
-                  <span *ngFor="let tag of recipe.tags" class="badge bg-secondary me-1 mb-1">
-                    {{ tag }}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+          <app-recipe-card
+            *ngFor="let recipe of recipes"
+            [recipe]="recipe"
+            [showDeleteButton]="true"
+            [showDescription]="true"
+            [clickable]="true"
+            (recipeClicked)="navigateToRecipeDetails($event)"
+            (deleteClicked)="onRecipeDeleteClicked($event)">
+          </app-recipe-card>
         </div>
 
         <!-- Tablet and Desktop Table Layout (>400px) -->
@@ -156,7 +133,7 @@
               </select>
             </div>
             
-            <div class="mb-3">
+            <div class="mb-3" *ngIf="mealTypesFormArray.controls.length > 0">
               <label class="form-label">Meal Types</label>
               <div formArrayName="mealTypes">
                 <div class="d-flex flex-wrap gap-3">
