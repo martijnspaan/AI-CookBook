@@ -12,7 +12,7 @@ namespace API.Specs;
 /// Integration tests for the AI Cookbook API
 /// These tests run synchronously in the specified order to test the complete CRUD workflow
 /// </summary>
-[TestCaseOrderer("API.Specs.SequentialTestCaseOrderer", "API.Specs")]
+[TestCaseOrderer("API.Specs.AttributeBasedTestCaseOrderer", "API.Specs")]
 public class IntegrationSpecs : IClassFixture<ApiWebApplicationFactory>
 {
     private readonly HttpClient _httpClient;
@@ -26,7 +26,8 @@ public class IntegrationSpecs : IClassFixture<ApiWebApplicationFactory>
     }
 
     [Fact]
-    public async Task Test0_CleanDatabase_ShouldDeleteAndRecreateCollection()
+    [TestOrder(0)]
+    public async Task CleanDatabase_ShouldDeleteAndRecreateCollection()
     {
         // Arrange
         using var serviceScope = _webApplicationFactory.CreateScope();
@@ -71,7 +72,8 @@ public class IntegrationSpecs : IClassFixture<ApiWebApplicationFactory>
     }
 
     [Fact]
-    public async Task Test1_CreateRecipe_ShouldReturnCreatedRecipe()
+    [TestOrder(1)]
+    public async Task CreateRecipe_ShouldReturnCreatedRecipe()
     {
         // Arrange
         var newRecipeInput = new CreateRecipeUseCaseInput(
@@ -105,7 +107,8 @@ public class IntegrationSpecs : IClassFixture<ApiWebApplicationFactory>
     }
 
     [Fact]
-    public async Task Test2_GetAllRecipes_ShouldContainCreatedRecipe()
+    [TestOrder(2)]
+    public async Task GetAllRecipes_ShouldContainCreatedRecipe()
     {
         // Arrange
         // No specific arrangement needed for this test
@@ -131,7 +134,8 @@ public class IntegrationSpecs : IClassFixture<ApiWebApplicationFactory>
     }
 
     [Fact]
-    public async Task Test3_UpdateRecipe_ShouldReturnUpdatedRecipe()
+    [TestOrder(3)]
+    public async Task UpdateRecipe_ShouldReturnUpdatedRecipe()
     {
         // Arrange
         await EnsureRecipeIdIsAvailable();
@@ -166,7 +170,8 @@ public class IntegrationSpecs : IClassFixture<ApiWebApplicationFactory>
     }
 
     [Fact]
-    public async Task Test4_GetRecipeById_ShouldReturnUpdatedRecipe()
+    [TestOrder(4)]
+    public async Task GetRecipeById_ShouldReturnUpdatedRecipe()
     {
         // Arrange
         await EnsureRecipeIdIsAvailable();
@@ -187,7 +192,8 @@ public class IntegrationSpecs : IClassFixture<ApiWebApplicationFactory>
     }
 
     [Fact]
-    public async Task Test5_DeleteRecipe_ShouldReturnNoContent()
+    [TestOrder(5)]
+    public async Task DeleteRecipe_ShouldReturnNoContent()
     {
         // Arrange
         await EnsureRecipeIdIsAvailable();
@@ -200,7 +206,8 @@ public class IntegrationSpecs : IClassFixture<ApiWebApplicationFactory>
     }
 
     [Fact]
-    public async Task Test6_GetAllRecipes_ShouldNotContainDeletedRecipe()
+    [TestOrder(6)]
+    public async Task GetAllRecipes_ShouldNotContainDeletedRecipe()
     {
         // Arrange
         // No specific arrangement needed for this test
