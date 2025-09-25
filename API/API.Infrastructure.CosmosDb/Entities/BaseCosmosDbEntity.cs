@@ -3,9 +3,6 @@ using Newtonsoft.Json;
 
 namespace API.Infrastructure.CosmosDb.Entities;
 
-/// <summary>
-/// Base implementation for Cosmos DB entities
-/// </summary>
 public abstract class BaseCosmosDbEntity : ICosmosDbEntity
 {
     [JsonProperty("id")]
@@ -38,18 +35,12 @@ public abstract class BaseCosmosDbEntity : ICosmosDbEntity
     [JsonProperty("_ts")]
     public long Timestamp { get; set; }
 
-    /// <summary>
-    /// Initializes a new instance of the BaseCosmosDbEntity
-    /// </summary>
     protected BaseCosmosDbEntity()
     {
         Type = GetType().Name;
-        PartitionKey = Id; // Initialize partition key to match the ID
+        PartitionKey = Id;
     }
 
-    /// <summary>
-    /// Updates the UpdatedAt timestamp
-    /// </summary>
     public virtual void UpdateTimestamp()
     {
         UpdatedAt = DateTime.UtcNow;

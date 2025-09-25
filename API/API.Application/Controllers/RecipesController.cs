@@ -32,8 +32,8 @@ public static class RecipesController
         {
             try
             {
-                var recipes = await repository.QueryAsync("SELECT * FROM c WHERE c.id = @id", new Dictionary<string, object> { { "id", id } });
-                var recipe = recipes.FirstOrDefault();
+                ICollection<RecipeEntity> recipes = await repository.QueryAsync("SELECT * FROM c WHERE c.id = @id", new Dictionary<string, object> { { "id", id } });
+                RecipeEntity? recipe = recipes.FirstOrDefault();
                 if (recipe == null)
                 {
                     return Results.Json(new { error = "Recipe not found" }, statusCode: 404);
@@ -68,8 +68,7 @@ public static class RecipesController
         // PUT /api/recipes/{id} - Update an existing recipe
         endpoints.MapPut("/api/recipes/{id}", async (string id, UpdateRecipeUseCaseInput input, UpdateRecipeUseCase updateRecipeUseCase) =>
         {
-            // Ensure the ID from the route matches the input
-            var updateInput = input with { Id = id };
+            UpdateRecipeUseCaseInput updateInput = input with { Id = id };
             UpdateRecipeUseCaseOutput output = await updateRecipeUseCase.Execute(updateInput);
 
             if (output.IsSuccess)

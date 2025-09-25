@@ -22,12 +22,11 @@ public class Startup(IConfiguration configuration)
         // Register repository with configured container name
         services.AddScoped<ICosmosDbRepository<RecipeEntity>>(provider =>
         {
-            var cosmosDbClientService = provider.GetRequiredService<ICosmosDbClientService>();
-            var logger = provider.GetRequiredService<ILogger<CosmosDbRepository<RecipeEntity>>>();
-            var configuration = provider.GetRequiredService<IConfiguration>();
+            ICosmosDbClientService cosmosDbClientService = provider.GetRequiredService<ICosmosDbClientService>();
+            ILogger<CosmosDbRepository<RecipeEntity>> logger = provider.GetRequiredService<ILogger<CosmosDbRepository<RecipeEntity>>>();
+            IConfiguration configuration = provider.GetRequiredService<IConfiguration>();
             
-            // Get container name from configuration
-            var containerName = configuration.GetSection("CosmosDb:ContainerName").Value ?? 
+            string containerName = configuration.GetSection("CosmosDb:ContainerName").Value ?? 
                                Environment.GetEnvironmentVariable("COSMOSDB_CONTAINER_NAME") ?? 
                                "Recipes";
             

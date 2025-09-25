@@ -10,7 +10,7 @@ public class CreateRecipeUseCase(ICosmosDbRepository<RecipeEntity> repository)
     {
         try
         {
-            var recipe = new RecipeEntity
+            RecipeEntity recipe = new RecipeEntity
             {
                 Title = input.Title,
                 Description = input.Description,
@@ -19,7 +19,7 @@ public class CreateRecipeUseCase(ICosmosDbRepository<RecipeEntity> repository)
                 Recipe = input.Recipe
             };
 
-            var createdRecipe = await repository.CreateAsync(recipe);
+            RecipeEntity createdRecipe = await repository.CreateAsync(recipe);
             return CreateRecipeUseCaseOutput.Success(createdRecipe);
         }
         catch (Exception ex)
