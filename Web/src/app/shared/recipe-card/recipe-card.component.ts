@@ -71,3 +71,4 @@ export class RecipeCardComponent implements OnInit, OnDestroy {
     this.deleteClicked.emit(this.recipe);
   }
 }
+
