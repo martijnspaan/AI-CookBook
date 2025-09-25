@@ -19,6 +19,17 @@
 
       <!-- Recipe Details -->
       <div *ngIf="!isLoadingRecipe && !errorMessage && recipe" class="recipe-detail">
+        <!-- Delete Button (only shown when not editing) -->
+        <div *ngIf="!isEditingMode" class="text-end mb-3">
+          <button 
+            class="btn btn-danger btn-sm" 
+            (click)="deleteRecipeWithConfirmation()"
+            title="Delete recipe">
+            <i class="fas fa-trash me-1"></i>
+            Delete Recipe
+          </button>
+        </div>
+        
         <div class="recipe-content-wrapper">
           <div class="recipe-body">
             <!-- Title (only shown when editing) -->
@@ -92,7 +103,7 @@
               <label class="form-label fw-bold">Tags</label>
               <div *ngIf="isEditingMode">
                 <div class="d-flex flex-wrap gap-2 mb-2">
-                  <div *ngFor="let tag of editedRecipe!.tags; let i = index" class="input-group" style="width: auto;">
+                  <div *ngFor="let tag of editedRecipe!.tags; let i = index; trackBy: trackByIndex" class="input-group" style="width: auto;">
                     <input 
                       type="text" 
                       class="form-control" 
@@ -124,7 +135,7 @@
                 <div class="ingredients-table-container mb-2">
                   <table class="table table-sm ingredients-table">
                     <tbody>
-                      <tr *ngFor="let ingredient of editedRecipe!.ingredients; let i = index">
+                      <tr *ngFor="let ingredient of editedRecipe!.ingredients; let i = index; trackBy: trackByIndex">
                         <td colspan="5">
                           <input 
                             type="text" 
@@ -216,7 +227,7 @@
               <label class="form-label fw-bold">Recipe</label>
               <div *ngIf="isEditingMode">
                 <div class="d-flex flex-column gap-2 mb-2">
-                  <div *ngFor="let step of editedRecipe!.recipe; let i = index" class="input-group">
+                  <div *ngFor="let step of editedRecipe!.recipe; let i = index; trackBy: trackByIndex" class="input-group">
                     <span class="input-group-text">{{ i + 1 }}.</span>
                     <input 
                       type="text" 

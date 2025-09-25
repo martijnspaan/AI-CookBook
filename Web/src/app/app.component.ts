@@ -5,6 +5,7 @@ import { HamburgerMenuComponent } from './hamburger-menu/hamburger-menu.componen
 import { FooterComponent } from './footer/footer.component';
 import { PageTitleService } from './services/page-title.service';
 import { CookbookModalService } from './services/cookbook-modal.service';
+import { RecipeModalService } from './services/recipe-modal.service';
 import { FooterService, FooterButtonConfig } from './services/footer.service';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
@@ -45,6 +46,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private pageTitleService: PageTitleService,
     private router: Router,
     private cookbookModalService: CookbookModalService,
+    private recipeModalService: RecipeModalService,
     private footerService: FooterService
   ) {}
 
@@ -173,21 +175,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
   
   private openCreateRecipeModal(): void {
-    const recipesComponent = this.getRecipesComponent();
-    if (recipesComponent) {
-      recipesComponent.openCreateRecipeModal();
-    }
-  }
-  
-  private getRecipesComponent(): any {
-    const routerOutlet = document.querySelector('router-outlet');
-    if (routerOutlet) {
-      const componentRef = (routerOutlet as any).componentRef;
-      if (componentRef && componentRef.instance) {
-        return componentRef.instance;
-      }
-    }
-    return null;
+    this.recipeModalService.openCreateRecipeModal();
   }
   
   private createGroceriesList(): void {

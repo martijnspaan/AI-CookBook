@@ -4,11 +4,12 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { RecipeService } from '../../services/recipe.service';
 import { Recipe } from '../../models/recipe.model';
+import { RecipeCardComponent } from '../../shared/recipe-card/recipe-card.component';
 
 @Component({
   selector: 'app-recipe-selection-dialog',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RecipeCardComponent],
   templateUrl: './recipe-selection-dialog.component.html',
   styleUrl: './recipe-selection-dialog.component.scss'
 })

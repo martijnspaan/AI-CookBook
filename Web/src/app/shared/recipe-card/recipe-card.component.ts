@@ -15,12 +15,10 @@ import { Cookbook } from '../../models/cookbook.model';
 })
 export class RecipeCardComponent implements OnInit, OnDestroy {
   @Input() recipe!: Recipe;
-  @Input() showDeleteButton: boolean = false;
   @Input() showDescription: boolean = true;
   @Input() compactMode: boolean = false;
   @Input() clickable: boolean = true;
   @Output() recipeClicked = new EventEmitter<Recipe>();
-  @Output() deleteClicked = new EventEmitter<Recipe>();
 
   cookbooks: Cookbook[] = [];
   isLoadingCookbooks = false;
@@ -64,11 +62,6 @@ export class RecipeCardComponent implements OnInit, OnDestroy {
     if (this.clickable) {
       this.recipeClicked.emit(this.recipe);
     }
-  }
-
-  onDeleteClick(event: Event): void {
-    event.stopPropagation();
-    this.deleteClicked.emit(this.recipe);
   }
 }
 

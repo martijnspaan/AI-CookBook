@@ -134,15 +134,29 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
   private updateFooterButtons(): void {
     if (this.isEditingMode) {
       this.footerService.setFooterConfig({
+        showLeftButton: true,
+        leftButtonText: 'Cancel',
+        leftButtonIcon: 'fas fa-times',
+        leftButtonClass: 'btn-outline-secondary',
+        leftButtonClickHandler: () => this.cancelEditingMode(),
+        showRightButton: true,
         rightButtonText: 'Save Changes',
         rightButtonIcon: 'fas fa-save',
-        rightButtonClass: 'btn-success'
+        rightButtonClass: 'btn-success',
+        rightButtonClickHandler: () => this.onRightButtonClick()
       });
     } else {
       this.footerService.setFooterConfig({
+        showLeftButton: true,
+        leftButtonText: 'Back to Recipes',
+        leftButtonIcon: 'fas fa-arrow-left',
+        leftButtonClass: 'btn-outline-secondary',
+        leftButtonClickHandler: () => this.navigateBackToRecipesList(),
+        showRightButton: true,
         rightButtonText: 'Edit Recipe',
         rightButtonIcon: 'fas fa-edit',
-        rightButtonClass: 'btn-primary'
+        rightButtonClass: 'btn-primary',
+        rightButtonClickHandler: () => this.onRightButtonClick()
       });
     }
   }
@@ -266,8 +280,31 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     }));
   }
 
+  trackByIndex(index: number, item: any): number {
+    return index;
+  }
+
   navigateBackToRecipesList(): void {
     this.router.navigate(['/recipes']);
+  }
+
+  deleteRecipeWithConfirmation(): void {
+    if (!this.recipe) return;
+    
+    const confirmationMessage = `Are you sure you want to delete "${this.recipe.title}"? This action cannot be undone.`;
+    if (confirm(confirmationMessage)) {
+      this.recipeService.deleteRecipeById(this.recipe.id)
+        .pipe(takeUntil(this.destroySubject))
+        .subscribe({
+          next: () => {
+            this.router.navigate(['/recipes']);
+          },
+          error: (error) => {
+            console.error('Error deleting recipe:', error);
+            this.errorMessage = 'Failed to delete recipe. Please try again.';
+          }
+        });
+    }
   }
 }
 

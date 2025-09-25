@@ -59,26 +59,14 @@
 
       <!-- Recipes Grid -->
       <div *ngIf="!isLoadingRecipes && !errorMessage && recipes.length > 0" class="recipes-grid">
-        <div 
-          *ngFor="let recipe of recipes" 
-          class="recipe-card"
-          (click)="selectRecipe(recipe)">
-          <div class="recipe-card-content">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-              <h6 class="recipe-title mb-0">{{ recipe.title }}</h6>
-              <div class="meal-types-container" *ngIf="recipe.mealTypes && recipe.mealTypes.length > 0">
-                <span *ngFor="let mealType of recipe.mealTypes" class="badge bg-primary me-1" style="font-size: 0.6em;">
-                  {{ mealType }}
-                </span>
-              </div>
-            </div>
-            <div class="recipe-tags">
-              <span *ngFor="let tag of recipe.tags" class="badge bg-secondary me-1 mb-1">
-                {{ tag }}
-              </span>
-            </div>
-          </div>
-        </div>
+        <app-recipe-card
+          *ngFor="let recipe of recipes"
+          [recipe]="recipe"
+          [showDescription]="false"
+          [compactMode]="true"
+          [clickable]="true"
+          (recipeClicked)="selectRecipe($event)">
+        </app-recipe-card>
       </div>
 
       <!-- Empty State -->

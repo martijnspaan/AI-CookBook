@@ -6,6 +6,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { RecipeService } from '../services/recipe.service';
 import { CookbookService } from '../services/cookbook.service';
+import { RecipeModalService } from '../services/recipe-modal.service';
 import { Recipe, Ingredient, CreateRecipeRequest } from '../models/recipe.model';
 import { Cookbook } from '../models/cookbook.model';
 import { PageTitleService } from '../services/page-title.service';
@@ -32,14 +33,15 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(
     private readonly recipeService: RecipeService,
     private readonly cookbookService: CookbookService,
+    private readonly recipeModalService: RecipeModalService,
     private readonly router: Router,
     private readonly formBuilder: FormBuilder,
     private readonly pageTitleService: PageTitleService
   ) {
     this.createRecipeForm = this.formBuilder.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
-      description: ['', [Validators.required, Validators.minLength(10)]],
-      tags: [''],
+      description: [''],
+      tags: this.formBuilder.array([]),
       cookbookId: [''],
       mealTypes: this.formBuilder.array([]),
       ingredients: this.formBuilder.array([]),
@@ -51,6 +53,13 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.loadAllRecipes();
     this.loadAllCookbooks();
     this.initializeMealTypes();
+    
+    // Subscribe to recipe modal service
+    this.recipeModalService.openModal$
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe(() => {
+        this.openCreateRecipeModal();
+      });
   }
 
   ngAfterViewInit(): void {
@@ -72,6 +81,10 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   get mealTypesFormArray(): FormArray {
     return this.createRecipeForm.get('mealTypes') as FormArray;
+  }
+
+  get tagsFormArray(): FormArray {
+    return this.createRecipeForm.get('tags') as FormArray;
   }
 
   loadAllRecipes(): void {
@@ -143,27 +156,12 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  onRecipeDeleteClicked(recipe: Recipe): void {
-    const confirmationMessage = `Are you sure you want to delete "${recipe.title}"?`;
-    if (confirm(confirmationMessage)) {
-      this.recipeService.deleteRecipeById(recipe.id)
-        .pipe(takeUntil(this.destroySubject))
-        .subscribe({
-          next: () => {
-            this.recipes = this.recipes.filter(existingRecipe => existingRecipe.id !== recipe.id);
-          },
-          error: (error) => {
-            console.error('Error deleting recipe:', error);
-            alert('Failed to delete recipe. Please try again.');
-          }
-        });
-    }
-  }
 
   public openCreateRecipeModal(): void {
     this.resetCreateRecipeForm();
     this.addEmptyIngredient();
     this.addEmptyRecipeStep();
+    this.addEmptyTag();
     this.showBootstrapModal();
   }
 
@@ -171,6 +169,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.createRecipeForm.reset();
     this.ingredientsFormArray.clear();
     this.recipeStepsFormArray.clear();
+    this.tagsFormArray.clear();
     this.initializeMealTypes();
   }
 
@@ -203,8 +202,8 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     const ingredientFormGroup = this.formBuilder.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       amountValue: [0, [Validators.required, Validators.min(0.1)]],
-      amountUnit: ['', [Validators.required, Validators.minLength(1)]],
-      type: ['', [Validators.required, Validators.minLength(2)]]
+      amountUnit: [null, [Validators.required]],
+      type: [null, [Validators.required]]
     });
     this.ingredientsFormArray.push(ingredientFormGroup);
   }
@@ -226,6 +225,17 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+  addEmptyTag(): void {
+    const tagControl = this.formBuilder.control('', [Validators.required, Validators.minLength(1)]);
+    this.tagsFormArray.push(tagControl);
+  }
+
+  removeTagAtIndex(index: number): void {
+    if (this.tagsFormArray.length > 1) {
+      this.tagsFormArray.removeAt(index);
+    }
+  }
+
   initializeMealTypes(): void {
     this.mealTypesFormArray.clear();
     this.availableMealTypes.forEach(mealType => {
@@ -243,16 +253,23 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   submitCreateRecipeForm(): void {
-    if (this.createRecipeForm.valid) {
+    console.log('Form submission attempted');
+    console.log('Button enabled:', this.isCreateButtonEnabled());
+    console.log('Form data:', this.createRecipeForm.value);
+    
+    if (this.isCreateButtonEnabled()) {
       this.isCreatingRecipe = true;
       
       const formData = this.createRecipeForm.value;
       const createRecipeRequest = this.buildCreateRecipeRequest(formData);
+      
+      console.log('Create recipe request:', createRecipeRequest);
 
       this.recipeService.createNewRecipe(createRecipeRequest)
         .pipe(takeUntil(this.destroySubject))
         .subscribe({
           next: (createdRecipe) => {
+            console.log('Recipe created successfully:', createdRecipe);
             this.recipes.unshift(createdRecipe);
             this.isCreatingRecipe = false;
             this.hideCreateRecipeModal();
@@ -263,20 +280,23 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
             alert('Failed to create recipe. Please try again.');
           }
         });
+    } else {
+      console.log('Button not enabled, form not submitted');
     }
   }
 
   private buildCreateRecipeRequest(formData: any): CreateRecipeRequest {
-    const tags = this.parseTagsFromString(formData.tags);
+    const tags = this.getTagsFromFormArray();
     const ingredients = this.transformFormIngredientsToModel(formData.ingredients);
     const mealTypes = this.getSelectedMealTypes();
+    const recipeSteps = this.getRecipeStepsFromFormArray();
 
     return {
       title: formData.title,
-      description: formData.description,
+      description: formData.description || '',
       tags: tags,
       ingredients: ingredients,
-      recipe: formData.recipeSteps,
+      recipe: recipeSteps,
       cookbookId: formData.cookbookId || undefined,
       mealTypes: mealTypes
     };
@@ -292,23 +312,29 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     return selectedMealTypes;
   }
 
-  private parseTagsFromString(tagsString: string): string[] {
-    if (!tagsString) return [];
-    return tagsString
-      .split(',')
-      .map(tag => tag.trim())
-      .filter(tag => tag.length > 0);
+  private getTagsFromFormArray(): string[] {
+    return this.tagsFormArray.controls
+      .map(control => control.value)
+      .filter(tag => tag && tag.trim().length > 0);
+  }
+
+  private getRecipeStepsFromFormArray(): string[] {
+    return this.recipeStepsFormArray.controls
+      .map(control => control.value)
+      .filter(step => step && step.trim().length > 0);
   }
 
   private transformFormIngredientsToModel(formIngredients: any[]): Ingredient[] {
-    return formIngredients.map(ingredient => ({
-      name: ingredient.name,
-      type: ingredient.type,
-      amount: {
-        value: ingredient.amountValue,
-        unit: ingredient.amountUnit
-      }
-    }));
+    return formIngredients
+      .filter(ingredient => ingredient.name && ingredient.name.trim().length > 0)
+      .map(ingredient => ({
+        name: ingredient.name,
+        type: ingredient.type,
+        amount: {
+          value: ingredient.amountValue,
+          unit: ingredient.amountUnit
+        }
+      }));
   }
 
   hideCreateRecipeModal(): void {
@@ -340,5 +366,14 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   cancelCreateRecipe(): void {
     this.hideCreateRecipeModal();
+  }
+
+  isCreateButtonEnabled(): boolean {
+    const titleControl = this.createRecipeForm.get('title');
+    const isValid = titleControl?.valid || false;
+    console.log('Title control value:', titleControl?.value);
+    console.log('Title control valid:', titleControl?.valid);
+    console.log('Title control errors:', titleControl?.errors);
+    return isValid;
   }
 }
