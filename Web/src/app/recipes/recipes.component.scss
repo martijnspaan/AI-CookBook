@@ -14,32 +14,81 @@
   }
 }
 
-.table {
-  th {
-    position: sticky;
-    top: 0;
-    z-index: 10;
+// Mobile-specific styles (≤400px)
+@media (max-width: 400px) {
+  .recipe-card {
+    cursor: pointer;
+    transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+    
+    .card {
+      border: none;
+      box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+      border-radius: 0.5rem;
+    }
+    
+    .card-title {
+      font-size: 1rem;
+      line-height: 1.2;
+      word-wrap: break-word;
+    }
+    
+    .card-text {
+      font-size: 0.875rem;
+      line-height: 1.4;
+      word-wrap: break-word;
+    }
+    
+    .tags-container {
+      margin-top: 0.5rem;
+    }
+    
+    .badge {
+      font-size: 0.6875rem;
+      padding: 0.25rem 0.5rem;
+    }
+  }
+}
+
+// Tablet and Desktop styles (>400px)
+@media (min-width: 401px) {
+  .table {
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+  }
+  
+  .table-responsive {
+    border-radius: 0.375rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    // Allow horizontal scroll for tablets and desktop
+    overflow-x: auto;
+  }
+  
+  .clickable-row {
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
+    
+    &:hover {
+      background-color: rgba(0, 123, 255, 0.1) !important;
+    }
+    
+    &:active {
+      background-color: rgba(0, 123, 255, 0.2) !important;
+    }
   }
 }
 
 .badge {
   font-size: 0.75rem;
-}
-
-.table-responsive {
-  border-radius: 0.375rem;
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-}
-
-.clickable-row {
-  cursor: pointer;
-  transition: background-color 0.15s ease-in-out;
-  
-  &:hover {
-    background-color: rgba(0, 123, 255, 0.1) !important;
-  }
-  
-  &:active {
-    background-color: rgba(0, 123, 255, 0.2) !important;
-  }
 }
