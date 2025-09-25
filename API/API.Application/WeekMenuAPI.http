@@ -1,0 +1,55 @@
+### Create or Update Week Menu
+POST https://localhost:7000/api/weekmenus
+Content-Type: application/json
+
+{
+  "weekNumber": 45,
+  "year": 2024,
+  "weekDays": [
+    {
+      "dayOfWeek": 1,
+      "breakfastRecipeId": "recipe-id-1",
+      "lunchRecipeId": "recipe-id-2",
+      "dinnerRecipeId": "recipe-id-3"
+    },
+    {
+      "dayOfWeek": 2,
+      "breakfastRecipeId": "recipe-id-4",
+      "lunchRecipeId": "recipe-id-5",
+      "dinnerRecipeId": "recipe-id-6"
+    },
+    {
+      "dayOfWeek": 3,
+      "breakfastRecipeId": "recipe-id-7",
+      "lunchRecipeId": "recipe-id-8",
+      "dinnerRecipeId": "recipe-id-9"
+    },
+    {
+      "dayOfWeek": 4,
+      "breakfastRecipeId": "recipe-id-10",
+      "lunchRecipeId": "recipe-id-11",
+      "dinnerRecipeId": "recipe-id-12"
+    },
+    {
+      "dayOfWeek": 5,
+      "breakfastRecipeId": "recipe-id-13",
+      "lunchRecipeId": "recipe-id-14",
+      "dinnerRecipeId": "recipe-id-15"
+    },
+    {
+      "dayOfWeek": 6,
+      "breakfastRecipeId": "recipe-id-16",
+      "lunchRecipeId": "recipe-id-17",
+      "dinnerRecipeId": "recipe-id-18"
+    },
+    {
+      "dayOfWeek": 0,
+      "breakfastRecipeId": "recipe-id-19",
+      "lunchRecipeId": "recipe-id-20",
+      "dinnerRecipeId": "recipe-id-21"
+    }
+  ]
+}
+
+### Get Week Menus for Current and Upcoming Two Weeks
+GET https://localhost:7000/api/weekmenus

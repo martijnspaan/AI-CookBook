@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -15,7 +15,7 @@ import { PageTitleService } from '../../services/page-title.service';
   templateUrl: './recipe-detail.component.html',
   styleUrl: './recipe-detail.component.scss'
 })
-export class RecipeDetailComponent implements OnInit, OnDestroy {
+export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
   recipe: Recipe | null = null;
   isLoadingRecipe = false;
   isUpdatingRecipe = false;
@@ -40,6 +40,10 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
     }
   }
 
+  ngAfterViewInit(): void {
+    // Page title will be set after recipe is loaded in loadRecipeById method
+  }
+
   ngOnDestroy(): void {
     this.destroySubject.next();
     this.destroySubject.complete();
@@ -55,7 +59,10 @@ export class RecipeDetailComponent implements OnInit, OnDestroy {
         next: (recipe) => {
           this.recipe = recipe;
           this.editedRecipe = { ...recipe };
-          this.pageTitleService.setPageTitle(recipe.title);
+          // Use setTimeout to defer page title setting to next change detection cycle
+          setTimeout(() => {
+            this.pageTitleService.setPageTitle(recipe.title);
+          }, 0);
           this.isLoadingRecipe = false;
         },
         error: (error) => {

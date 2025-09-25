@@ -30,7 +30,10 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.pageTitleService.pageTitle$.subscribe(title => {
-      this.currentPageTitle = title;
+      // Use setTimeout to defer the update to the next change detection cycle
+      setTimeout(() => {
+        this.currentPageTitle = title;
+      }, 0);
     });
     
     this.router.events

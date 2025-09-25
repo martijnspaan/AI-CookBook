@@ -1,3 +1,9 @@
+<!-- Saving Indicator -->
+<div *ngIf="isSaving" class="saving-indicator">
+  <i class="fas fa-spinner fa-spin"></i>
+  <span>Saving week menu...</span>
+</div>
+
 <!-- Week Calendar - Full Screen -->
 <app-week-calendar 
   [selectedWeek]="selectedWeek"

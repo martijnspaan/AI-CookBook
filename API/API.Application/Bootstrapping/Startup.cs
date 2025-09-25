@@ -33,11 +33,27 @@ public class Startup(IConfiguration configuration)
             return new CosmosDbRepository<RecipeEntity>(cosmosDbClientService, logger, containerName);
         });
 
+        // Register WeekMenu repository
+        services.AddScoped<ICosmosDbRepository<WeekMenuEntity>>(provider =>
+        {
+            ICosmosDbClientService cosmosDbClientService = provider.GetRequiredService<ICosmosDbClientService>();
+            ILogger<CosmosDbRepository<WeekMenuEntity>> logger = provider.GetRequiredService<ILogger<CosmosDbRepository<WeekMenuEntity>>>();
+            IConfiguration configuration = provider.GetRequiredService<IConfiguration>();
+            
+            string containerName = configuration.GetSection("CosmosDb:WeekMenuContainerName").Value ?? 
+                               Environment.GetEnvironmentVariable("COSMOSDB_WEEKMENU_CONTAINER_NAME") ?? 
+                               "WeekMenu";
+            
+            return new CosmosDbRepository<WeekMenuEntity>(cosmosDbClientService, logger, containerName);
+        });
+
         // Register use cases
         services.AddScoped<GetAllRecipesUseCase>();
         services.AddScoped<CreateRecipeUseCase>();
         services.AddScoped<UpdateRecipeUseCase>();
         services.AddScoped<DeleteRecipeUseCase>();
+        services.AddScoped<CreateOrUpdateWeekMenuUseCase>();
+        services.AddScoped<GetWeekMenusUseCase>();
 
         // Configure Swagger
         services.AddSwaggerGen(c =>
@@ -131,6 +147,9 @@ public class Startup(IConfiguration configuration)
             
             // Map recipes endpoints
             endpoints.MapRecipesEndpoints();
+            
+            // Map week menu endpoints
+            endpoints.MapWeekMenuEndpoints();
         });
     }
 }

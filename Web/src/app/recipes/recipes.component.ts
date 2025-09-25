@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormArray, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -15,7 +15,7 @@ import { PageTitleService } from '../services/page-title.service';
   templateUrl: './recipes.component.html',
   styleUrl: './recipes.component.scss'
 })
-export class RecipesComponent implements OnInit, OnDestroy {
+export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   recipes: Recipe[] = [];
   isLoadingRecipes = false;
   isCreatingRecipe = false;
@@ -39,8 +39,11 @@ export class RecipesComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.pageTitleService.setPageTitle('Recipe Collection');
     this.loadAllRecipes();
+  }
+
+  ngAfterViewInit(): void {
+    this.pageTitleService.setPageTitle('Recipe Collection');
   }
 
   ngOnDestroy(): void {

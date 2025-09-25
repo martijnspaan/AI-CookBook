@@ -127,20 +127,35 @@ public class CosmosDbClientService(IOptions<CosmosDbConfiguration> configuration
 
             _logger.LogInformation("Database '{DatabaseName}' created or already exists", _configuration.DatabaseName);
 
-            // Create container
+            // Create Recipes container
             _logger.LogInformation("Creating container '{ContainerName}' if it doesn't exist...", _configuration.ContainerName);
 
-            ContainerProperties containerProperties = new ContainerProperties
+            ContainerProperties recipesContainerProperties = new ContainerProperties
             {
                 Id = _configuration.ContainerName,
                 PartitionKeyPath = _configuration.PartitionKeyPath
             };
 
-            ContainerResponse containerResponse = await _database.CreateContainerIfNotExistsAsync(
-                containerProperties,
+            ContainerResponse recipesContainerResponse = await _database.CreateContainerIfNotExistsAsync(
+                recipesContainerProperties,
                 cancellationToken: cancellationToken);
 
             _logger.LogInformation("Container '{ContainerName}' created or already exists", _configuration.ContainerName);
+
+            // Create WeekMenu container
+            _logger.LogInformation("Creating container '{WeekMenuContainerName}' if it doesn't exist...", _configuration.WeekMenuContainerName);
+
+            ContainerProperties weekMenuContainerProperties = new ContainerProperties
+            {
+                Id = _configuration.WeekMenuContainerName,
+                PartitionKeyPath = _configuration.PartitionKeyPath
+            };
+
+            ContainerResponse weekMenuContainerResponse = await _database.CreateContainerIfNotExistsAsync(
+                weekMenuContainerProperties,
+                cancellationToken: cancellationToken);
+
+            _logger.LogInformation("Container '{WeekMenuContainerName}' created or already exists", _configuration.WeekMenuContainerName);
         }
         catch (Exception ex)
         {
