@@ -1,22 +1,25 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { WeekCalendarComponent, RecipeAssignment } from './week-calendar/week-calendar.component';
 import { RecipeSelectionDialogComponent } from './recipe-selection-dialog/recipe-selection-dialog.component';
+import { GroceryShoppingDialogComponent, MealSelection } from './grocery-shopping-dialog/grocery-shopping-dialog.component';
 import { Recipe } from '../models/recipe.model';
 import { PageTitleService } from '../services/page-title.service';
 import { WeekMenuService } from '../services/week-menu.service';
 import { RecipeService } from '../services/recipe.service';
+import { GroceryShoppingDialogService } from '../services/grocery-shopping-dialog.service';
 import { WeekMenu, WeekDay, CreateOrUpdateWeekMenuRequest } from '../models/week-menu.model';
-import { forkJoin, Observable } from 'rxjs';
+import { forkJoin, Observable, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-week-menu',
   standalone: true,
-  imports: [CommonModule, WeekCalendarComponent, RecipeSelectionDialogComponent],
+  imports: [CommonModule, WeekCalendarComponent, RecipeSelectionDialogComponent, GroceryShoppingDialogComponent],
   templateUrl: './week-menu.component.html',
   styleUrl: './week-menu.component.scss'
 })
-export class WeekMenuComponent implements OnInit, AfterViewInit {
+export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedWeek: Date = new Date();
   selectedMealType: 'breakfast' | 'lunch' | 'dinner' | null = null;
   selectedDate: Date | null = null;
@@ -24,19 +27,23 @@ export class WeekMenuComponent implements OnInit, AfterViewInit {
   recipeAssignments: RecipeAssignment[] = [];
   recipes: Recipe[] = [];
   showRecipeDialog: boolean = false;
+  showGroceryShoppingDialog: boolean = false;
   currentWeekMenu: WeekMenu | null = null;
   isSaving: boolean = false;
   isCalendarLoading: boolean = true;
+  private destroySubject = new Subject<void>();
 
   constructor(
     private pageTitleService: PageTitleService,
     private weekMenuService: WeekMenuService,
-    private recipeService: RecipeService
+    private recipeService: RecipeService,
+    private groceryShoppingDialogService: GroceryShoppingDialogService
   ) {}
 
   ngOnInit(): void {
     this.loadWeekMenus();
     this.loadAllRecipes();
+    this.subscribeToGroceryShoppingDialog();
   }
 
   ngAfterViewInit(): void {
@@ -377,5 +384,34 @@ export class WeekMenuComponent implements OnInit, AfterViewInit {
         this.isCalendarLoading = false;
       }
     });
+  }
+
+  private subscribeToGroceryShoppingDialog(): void {
+    this.groceryShoppingDialogService.dialogState$
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe(config => {
+        this.showGroceryShoppingDialog = config.isVisible;
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroySubject.next();
+    this.destroySubject.complete();
+  }
+
+  onGroceryShoppingListCreated(event: { selectedDay: Date; selectedMeals: MealSelection[] }): void {
+    console.log('Grocery shopping list created:', event);
+    // TODO: Implement actual grocery list creation logic here
+    // This could involve:
+    // 1. Extracting ingredients from selected meals
+    // 2. Aggregating ingredients by type
+    // 3. Creating a shopping list
+    // 4. Saving to backend or navigating to grocery list page
+    
+    this.groceryShoppingDialogService.closeGroceryShoppingDialog();
+  }
+
+  onGroceryShoppingDialogClosed(): void {
+    this.groceryShoppingDialogService.closeGroceryShoppingDialog();
   }
 }

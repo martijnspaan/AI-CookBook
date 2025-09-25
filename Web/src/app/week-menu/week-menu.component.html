@@ -32,5 +32,13 @@
       (recipeRemoved)="onRecipeRemoved($event)"
       (dialogClosed)="onDialogClosed()">
     </app-recipe-selection-dialog>
+
+    <!-- Grocery Shopping Dialog -->
+    <app-grocery-shopping-dialog
+      [isVisible]="showGroceryShoppingDialog"
+      [recipeAssignments]="recipeAssignments"
+      (shoppingListCreated)="onGroceryShoppingListCreated($event)"
+      (dialogClosed)="onGroceryShoppingDialogClosed()">
+    </app-grocery-shopping-dialog>
   </div>
 </div>

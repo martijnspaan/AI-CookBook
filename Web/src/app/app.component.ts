@@ -6,6 +6,7 @@ import { FooterComponent } from './footer/footer.component';
 import { PageTitleService } from './services/page-title.service';
 import { CookbookModalService } from './services/cookbook-modal.service';
 import { RecipeModalService } from './services/recipe-modal.service';
+import { GroceryShoppingDialogService } from './services/grocery-shopping-dialog.service';
 import { FooterService, FooterButtonConfig } from './services/footer.service';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
@@ -47,6 +48,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private router: Router,
     private cookbookModalService: CookbookModalService,
     private recipeModalService: RecipeModalService,
+    private groceryShoppingDialogService: GroceryShoppingDialogService,
     private footerService: FooterService
   ) {}
 
@@ -179,8 +181,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
   
   private createGroceriesList(): void {
-    // TODO: Implement groceries list creation functionality
-    console.log('Create groceries list functionality not yet implemented');
+    this.groceryShoppingDialogService.openGroceryShoppingDialog();
   }
   
   private openCreateCookbookModal(): void {
