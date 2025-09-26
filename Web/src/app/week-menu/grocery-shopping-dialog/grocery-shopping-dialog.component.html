@@ -27,6 +27,10 @@
         <div class="mb-4">
           <div class="mb-3">
             <label class="form-label fw-bold">Select meals to include:</label>
+            <div *ngIf="isLoadingGroceryLists" class="text-muted small">
+              <i class="fas fa-spinner fa-spin me-1"></i>
+              Loading existing grocery lists...
+            </div>
           </div>
           
           <div class="meal-selection-container">
@@ -36,19 +40,38 @@
               </div>
               
               <div class="meals-list">
-                <div *ngFor="let meal of dateGroup.meals" class="meal-row">
+                <div *ngFor="let meal of dateGroup.meals" class="meal-row" [class.meal-already-used]="meal.isAlreadyUsed">
                   <div class="form-check">
-                    <input 
-                      class="form-check-input" 
-                      type="checkbox" 
-                      [id]="'meal-' + meal.date + '-' + meal.mealType"
-                      [(ngModel)]="meal.isSelected"
-                      (change)="onMealSelectionChanged(meal)">
+                    <!-- Container for both checkbox and shopping cart icon to ensure same positioning -->
+                    <div class="form-check-input-container">
+                      <!-- Show checkbox for available meals -->
+                      <input 
+                        *ngIf="!meal.isAlreadyUsed"
+                        class="form-check-input" 
+                        type="checkbox" 
+                        [id]="'meal-' + meal.date + '-' + meal.mealType"
+                        [(ngModel)]="meal.isSelected"
+                        (change)="onMealSelectionChanged(meal)">
+                      
+                      <!-- Show grayed-out shopping cart icon for already used meals -->
+                      <div 
+                        *ngIf="meal.isAlreadyUsed"
+                        class="shopping-cart-icon-disabled"
+                        [id]="'meal-' + meal.date + '-' + meal.mealType">
+                        <i class="fas fa-shopping-cart"></i>
+                      </div>
+                    </div>
+                    
                     <label 
                       class="form-check-label d-flex align-items-center justify-content-between w-100" 
-                      [for]="'meal-' + meal.date + '-' + meal.mealType">
-                      <span class="recipe-name">{{ meal.recipeTitle }}</span>
-                      <span class="badge bg-primary">{{ getMealTypeLabel(meal.mealType) }}</span>
+                      [for]="'meal-' + meal.date + '-' + meal.mealType"
+                      [class.text-muted]="meal.isAlreadyUsed">
+                      <span class="recipe-name">
+                        {{ meal.recipeTitle }}
+                      </span>
+                      <span class="badge" [class.bg-primary]="!meal.isAlreadyUsed" [class.bg-secondary]="meal.isAlreadyUsed">
+                        {{ getMealTypeLabel(meal.mealType) }}
+                      </span>
                     </label>
                   </div>
                 </div>

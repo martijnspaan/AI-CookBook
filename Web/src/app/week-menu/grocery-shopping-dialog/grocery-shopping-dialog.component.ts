@@ -2,6 +2,8 @@ import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChange
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RecipeAssignment } from '../week-calendar/week-calendar.component';
+import { GroceryListService } from '../../services/grocery-list.service';
+import { GroceryList } from '../../models/grocery-list.model';
 
 export interface ShoppingDayOption {
   date: Date;
@@ -14,6 +16,7 @@ export interface MealSelection {
   recipeTitle: string;
   recipeId: string;
   isSelected: boolean;
+  isAlreadyUsed: boolean;
 }
 
 @Component({
@@ -33,16 +36,20 @@ export class GroceryShoppingDialogComponent implements OnInit, OnChanges {
   shoppingDayOptions: ShoppingDayOption[] = [];
   mealSelections: MealSelection[] = [];
   mealsByDate: { date: string; meals: MealSelection[] }[] = [];
+  existingGroceryLists: GroceryList[] = [];
+  isLoadingGroceryLists: boolean = false;
+
+  constructor(private groceryListService: GroceryListService) {}
 
   ngOnInit(): void {
     this.generateShoppingDayOptions();
-    this.generateMealSelections();
+    this.loadExistingGroceryLists();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isVisible'] && changes['isVisible'].currentValue === true) {
       this.generateShoppingDayOptions();
-      this.generateMealSelections();
+      this.loadExistingGroceryLists();
     }
     if (changes['recipeAssignments']) {
       this.generateMealSelections();
@@ -70,11 +77,29 @@ export class GroceryShoppingDialogComponent implements OnInit, OnChanges {
     this.selectedShoppingDay = this.shoppingDayOptions[0].date;
   }
 
+  private loadExistingGroceryLists(): void {
+    this.isLoadingGroceryLists = true;
+    this.groceryListService.getAllGroceryLists().subscribe({
+      next: (groceryLists) => {
+        this.existingGroceryLists = groceryLists;
+        this.generateMealSelections();
+        this.isLoadingGroceryLists = false;
+      },
+      error: (error) => {
+        console.error('Error loading existing grocery lists:', error);
+        this.generateMealSelections();
+        this.isLoadingGroceryLists = false;
+      }
+    });
+  }
+
   private generateMealSelections(): void {
     this.mealSelections = [];
     
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    
+    const alreadyUsedMeals = this.getAlreadyUsedMeals();
     
     this.recipeAssignments.forEach(assignment => {
       // Parse assignment.date (which is in YYYY-MM-DD format) as local date to avoid timezone issues
@@ -90,17 +115,63 @@ export class GroceryShoppingDialogComponent implements OnInit, OnChanges {
       mealDate.setHours(0, 0, 0, 0);
       
       if (mealDate >= today) {
+        const isAlreadyUsed = this.isMealAlreadyUsed(assignment, alreadyUsedMeals);
+        
         this.mealSelections.push({
           date: assignment.date,
           mealType: assignment.mealType,
           recipeTitle: assignment.recipeTitle,
           recipeId: assignment.recipeId,
-          isSelected: true
+          isSelected: !isAlreadyUsed,
+          isAlreadyUsed: isAlreadyUsed
         });
       }
     });
     
     this.updateMealsByDate();
+  }
+
+  private getAlreadyUsedMeals(): Set<string> {
+    const alreadyUsedMeals = new Set<string>();
+    
+    this.existingGroceryLists.forEach(groceryList => {
+      groceryList.meals.forEach(meal => {
+        const mealKey = this.createMealKey(meal.dayOfMeal, meal.mealType, meal.recipeId);
+        alreadyUsedMeals.add(mealKey);
+      });
+    });
+    
+    return alreadyUsedMeals;
+  }
+
+  private isMealAlreadyUsed(assignment: RecipeAssignment, alreadyUsedMeals: Set<string>): boolean {
+    const mealKey = this.createMealKey(assignment.date, assignment.mealType, assignment.recipeId);
+    return alreadyUsedMeals.has(mealKey);
+  }
+
+  private createMealKey(date: string, mealType: string, recipeId: string | undefined): string {
+    // Normalize date to YYYY-MM-DD format for consistent comparison
+    const normalizedDate = this.normalizeDate(date);
+    return `${normalizedDate}|${mealType}|${recipeId || ''}`;
+  }
+
+  private normalizeDate(dateString: string): string {
+    try {
+      // If it's already in YYYY-MM-DD format, return as is
+      if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+        return dateString;
+      }
+      
+      // If it's an ISO 8601 string, extract just the date part
+      const date = new Date(dateString);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    } catch (error) {
+      console.error('Error normalizing date:', dateString, error);
+      return dateString; // Return original if parsing fails
+    }
   }
 
   onShoppingDayChanged(): void {
@@ -120,11 +191,11 @@ export class GroceryShoppingDialogComponent implements OnInit, OnChanges {
 
 
   getSelectedMealsCount(): number {
-    return this.mealSelections.filter(meal => meal.isSelected).length;
+    return this.mealSelections.filter(meal => meal.isSelected && !meal.isAlreadyUsed).length;
   }
 
   createShoppingList(): void {
-    const selectedMeals = this.mealSelections.filter(meal => meal.isSelected);
+    const selectedMeals = this.mealSelections.filter(meal => meal.isSelected && !meal.isAlreadyUsed);
     this.shoppingListCreated.emit({
       selectedDay: this.selectedShoppingDay,
       selectedMeals: selectedMeals
