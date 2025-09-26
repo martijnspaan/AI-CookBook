@@ -24,8 +24,8 @@
         </div>
 
         <!-- Meal Selection -->
-        <div class="mb-4">
-          <div class="mb-3">
+        <div class="mb-3">
+          <div class="mb-2">
             <label class="form-label fw-bold">Select meals to include:</label>
             <div *ngIf="isLoadingGroceryLists" class="text-muted small">
               <i class="fas fa-spinner fa-spin me-1"></i>
@@ -85,13 +85,6 @@
           </div>
         </div>
 
-        <!-- Selection Summary -->
-        <div *ngIf="mealSelections.length > 0" class="selection-summary">
-          <div class="alert alert-info">
-            <i class="fas fa-info-circle me-2"></i>
-            <strong>{{ getSelectedMealsCount() }}</strong> meal(s) selected for grocery shopping
-          </div>
-        </div>
       </div>
       
       <div class="modal-footer">
