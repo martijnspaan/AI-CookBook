@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ai-cookbook-config
+  namespace: ai-cookbook
+data:
+  # API Configuration
+  API_TITLE: "AI Cookbook API"
+  API_VERSION: "v1"
+  API_DESCRIPTION: "A minimal API for the AI Cookbook project"
+  API_CONTACT_NAME: "AI Cookbook Team"
+  API_CONTACT_EMAIL: "contact@aicookbook.com"
+  
+  # CORS Configuration
+  CORS_ALLOWED_ORIGINS: "http://localhost:4200,http://localhost:3000,http://localhost:8080"
+  CORS_ALLOWED_METHODS: "GET,POST,PUT,DELETE,OPTIONS"
+  CORS_ALLOWED_HEADERS: "*"
+  
+  # Swagger Configuration
+  SWAGGER_ENABLED: "true"
+  SWAGGER_ROUTE_PREFIX: ""
+  SWAGGER_DOCUMENT_TITLE: "AI Cookbook API Documentation"
+  
+  # Recipes Configuration
+  RECIPES_PATH: "recipes"
+  
+  # CosmosDB Configuration
+  COSMOSDB_DATABASE_NAME: "CookBook"
+  COSMOSDB_CONTAINER_NAME: "Recipes"
+  COSMOSDB_WEEK_MENU_CONTAINER_NAME: "WeekMenu"
+  COSMOSDB_COOKBOOK_CONTAINER_NAME: "Cookbooks"
+  COSMOSDB_GROCERY_LIST_CONTAINER_NAME: "GroceryLists"
+  COSMOSDB_PARTITION_KEY_PATH: "/id"
+  COSMOSDB_THROUGHPUT: "400"
+  COSMOSDB_CREATE_IF_NOT_EXISTS: "true"

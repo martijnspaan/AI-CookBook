@@ -13,7 +13,7 @@ import {
   providedIn: 'root'
 })
 export class WeekMenuService {
-  private readonly apiBaseUrl = 'https://localhost:7149/api/weekmenus';
+  private readonly apiBaseUrl = 'http://localhost:4201/api/weekmenus';
 
   constructor(private readonly httpClient: HttpClient) { }
 

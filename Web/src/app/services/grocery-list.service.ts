@@ -8,7 +8,7 @@ import { GroceryList, CreateGroceryListRequest } from '../models/grocery-list.mo
   providedIn: 'root'
 })
 export class GroceryListService {
-  private readonly apiBaseUrl = 'https://localhost:7149/api/grocerylists';
+  private readonly apiBaseUrl = 'http://localhost:4201/api/grocerylists';
 
   constructor(private readonly httpClient: HttpClient) { }
 

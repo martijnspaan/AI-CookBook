@@ -8,7 +8,7 @@ import { Cookbook, CreateCookbookRequest, UpdateCookbookRequest } from '../model
   providedIn: 'root'
 })
 export class CookbookService {
-  private readonly apiBaseUrl = 'https://localhost:7149/api/cookbooks';
+  private readonly apiBaseUrl = 'http://localhost:4201/api/cookbooks';
 
   constructor(private readonly httpClient: HttpClient) { }
 
