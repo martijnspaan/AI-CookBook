@@ -1,5 +1,5 @@
 <div class="modal fade show d-block" *ngIf="isVisible" tabindex="-1" role="dialog">
-  <div class="modal-dialog modal-lg" role="document">
+  <div class="modal-dialog modal-fullscreen" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">
@@ -11,7 +11,7 @@
       
       <div class="modal-body">
         <!-- Shopping Day Selection -->
-        <div class="mb-4">
+        <div class="mb-3">
           <label class="form-label fw-bold">Choose your shopping day:</label>
           <select 
             class="form-select" 
@@ -24,7 +24,7 @@
         </div>
 
         <!-- Meal Selection -->
-        <div class="mb-3">
+        <div class="mb-2 flex-grow-1 d-flex flex-column">
           <div class="mb-2">
             <label class="form-label fw-bold">Select meals to include:</label>
             <div *ngIf="isLoadingGroceryLists" class="text-muted small">

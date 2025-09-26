@@ -2,6 +2,7 @@ using API.Application.Dtos;
 using API.Application.UseCases;
 using API.Infrastructure.CosmosDb.Interfaces;
 using API.Infrastructure.CosmosDb.Entities;
+using Microsoft.AspNetCore.Mvc;
 
 namespace API.Application.Controllers;
 
@@ -63,6 +64,24 @@ public static class GroceryListController
             }
         })
         .WithName("CreateGroceryList")
+        .WithOpenApi();
+
+        // DELETE /api/grocerylists/{id} - Delete a grocery list
+        endpoints.MapDelete("/api/grocerylists/{id}", async (string id, [FromServices] DeleteGroceryListUseCase deleteGroceryListUseCase) =>
+        {
+            DeleteGroceryListUseCaseInput input = new DeleteGroceryListUseCaseInput(id);
+            DeleteGroceryListUseCaseOutput output = await deleteGroceryListUseCase.Execute(input);
+
+            if (output.IsSuccess)
+            {
+                return Results.NoContent();
+            }
+            else
+            {
+                return Results.Json(new { error = output.ErrorMessage }, statusCode: 404);
+            }
+        })
+        .WithName("DeleteGroceryList")
         .WithOpenApi();
     }
 }

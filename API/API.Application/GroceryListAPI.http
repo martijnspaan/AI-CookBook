@@ -33,3 +33,6 @@ GET https://localhost:7149/api/grocerylists
 
 ### Get a specific grocery list by ID
 GET https://localhost:7149/api/grocerylists/{{groceryListId}}
+
+### Delete a grocery list by ID
+DELETE https://localhost:7149/api/grocerylists/{{groceryListId}}

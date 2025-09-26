@@ -185,7 +185,8 @@ export class GroceryShoppingDialogComponent implements OnInit, OnChanges {
     );
     if (index !== -1) {
       this.mealSelections[index].isSelected = meal.isSelected;
-      this.updateMealsByDate();
+      // No need to call updateMealsByDate() as it only changes the isSelected property
+      // and doesn't affect the structure of mealsByDate
     }
   }
 

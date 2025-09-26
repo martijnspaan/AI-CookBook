@@ -33,6 +33,7 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
   groceryLists: GroceryListWithRecipes[] = [];
   isLoading: boolean = true;
   errorMessage: string | null = null;
+  isDeleting: boolean = false;
 
   constructor(
     private pageTitleService: PageTitleService,
@@ -205,6 +206,26 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
       weekday: 'short',
       month: 'short',
       day: 'numeric'
+    });
+  }
+
+  deleteGroceryList(groceryListId: string): void {
+    this.isDeleting = true;
+    this.errorMessage = null;
+
+    this.groceryListService.deleteGroceryList(groceryListId).subscribe({
+      next: () => {
+        console.log('Grocery list deleted successfully');
+        this.isDeleting = false;
+        
+        // Reload the grocery lists
+        this.loadGroceryLists();
+      },
+      error: (error) => {
+        console.error('Error deleting grocery list:', error);
+        this.errorMessage = 'Failed to delete shopping list. Please try again.';
+        this.isDeleting = false;
+      }
     });
   }
 

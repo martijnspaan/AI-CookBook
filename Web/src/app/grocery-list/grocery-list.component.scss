@@ -9,10 +9,10 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 2rem;
+  padding: 0;
   
   @media (max-width: 400px) {
-    padding: 1rem;
+    padding: 0;
   }
 }
 
@@ -155,8 +155,8 @@
 .grocery-lists {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1rem;
+  gap: 1rem;
+  margin-top: 0;
 
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
@@ -168,7 +168,7 @@
   border: 2px solid #dee2e6;
   border-radius: 0.5rem;
   padding: 0.75rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0;
   transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out, border-color 0.15s ease-in-out;
 
   &:hover {
@@ -188,7 +188,7 @@
 
   .meals-section {
     .day-group {
-      margin-bottom: 0.5rem;
+      margin-bottom: 0;
       
       &:last-child {
         margin-bottom: 0;
@@ -196,7 +196,7 @@
     }
 
     .day-header {
-      margin-bottom: 0.25rem;
+      margin-bottom: 0;
     }
 
     .day-label {
@@ -344,4 +344,86 @@
     opacity: 0.6;
     cursor: not-allowed;
   }
+
+  &.btn-outline-danger {
+    background-color: transparent;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+
+    &:hover:not(:disabled) {
+      background-color: #dc3545;
+      color: white;
+    }
+  }
+
+  &.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  &.delete-button {
+    min-width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    @media (max-width: 400px) {
+      min-width: 28px;
+      height: 28px;
+      font-size: 0.75rem;
+    }
+  }
+}
+
+// Modal styles
+.modal {
+  .modal-dialog {
+    @media (max-width: 400px) {
+      margin: 0.5rem;
+    }
+  }
+
+  .modal-content {
+    border-radius: 0.5rem;
+  }
+
+  .modal-header {
+    border-bottom: 1px solid #dee2e6;
+    padding: 1rem 1.5rem;
+
+    @media (max-width: 400px) {
+      padding: 0.75rem 1rem;
+    }
+  }
+
+  .modal-body {
+    padding: 1.5rem;
+
+    @media (max-width: 400px) {
+      padding: 1rem;
+    }
+  }
+
+  .modal-footer {
+    border-top: 1px solid #dee2e6;
+    padding: 1rem 1.5rem;
+    gap: 0.5rem;
+
+    @media (max-width: 400px) {
+      padding: 0.75rem 1rem;
+      flex-direction: column;
+      
+      .btn {
+        width: 100%;
+      }
+    }
+  }
+}
+
+// Spinner styles
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
 }

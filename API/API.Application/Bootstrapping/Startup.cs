@@ -88,6 +88,7 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<DeleteCookbookUseCase>();
         services.AddScoped<CreateGroceryListUseCase>();
         services.AddScoped<GetAllGroceryListsUseCase>();
+        services.AddScoped<DeleteGroceryListUseCase>();
 
         // Configure Swagger
         services.AddSwaggerGen(c =>

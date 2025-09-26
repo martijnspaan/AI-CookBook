@@ -30,6 +30,12 @@ export class GroceryListService {
     );
   }
 
+  deleteGroceryList(groceryListId: string): Observable<void> {
+    return this.httpClient.delete<void>(`${this.apiBaseUrl}/${groceryListId}`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'An unknown error occurred';
     

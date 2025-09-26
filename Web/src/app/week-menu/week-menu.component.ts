@@ -433,13 +433,11 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     this.groceryListService.createGroceryList(groceryListRequest).subscribe({
       next: (groceryList) => {
         console.log('Grocery list created successfully:', groceryList);
-        alert('Grocery list created successfully!');
         this.groceryShoppingDialogService.closeGroceryShoppingDialog();
         this.router.navigate(['/grocery-list']);
       },
       error: (error) => {
         console.error('Error creating grocery list:', error);
-        alert('Error creating grocery list. Please try again.');
       }
     });
   }
