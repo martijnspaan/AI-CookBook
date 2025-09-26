@@ -7,15 +7,16 @@
 }
 
 .modal-dialog {
-  margin: 0;
-  max-height: 100vh;
+  margin: 1.75rem auto;
+  max-width: 600px;
+  max-height: calc(100vh - 3.5rem);
 }
 
 .modal-content {
-  border: none;
-  border-radius: 0;
-  box-shadow: none;
-  height: 100vh;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-radius: 0.5rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  max-height: calc(100vh - 3.5rem);
   display: flex;
   flex-direction: column;
 }
@@ -23,7 +24,7 @@
 .modal-header {
   border-bottom: 1px solid #e9ecef;
   background-color: #f8f9fa;
-  border-radius: 0;
+  border-radius: 0.5rem 0.5rem 0 0;
   flex-shrink: 0;
   
   .modal-title {
@@ -185,7 +186,7 @@
 .modal-footer {
   border-top: 1px solid #e9ecef;
   background-color: #f8f9fa;
-  border-radius: 0;
+  border-radius: 0 0 0.5rem 0.5rem;
   flex-shrink: 0;
   
   .btn {
@@ -241,10 +242,15 @@
 }
 
 // Responsive adjustments
-@media (max-width: 768px) {
+@media (max-width: 400px) {
   .modal-dialog {
-    margin: 0;
-    max-width: 100%;
+    margin: 0.5rem;
+    max-width: calc(100% - 1rem);
+    max-height: calc(100vh - 1rem);
+  }
+  
+  .modal-content {
+    max-height: calc(100vh - 1rem);
   }
   
   .modal-body {
@@ -265,5 +271,17 @@
     .badge {
       flex-shrink: 0;
     }
+  }
+}
+
+@media (min-width: 401px) and (max-width: 768px) {
+  .modal-dialog {
+    margin: 1rem;
+    max-width: calc(100% - 2rem);
+    max-height: calc(100vh - 2rem);
+  }
+  
+  .modal-content {
+    max-height: calc(100vh - 2rem);
   }
 }
