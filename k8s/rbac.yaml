@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ai-cookbook-sa
+  namespace: ai-cookbook
+  labels:
+    app.kubernetes.io/name: ai-cookbook
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: rbac
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ai-cookbook-role
+  namespace: ai-cookbook
+  labels:
+    app.kubernetes.io/name: ai-cookbook
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: rbac
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "endpoints", "persistentvolumeclaims", "events", "configmaps", "secrets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "daemonsets", "replicasets", "statefulsets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingresses", "networkpolicies"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["policy"]
+  resources: ["poddisruptionbudgets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ai-cookbook-rolebinding
+  namespace: ai-cookbook
+  labels:
+    app.kubernetes.io/name: ai-cookbook
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: rbac
+subjects:
+- kind: ServiceAccount
+  name: ai-cookbook-sa
+  namespace: ai-cookbook
+roleRef:
+  kind: Role
+  name: ai-cookbook-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ai-cookbook-cluster-role
+  labels:
+    app.kubernetes.io/name: ai-cookbook
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: rbac
+rules:
+- apiGroups: [""]
+  resources: ["nodes", "namespaces"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["metrics.k8s.io"]
+  resources: ["nodes", "pods"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ai-cookbook-cluster-rolebinding
+  labels:
+    app.kubernetes.io/name: ai-cookbook
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: rbac
+subjects:
+- kind: ServiceAccount
+  name: ai-cookbook-sa
+  namespace: ai-cookbook
+roleRef:
+  kind: ClusterRole
+  name: ai-cookbook-cluster-role
+  apiGroup: rbac.authorization.k8s.io

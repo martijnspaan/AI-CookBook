@@ -5,22 +5,52 @@ metadata:
   namespace: ai-cookbook
   labels:
     app: web
+    app.kubernetes.io/name: ai-cookbook-web
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: web
+  annotations:
+    deployment.kubernetes.io/revision: "1"
 spec:
-  replicas: 1
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
   selector:
     matchLabels:
       app: web
+      app.kubernetes.io/name: ai-cookbook-web
   template:
     metadata:
       labels:
         app: web
+        app.kubernetes.io/name: ai-cookbook-web
+        app.kubernetes.io/part-of: ai-cookbook
+        app.kubernetes.io/version: "1.0.0"
+        app.kubernetes.io/component: web
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "4200"
+        prometheus.io/path: "/metrics"
     spec:
+      serviceAccountName: ai-cookbook-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 2000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: web
-        image: ai-cookbook-web:latest
-        imagePullPolicy: Never  # Use local image for development
+        image: ai-cookbook-web:1.0.0
+        imagePullPolicy: IfNotPresent
         ports:
-        - containerPort: 4200
+        - name: http
+          containerPort: 4200
+          protocol: TCP
         resources:
           requests:
             memory: "128Mi"
@@ -28,15 +58,59 @@ spec:
           limits:
             memory: "256Mi"
             cpu: "200m"
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+            - ALL
         livenessProbe:
           httpGet:
             path: /
             port: 4200
+            scheme: HTTP
           initialDelaySeconds: 30
           periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+          successThreshold: 1
         readinessProbe:
           httpGet:
             path: /
             port: 4200
+            scheme: HTTP
           initialDelaySeconds: 5
           periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+          successThreshold: 1
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: var-tmp
+          mountPath: /var/tmp
+      volumes:
+      - name: tmp
+        emptyDir: {}
+      - name: var-tmp
+        emptyDir: {}
+      nodeSelector:
+        kubernetes.io/os: linux
+      tolerations:
+      - key: "node-role.kubernetes.io/master"
+        operator: "Exists"
+        effect: "NoSchedule"
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - web
+              topologyKey: kubernetes.io/hostname

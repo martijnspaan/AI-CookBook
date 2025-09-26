@@ -4,3 +4,10 @@ metadata:
   name: ai-cookbook
   labels:
     name: ai-cookbook
+    app.kubernetes.io/name: ai-cookbook
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+  annotations:
+    description: "AI Cookbook application namespace"
+    contact: "AI Cookbook Team"
