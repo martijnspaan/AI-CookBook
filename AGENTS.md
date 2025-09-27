@@ -3,6 +3,10 @@ This project is an AI powered application that works with cooking recipes and gr
 
 # Project Instructions
 
+## Agent rules [IMPORTANT]
+
+- Whenever the agents wants to go for a completely different approach while investiging an issue, always consult with the user first before taking that approach.
+
 ## Folder structure
 
 - The frontend application must be managed in the 'Web' folder
@@ -13,7 +17,7 @@ This project is an AI powered application that works with cooking recipes and gr
 
 ## Project rules
 
-- When running scripts, never use ampersands (&&) to concatenate commands, instead run each command separately.
+- When running powershell of bash scripts, never use '&&' for command chaining, instead run each command separately.
 - When running scripts always check in the current folder.
 
 ## Coding style
@@ -24,6 +28,7 @@ This project is an AI powered application that works with cooking recipes and gr
 ## Azure test environment
 
 - Any commands and actions performed on Azure are only allowed in the subscription 'Playground - masp' and resource group 'AI-CookBook'
+- Should use best practise for managing azure resources including descriptive names
 
 ## Debugging and analyzing
 

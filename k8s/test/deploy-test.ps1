@@ -7,7 +7,8 @@ param(
     [string]$ResourceGroup = "AI-CookBook",
     [string]$AksClusterName = "k8s-ai-cookbook",
     [switch]$SkipImageBuild = $false,
-    [switch]$SkipImagePush = $false
+    [switch]$SkipImagePush = $false,
+    [switch]$SkipAzureSetup = $false
 )
 
 Write-Host "Starting AI Cookbook test environment deployment to Azure Kubernetes..." -ForegroundColor Green
@@ -33,31 +34,38 @@ if (-not (Get-Command openssl -ErrorAction SilentlyContinue)) {
     exit 1
 }
 
-# Check if logged into Azure
-Write-Host "Checking Azure authentication..." -ForegroundColor Yellow
-$azAccount = az account show --query "name" -o tsv 2>$null
-if (-not $azAccount) {
-    Write-Error "Not logged into Azure. Please run 'az login' first."
-    exit 1
-}
-Write-Host "Logged into Azure as: $azAccount" -ForegroundColor Green
+# Azure setup (skip if called from mobile access script)
+if (-not $SkipAzureSetup) {
+    Write-Host "Performing Azure setup..." -ForegroundColor Yellow
+    
+    # Check if logged into Azure
+    Write-Host "Checking Azure authentication..." -ForegroundColor Yellow
+    $azAccount = az account show --query "name" -o tsv 2>$null
+    if (-not $azAccount) {
+        Write-Error "Not logged into Azure. Please run 'az login' first."
+        exit 1
+    }
+    Write-Host "Logged into Azure as: $azAccount" -ForegroundColor Green
 
-# Get AKS credentials
-Write-Host "Getting AKS credentials..." -ForegroundColor Yellow
-az aks get-credentials --resource-group $ResourceGroup --name $AksClusterName --overwrite-existing
+    # Get AKS credentials
+    Write-Host "Getting AKS credentials..." -ForegroundColor Yellow
+    az aks get-credentials --resource-group $ResourceGroup --name $AksClusterName --overwrite-existing
 
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed to get AKS credentials. Please check your resource group and cluster name."
-    exit 1
-}
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to get AKS credentials. Please check your resource group and cluster name."
+        exit 1
+    }
 
-# Login to Azure Container Registry
-Write-Host "Logging into Azure Container Registry..." -ForegroundColor Yellow
-az acr login --name $AzureContainerRegistry.Split('.')[0]
+    # Login to Azure Container Registry
+    Write-Host "Logging into Azure Container Registry..." -ForegroundColor Yellow
+    az acr login --name $AzureContainerRegistry.Split('.')[0]
 
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed to login to Azure Container Registry. Please check your registry name and permissions."
-    exit 1
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to login to Azure Container Registry. Please check your registry name and permissions."
+        exit 1
+    }
+} else {
+    Write-Host "Skipping Azure setup (handled by calling script)..." -ForegroundColor Yellow
 }
 
 # Build and push Docker images if not skipped

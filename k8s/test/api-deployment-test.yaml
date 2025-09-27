@@ -54,7 +54,7 @@ spec:
         supplementalGroups: [1000]
       containers:
       - name: api
-        image: aicookbookregistry.azurecr.io/ai-cookbook-api:1.0.0-test
+        image: aicookbookregistry.azurecr.io/aicookbookregistry.azurecr.io/aicookbookregistry.azurecr.io/aicookbookregistry.azurecr.io/ai-cookbook-api:1.0.0-test
         imagePullPolicy: Always
         ports:
         - name: http
@@ -152,6 +152,9 @@ spec:
                   values:
                   - test
               topologyKey: kubernetes.io/hostname
+
+
+
 
 
 
