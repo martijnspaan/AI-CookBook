@@ -1,0 +1,36 @@
+# Development Dockerfile for faster rebuilds
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+
+WORKDIR /src
+
+# Copy project files first for better layer caching
+COPY API.Application/API.Application.csproj API.Application/
+COPY API.Infrastructure.CosmosDb/API.Infrastructure.CosmosDb.csproj API.Infrastructure.CosmosDb/
+
+# Restore dependencies (this layer will be cached if project files don't change)
+RUN dotnet restore API.Application/API.Application.csproj
+
+# Copy source code
+COPY . .
+
+# Build the application
+WORKDIR /src/API.Application
+RUN dotnet build "API.Application.csproj" -c Debug -o /app/build
+
+# Development runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+
+# Copy built application
+COPY --from=build /app/build .
+
+# Expose port 4201
+EXPOSE 4201
+
+# Set environment variables for development
+ENV ASPNETCORE_URLS=http://+:4201
+ENV ASPNETCORE_ENVIRONMENT=Development
+ENV DOTNET_USE_POLLING_FILE_WATCHER=true
+ENV ASPNETCORE_DETAILEDERRORS=true
+
+ENTRYPOINT ["dotnet", "API.Application.dll"]

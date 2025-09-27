@@ -17,6 +17,7 @@ export interface Recipe {
   ingredients: Ingredient[];
   recipe: string[];
   cookbookId?: string;
+  page?: number;
   mealTypes: string[];
   createdAt?: Date;
   updatedAt?: Date;
@@ -29,6 +30,7 @@ export interface CreateRecipeRequest {
   ingredients: Ingredient[];
   recipe: string[];
   cookbookId?: string;
+  page?: number;
   mealTypes: string[];
 }
 
@@ -39,5 +41,6 @@ export interface UpdateRecipeRequest {
   ingredients?: Ingredient[];
   recipe?: string[];
   cookbookId?: string;
+  page?: number;
   mealTypes?: string[];
 }

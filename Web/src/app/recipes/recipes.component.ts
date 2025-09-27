@@ -43,6 +43,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
       description: [''],
       tags: this.formBuilder.array([]),
       cookbookId: [''],
+      page: [null],
       mealTypes: this.formBuilder.array([]),
       ingredients: this.formBuilder.array([]),
       recipeSteps: this.formBuilder.array([])
@@ -290,6 +291,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
       ingredients: ingredients,
       recipe: recipeSteps,
       cookbookId: formData.cookbookId || undefined,
+      page: formData.page || undefined,
       mealTypes: mealTypes
     };
   }

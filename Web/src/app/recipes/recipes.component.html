@@ -147,6 +147,11 @@
               </select>
             </div>
             
+            <div class="mb-3">
+              <label for="page" class="form-label fw-bold">Page</label>
+              <input type="number" class="form-control" id="page" formControlName="page" min="1" placeholder="Page number in cookbook">
+            </div>
+            
             <div class="mb-3" *ngIf="mealTypesFormArray.controls.length > 0">
               <label class="form-label fw-bold">Meal Types</label>
               <div formArrayName="mealTypes">

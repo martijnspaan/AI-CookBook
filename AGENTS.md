@@ -32,4 +32,4 @@ This project is an AI powered application that works with cooking recipes and gr
 
 ## Debugging and analyzing
 
-- When debugging or analyzing issues, always make use of the localhost k8s cluster. Web runs on port 4200 and API runs on port 4201
+- When testing the application, always test on the localhost k8s cluster. Web application runs on port 4200 and the API runs on port 4201

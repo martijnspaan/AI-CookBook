@@ -10,4 +10,5 @@ public record UpdateRecipeUseCaseInput(
     List<Ingredient> Ingredients,
     List<string> Recipe,
     string? CookbookId = null,
-    List<string> MealTypes = null);
+    int? Page = null,
+    List<string>? MealTypes = null);

@@ -18,6 +18,7 @@ public class CreateRecipeUseCase(ICosmosDbRepository<RecipeEntity> repository)
                 Ingredients = input.Ingredients,
                 Recipe = input.Recipe,
                 CookbookId = input.CookbookId,
+                Page = input.Page,
                 MealTypes = input.MealTypes ?? new List<string>()
             };
 
