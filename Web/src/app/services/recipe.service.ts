@@ -8,7 +8,7 @@ import { Recipe, CreateRecipeRequest, UpdateRecipeRequest } from '../models/reci
   providedIn: 'root'
 })
 export class RecipeService {
-  private readonly apiBaseUrl = 'http://localhost:4201/api/recipes';
+  private readonly apiBaseUrl = '/api/recipes';
 
   constructor(private readonly httpClient: HttpClient) { }
 

@@ -168,7 +168,12 @@ public class Startup(IConfiguration configuration)
             });
         }
 
-        app.UseHttpsRedirection();
+        // Conditionally enable HTTPS redirection based on configuration
+        bool httpsRedirectionEnabled = Configuration.GetValue<bool>("HttpsRedirection:Enabled", true);
+        if (httpsRedirectionEnabled)
+        {
+            app.UseHttpsRedirection();
+        }
 
         // Use CORS
         app.UseCors("AllowAll");

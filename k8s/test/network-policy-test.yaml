@@ -1,0 +1,63 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ai-cookbook-network-policy-test
+  namespace: ai-cookbook-test
+  labels:
+    app.kubernetes.io/name: ai-cookbook
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: network-policy
+    app.kubernetes.io/environment: test
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: ai-cookbook
+      app.kubernetes.io/environment: test
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ai-cookbook-test
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/part-of: ai-cookbook
+          app.kubernetes.io/environment: test
+    ports:
+    - protocol: TCP
+      port: 4200
+    - protocol: TCP
+      port: 4201
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 4200
+    - protocol: TCP
+      port: 4201
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: ai-cookbook-test
+    ports:
+    - protocol: TCP
+      port: 4200
+    - protocol: TCP
+      port: 4201
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 53
+    - protocol: UDP
+      port: 53
