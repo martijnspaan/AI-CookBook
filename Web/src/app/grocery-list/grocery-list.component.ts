@@ -52,11 +52,9 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
   private loadGroceryLists(): void {
     this.isLoading = true;
     this.errorMessage = null;
-    console.log('Loading grocery lists...');
 
     this.groceryListService.getAllGroceryLists().subscribe({
       next: (groceryLists) => {
-        console.log('Grocery lists loaded:', groceryLists);
         this.loadGroceryListsWithRecipes(groceryLists);
       },
       error: (error) => {
@@ -68,7 +66,6 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
   }
 
   private loadGroceryListsWithRecipes(groceryLists: GroceryList[]): void {
-    console.log('Processing grocery lists with recipes:', groceryLists);
     
     if (groceryLists.length === 0) {
       this.groceryLists = [];
@@ -86,7 +83,6 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
       });
     });
 
-    console.log('Recipe IDs found:', Array.from(recipeIds));
 
     if (recipeIds.size === 0) {
       this.groceryLists = groceryLists as GroceryListWithRecipes[];
@@ -104,11 +100,8 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
       )
     );
 
-    console.log('Fetching recipes...');
     forkJoin(recipeObservables).subscribe({
       next: (recipes) => {
-        console.log('Recipes fetched:', recipes);
-        
         // Create a map of recipe ID to recipe title
         const recipeMap = new Map<string, string>();
         recipes.forEach(recipe => {
@@ -116,8 +109,6 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
             recipeMap.set(recipe.id, recipe.title);
           }
         });
-
-        console.log('Recipe map:', recipeMap);
 
         // Update grocery lists with recipe titles
         this.groceryLists = groceryLists.map(groceryList => ({
@@ -128,7 +119,6 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
           }))
         }));
 
-        console.log('Final grocery lists with recipes:', this.groceryLists);
         this.isLoading = false;
       },
       error: (error) => {
@@ -215,7 +205,6 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
 
     this.groceryListService.deleteGroceryList(groceryListId).subscribe({
       next: () => {
-        console.log('Grocery list deleted successfully');
         this.isDeleting = false;
         
         // Reload the grocery lists

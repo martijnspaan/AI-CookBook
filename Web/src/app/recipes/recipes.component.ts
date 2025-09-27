@@ -253,23 +253,17 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   submitCreateRecipeForm(): void {
-    console.log('Form submission attempted');
-    console.log('Button enabled:', this.isCreateButtonEnabled());
-    console.log('Form data:', this.createRecipeForm.value);
-    
     if (this.isCreateButtonEnabled()) {
       this.isCreatingRecipe = true;
       
       const formData = this.createRecipeForm.value;
       const createRecipeRequest = this.buildCreateRecipeRequest(formData);
       
-      console.log('Create recipe request:', createRecipeRequest);
 
       this.recipeService.createNewRecipe(createRecipeRequest)
         .pipe(takeUntil(this.destroySubject))
         .subscribe({
           next: (createdRecipe) => {
-            console.log('Recipe created successfully:', createdRecipe);
             this.recipes.unshift(createdRecipe);
             this.isCreatingRecipe = false;
             this.hideCreateRecipeModal();
@@ -280,8 +274,6 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
             alert('Failed to create recipe. Please try again.');
           }
         });
-    } else {
-      console.log('Button not enabled, form not submitted');
     }
   }
 
@@ -371,9 +363,6 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   isCreateButtonEnabled(): boolean {
     const titleControl = this.createRecipeForm.get('title');
     const isValid = titleControl?.valid || false;
-    console.log('Title control value:', titleControl?.value);
-    console.log('Title control valid:', titleControl?.valid);
-    console.log('Title control errors:', titleControl?.errors);
     return isValid;
   }
 }

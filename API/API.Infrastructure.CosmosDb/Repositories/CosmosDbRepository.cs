@@ -46,20 +46,15 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
     {
         try
         {
-            _logger.LogDebug("Getting item with ID '{Id}' from container '{ContainerName}'", 
-                id, _containerName);
-
             ItemResponse<T> response = await Container.ReadItemAsync<T>(
                 id,
                 new PartitionKey(id),
                 cancellationToken: cancellationToken);
 
-            _logger.LogDebug("Successfully retrieved item with ID '{Id}'", id);
             return response.Resource;
         }
         catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
         {
-            _logger.LogDebug("Item with ID '{Id}' not found", id);
             return null;
         }
         catch (Exception ex)
@@ -80,9 +75,6 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
     {
         try
         {
-            _logger.LogDebug("Getting all items from container '{ContainerName}' with query '{Query}'", 
-                _containerName, query ?? "SELECT * FROM c");
-
             string sqlQuery = query ?? "SELECT * FROM c";
             QueryDefinition queryDefinition = new QueryDefinition(sqlQuery);
 
@@ -103,7 +95,6 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
                 items.AddRange(response.ToList());
             }
 
-            _logger.LogDebug("Successfully retrieved {Count} items from container '{ContainerName}'", items.Count, _containerName);
             return items;
         }
         catch (Exception ex)
@@ -123,13 +114,10 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
     {
         try
         {
-            _logger.LogDebug("Creating new item in container '{ContainerName}'", _containerName);
-
             ItemResponse<T> response = await Container.CreateItemAsync(
                 item,
                 cancellationToken: cancellationToken);
 
-            _logger.LogDebug("Successfully created item with ID '{Id}'", GetItemId(item));
             return response.Resource;
         }
         catch (Exception ex)
@@ -150,7 +138,6 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
         try
         {
             string itemId = GetItemId(item);
-            _logger.LogDebug("Updating item with ID '{Id}' in container '{ContainerName}'", itemId, _containerName);
             
             ItemResponse<T> response = await Container.ReplaceItemAsync(
                 item,
@@ -158,7 +145,6 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
                 new PartitionKey(itemId),
                 cancellationToken: cancellationToken);
 
-            _logger.LogDebug("Successfully updated item with ID '{Id}'", itemId);
             return response.Resource;
         }
         catch (Exception ex)
@@ -178,13 +164,10 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
     {
         try
         {
-            _logger.LogDebug("Upserting item with ID '{Id}' in container '{ContainerName}'", GetItemId(item), _containerName);
-
             ItemResponse<T> response = await Container.UpsertItemAsync(
                 item,
                 cancellationToken: cancellationToken);
 
-            _logger.LogDebug("Successfully upserted item with ID '{Id}'", GetItemId(item));
             return response.Resource;
         }
         catch (Exception ex)
@@ -204,20 +187,15 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
     {
         try
         {
-            _logger.LogDebug("Deleting item with ID '{Id}' from container '{ContainerName}'", 
-                id, _containerName);
-
             await Container.DeleteItemAsync<T>(
                 id,
                 new PartitionKey(id),
                 cancellationToken: cancellationToken);
 
-            _logger.LogDebug("Successfully deleted item with ID '{Id}'", id);
             return true;
         }
         catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
         {
-            _logger.LogDebug("Item with ID '{Id}' not found for deletion", id);
             return false;
         }
         catch (Exception ex)
@@ -238,8 +216,6 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
     {
         try
         {
-            _logger.LogDebug("Executing query '{Query}' on container '{ContainerName}'", query, _containerName);
-
             QueryDefinition queryDefinition = new QueryDefinition(query);
 
             if (queryParameters != null)
@@ -259,7 +235,6 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
                 items.AddRange(response.ToList());
             }
 
-            _logger.LogDebug("Query executed successfully, returned {Count} items", items.Count);
             return items;
         }
         catch (Exception ex)

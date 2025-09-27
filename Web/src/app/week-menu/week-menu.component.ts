@@ -169,17 +169,11 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private convertWeekDaysToRecipeAssignments(): void {
     if (!this.currentWeekMenu) {
-      console.log('No current week menu found');
       return;
     }
     
-    console.log('=== DEBUG: convertWeekDaysToRecipeAssignments ===');
-    console.log('Current week menu:', this.currentWeekMenu);
-    console.log('Selected week:', this.selectedWeek);
-    
     this.recipeAssignments = [];
     const startOfWeek = this.getStartOfWeek(this.selectedWeek);
-    console.log('Start of week:', startOfWeek);
     
     // Collect all unique recipe IDs to fetch
     const recipeIdsToFetch = new Set<string>();
@@ -190,7 +184,6 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
       if (weekDay.dinnerRecipeId) recipeIdsToFetch.add(weekDay.dinnerRecipeId);
     });
     
-    console.log('Recipe IDs to fetch:', Array.from(recipeIdsToFetch));
     
     // Create assignments with actual recipe titles (no loading state)
     const assignments: RecipeAssignment[] = [];
@@ -211,7 +204,6 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
       currentDate.setDate(startOfWeek.getDate() + dayOffset);
       const dateString = this.formatDateAsString(currentDate);
       
-      console.log(`Processing dayOfWeek: ${weekDay.dayOfWeek}, dayOffset: ${dayOffset}, calculated date: ${dateString}`);
       
       if (weekDay.breakfastRecipeId) {
         assignments.push({
@@ -241,14 +233,10 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
     
-    console.log('Created assignments:', assignments);
-    
     // Fetch recipe details and update titles before showing calendar
     if (recipeIdsToFetch.size > 0) {
-      console.log('Calling fetchRecipeTitlesAndUpdateAssignments with:', Array.from(recipeIdsToFetch));
       this.fetchRecipeTitlesAndUpdateAssignments(Array.from(recipeIdsToFetch), assignments);
     } else {
-      console.log('No recipe IDs to fetch');
       this.recipeAssignments = assignments;
       this.isCalendarLoading = false;
     }
@@ -280,7 +268,6 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
           weekDays: response.weekDays
         };
         this.isSaving = false;
-        console.log('Week menu saved successfully:', response);
       },
       error: (error) => {
         console.error('Error saving week menu:', error);
@@ -350,8 +337,6 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private fetchRecipeTitlesAndUpdateAssignments(recipeIds: string[], assignments: RecipeAssignment[]): void {
-    console.log('=== DEBUG: fetchRecipeTitlesAndUpdateAssignments ===');
-    console.log('Fetching recipe details for IDs:', recipeIds);
     
     // Create observables for each recipe fetch
     const recipeObservables: Observable<Recipe>[] = recipeIds.map(id => 
@@ -361,24 +346,17 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     // Fetch all recipes in parallel
     forkJoin(recipeObservables).subscribe({
       next: (recipes) => {
-        console.log('Successfully fetched recipes:', recipes);
-        
         // Create a map of recipe ID to recipe title for quick lookup
         const recipeTitleMap = new Map<string, string>();
         recipes.forEach(recipe => {
           recipeTitleMap.set(recipe.id, recipe.title);
         });
         
-        console.log('Recipe title map:', recipeTitleMap);
-        console.log('Before update - assignments:', assignments);
-        
         // Update the recipe assignments with actual titles
         const updatedAssignments = assignments.map(assignment => ({
           ...assignment,
           recipeTitle: recipeTitleMap.get(assignment.recipeId) || 'Recipe not found'
         }));
-        
-        console.log('After update - assignments:', updatedAssignments);
         
         // Set the final assignments and mark calendar as ready
         this.recipeAssignments = updatedAssignments;
@@ -412,7 +390,6 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onGroceryShoppingListCreated(event: { selectedDay: Date; selectedMeals: MealSelection[] }): void {
-    console.log('Grocery shopping list created:', event);
     
     // Convert MealSelection to Meal format for the API
     const meals = event.selectedMeals.map(meal => {
@@ -428,11 +405,9 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
       meals: meals
     };
 
-    console.log('Sending grocery list request:', groceryListRequest);
 
     this.groceryListService.createGroceryList(groceryListRequest).subscribe({
       next: (groceryList) => {
-        console.log('Grocery list created successfully:', groceryList);
         this.groceryShoppingDialogService.closeGroceryShoppingDialog();
         this.router.navigate(['/grocery-list']);
       },

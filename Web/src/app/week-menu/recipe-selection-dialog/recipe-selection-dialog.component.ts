@@ -116,12 +116,6 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy {
   }
 
   applyFilters(): void {
-    console.log('applyFilters called with:', {
-      mealTypeFilters: this.selectedMealTypeFilters,
-      cookbookFilters: this.selectedCookbookFilters,
-      totalRecipes: this.allRecipes.length
-    });
-    
     let filtered = [...this.allRecipes];
 
     if (this.selectedMealTypeFilters.length > 0) {
@@ -140,8 +134,6 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy {
 
     this.filteredRecipes = filtered;
     this.recipes = this.filteredRecipes;
-    
-    console.log('Filtered recipes count:', this.recipes.length);
   }
 
 
@@ -152,7 +144,6 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy {
   }
 
   toggleMealTypeFilter(mealType: string, event?: Event): void {
-    console.log('toggleMealTypeFilter called with:', mealType);
     if (event) {
       event.stopPropagation();
     }
@@ -164,7 +155,6 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy {
       this.selectedMealTypeFilters.push(mealType);
     }
     
-    console.log('Selected filters after toggle:', this.selectedMealTypeFilters);
     this.applyFilters();
     
     // Close dropdown to show the updated text
@@ -175,7 +165,6 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy {
   }
 
   toggleCookbookFilter(cookbookId: string, event?: Event): void {
-    console.log('toggleCookbookFilter called with:', cookbookId);
     if (event) {
       event.stopPropagation();
     }
@@ -187,7 +176,6 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy {
       this.selectedCookbookFilters.push(cookbookId);
     }
     
-    console.log('Selected cookbook filters after toggle:', this.selectedCookbookFilters);
     this.applyFilters();
     
     // Close dropdown to show the updated text
@@ -228,15 +216,9 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy {
   }
 
   toggleMealTypeDropdown(): void {
-    console.log('toggleMealTypeDropdown called');
-    console.log('Available meal types:', this.availableMealTypes);
-    console.log('Current state:', this.showMealTypeDropdown);
-    
     const wasOpen = this.showMealTypeDropdown;
     this.showMealTypeDropdown = !this.showMealTypeDropdown;
     this.showCookbookDropdown = false;
-    
-    console.log('New state:', this.showMealTypeDropdown);
     
     // If we're closing the dropdown, force display text update
     if (wasOpen && !this.showMealTypeDropdown) {
@@ -245,15 +227,9 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy {
   }
 
   toggleCookbookDropdown(): void {
-    console.log('toggleCookbookDropdown called');
-    console.log('Available cookbooks:', this.cookbooks);
-    console.log('Current state:', this.showCookbookDropdown);
-    
     const wasOpen = this.showCookbookDropdown;
     this.showCookbookDropdown = !this.showCookbookDropdown;
     this.showMealTypeDropdown = false;
-    
-    console.log('New state:', this.showCookbookDropdown);
     
     // If we're closing the dropdown, force display text update
     if (wasOpen && !this.showCookbookDropdown) {
