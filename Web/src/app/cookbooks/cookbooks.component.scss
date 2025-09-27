@@ -81,5 +81,9 @@
 .btn-group {
   .btn {
     font-size: 0.75rem;
+    
+    i {
+      font-size: 0.875rem; // Make icons slightly larger than button text
+    }
   }
 }
