@@ -24,3 +24,7 @@ This project is an AI powered application that works with cooking recipes and gr
 ## Azure test environment
 
 - Any commands and actions performed on Azure are only allowed in the subscription 'Playground - masp' and resource group 'AI-CookBook'
+
+## Debugging and analyzing
+
+- When debugging or analyzing issues, always make use of the localhost k8s cluster. Web runs on port 4200 and API runs on port 4201

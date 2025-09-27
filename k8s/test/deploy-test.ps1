@@ -28,6 +28,11 @@ if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
     exit 1
 }
 
+if (-not (Get-Command openssl -ErrorAction SilentlyContinue)) {
+    Write-Error "OpenSSL is not installed or not in PATH. Please install OpenSSL to generate TLS certificates."
+    exit 1
+}
+
 # Check if logged into Azure
 Write-Host "Checking Azure authentication..." -ForegroundColor Yellow
 $azAccount = az account show --query "name" -o tsv 2>$null
@@ -113,6 +118,21 @@ if (-not $SkipImagePush) {
     Write-Host "Images pushed successfully!" -ForegroundColor Green
 }
 
+# Generate TLS certificate for test environment
+Write-Host "Generating TLS certificate for test environment..." -ForegroundColor Yellow
+$certificateScript = "../../azure/generate-test-certificate.ps1"
+if (Test-Path $certificateScript) {
+    & $certificateScript -Domain "ai-cookbook-test.westeurope.cloudapp.azure.com" -OutputPath "certificates"
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to generate TLS certificate"
+        exit 1
+    }
+    Write-Host "TLS certificate generated successfully!" -ForegroundColor Green
+} else {
+    Write-Warning "Certificate generation script not found at $certificateScript"
+    Write-Warning "Proceeding without certificate generation. HTTPS may not work properly."
+}
+
 # Update image references in deployment files
 Write-Host "Updating image references in deployment files..." -ForegroundColor Yellow
 
@@ -139,7 +159,15 @@ Write-Host "Applying RBAC and configuration..." -ForegroundColor Cyan
 kubectl apply -f rbac-test.yaml
 kubectl apply -f configmap-test.yaml
 kubectl apply -f secret-test.yaml
-kubectl apply -f tls-secret-test.yaml
+
+# Apply TLS secret (use generated certificate if available)
+if (Test-Path "certificates/tls-secret-test.yaml") {
+    Write-Host "Applying generated TLS certificate..." -ForegroundColor Cyan
+    kubectl apply -f certificates/tls-secret-test.yaml
+} else {
+    Write-Host "Applying default TLS secret (may need manual certificate setup)..." -ForegroundColor Yellow
+    kubectl apply -f tls-secret-test.yaml
+}
 
 # 3. Application Deployments
 Write-Host "Applying application deployments..." -ForegroundColor Cyan
