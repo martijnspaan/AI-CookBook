@@ -28,6 +28,12 @@
       border-radius: 0.5rem;
     }
     
+    .cookbook-icon {
+      font-size: 1.5rem;
+      color: #007bff;
+      margin-top: 0.25rem;
+    }
+    
     .card-title {
       font-size: 1rem;
       line-height: 1.2;
@@ -50,7 +56,18 @@
       position: sticky;
       top: 0;
       z-index: 10;
+      
+      i {
+        color: #fff;
+      }
     }
+  }
+  
+  .cookbook-icon-small {
+    font-size: 1rem;
+    color: #007bff;
+    width: 20px;
+    text-align: center;
   }
   
   .table-responsive {

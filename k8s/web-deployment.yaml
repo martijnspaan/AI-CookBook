@@ -91,10 +91,18 @@ spec:
           mountPath: /tmp
         - name: var-tmp
           mountPath: /var/tmp
+        - name: nginx-cache
+          mountPath: /var/cache/nginx
+        - name: nginx-run
+          mountPath: /var/run
       volumes:
       - name: tmp
         emptyDir: {}
       - name: var-tmp
+        emptyDir: {}
+      - name: nginx-cache
+        emptyDir: {}
+      - name: nginx-run
         emptyDir: {}
       nodeSelector:
         kubernetes.io/os: linux

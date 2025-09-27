@@ -129,6 +129,19 @@
     max-width: 4rem;
   }
 
+  .page-field-container {
+    width: 4rem;
+    min-width: 4rem;
+    max-width: 4rem;
+    
+    .recipe-field {
+      min-height: calc(1.5em + 1rem + 2px);
+      display: flex;
+      align-items: center;
+    }
+  }
+
+
   // Ingredients styling
   .ingredients-list {
     .ingredient-type-group {

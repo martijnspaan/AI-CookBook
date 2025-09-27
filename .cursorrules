@@ -1,0 +1,28 @@
+# AI Cookbook Cursor Rules
+
+## Automatic Deployment Rule
+After completing any piece of work that involves changes to the application code, ALWAYS automatically run the appropriate update.ps1 script command based on which components were modified:
+
+- If changes were made to files in the `API/` directory: Run `.\update.ps1 -Image api`
+- If changes were made to files in the `Web/` directory: Run `.\update.ps1 -Image web`  
+- If changes were made to both `API/` and `Web/` directories: Run `.\update.ps1 -Image all`
+- If no application code changes were made: Do not run the update script
+
+## Testing Protocol
+- All testing of the application functionality should be performed on the Kubernetes pods after deployment
+- The application runs on localhost k8s cluster with Web on port 4200 and API on port 4201
+- Never test locally without deploying to k8s first
+- After running update.ps1, verify the deployment completed successfully before proceeding with any testing
+
+## Workflow
+1. Complete the coding task
+2. Identify which image(s) need updating based on file changes
+3. Automatically run the appropriate update.ps1 command
+4. Wait for deployment to complete successfully
+5. Test the application on the k8s cluster
+6. Report results to user
+
+## Exception Handling
+- If the update.ps1 script fails, troubleshoot the issue before proceeding
+- If deployment fails, check pod status with `kubectl get pods -n ai-cookbook`
+- Only proceed with testing after successful deployment confirmation

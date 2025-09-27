@@ -60,13 +60,13 @@
                     {{ getCookbookTitle(recipe.cookbookId) }}
                   </div>
                 </div>
-                <div class="col-auto">
+                <div class="col-auto page-field-container">
                   <label class="form-label fw-bold">Page</label>
                   <div *ngIf="isEditingMode">
                     <input type="number" class="form-control page-input" [(ngModel)]="editedRecipe!.page" min="1" placeholder="Page" maxlength="3">
                   </div>
                   <div *ngIf="!isEditingMode" class="recipe-field">
-                    {{ recipe.page || 'Not specified' }}
+                    {{ recipe.page }}
                   </div>
                 </div>
               </div>
@@ -74,7 +74,7 @@
 
             <!-- Meal Types -->
             <div class="mb-2">
-                <label class="form-label fw-bold">Meal Types 17</label>
+                <label class="form-label fw-bold">Meal Types</label>
               <div *ngIf="isEditingMode">
                 <div class="d-flex flex-wrap gap-3">
                   <div *ngFor="let mealType of availableMealTypes" class="form-check">

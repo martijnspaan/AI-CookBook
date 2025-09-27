@@ -78,7 +78,7 @@ spec:
             - ALL
         livenessProbe:
           httpGet:
-            path: /health
+            path: /
             port: 4201
             scheme: HTTP
           initialDelaySeconds: 30
@@ -88,7 +88,7 @@ spec:
           successThreshold: 1
         readinessProbe:
           httpGet:
-            path: /health/ready
+            path: /
             port: 4201
             scheme: HTTP
           initialDelaySeconds: 5
