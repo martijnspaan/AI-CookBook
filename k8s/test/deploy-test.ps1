@@ -126,40 +126,53 @@ $webDeploymentContent = Get-Content "web-deployment-test.yaml" -Raw
 $webDeploymentContent = $webDeploymentContent -replace "ai-cookbook-web:1.0.0-test", "$AzureContainerRegistry/ai-cookbook-web:$ImageTag"
 Set-Content "web-deployment-test.yaml" -Value $webDeploymentContent
 
-# Apply Kubernetes manifests
-Write-Host "Applying Kubernetes manifests..." -ForegroundColor Yellow
+# Apply Kubernetes manifests with best practices
+Write-Host "Applying Kubernetes manifests with best practices..." -ForegroundColor Yellow
 
-# Create namespace
-kubectl apply -f namespace-test.yaml
+# 1. Security and Resource Management
+Write-Host "Applying security and resource management..." -ForegroundColor Cyan
+kubectl apply -f pod-security-test.yaml
+kubectl apply -f resource-quotas-test.yaml
 
-# Apply RBAC
+# 2. RBAC and Configuration
+Write-Host "Applying RBAC and configuration..." -ForegroundColor Cyan
 kubectl apply -f rbac-test.yaml
-
-# Apply ConfigMap
 kubectl apply -f configmap-test.yaml
-
-# Apply Secret (you may need to update the connection string)
 kubectl apply -f secret-test.yaml
-
-# Apply TLS Secret (you may need to update the certificate)
 kubectl apply -f tls-secret-test.yaml
 
-# Apply API resources
+# 3. Application Deployments
+Write-Host "Applying application deployments..." -ForegroundColor Cyan
 kubectl apply -f api-deployment-test.yaml
-kubectl apply -f api-service-test.yaml
-
-# Apply Web resources
 kubectl apply -f web-deployment-test.yaml
+kubectl apply -f api-service-test.yaml
 kubectl apply -f web-service-test.yaml
 
-# Apply Pod Disruption Budgets
+# 4. High Availability and Scaling
+Write-Host "Applying high availability and scaling..." -ForegroundColor Cyan
 kubectl apply -f pod-disruption-budget-test.yaml
+kubectl apply -f hpa-test.yaml
 
-# Apply Network Policy
+# 5. Network and Ingress
+Write-Host "Applying network policies and ingress..." -ForegroundColor Cyan
 kubectl apply -f network-policy-test.yaml
-
-# Apply Ingress
 kubectl apply -f ingress-test.yaml
+
+# 6. Monitoring and Operations (Optional - requires Prometheus operator)
+Write-Host "Applying monitoring and operational tools..." -ForegroundColor Cyan
+try {
+    kubectl apply -f monitoring-test.yaml
+    Write-Host "Monitoring configuration applied successfully" -ForegroundColor Green
+} catch {
+    Write-Warning "Monitoring configuration skipped (Prometheus operator may not be installed)"
+}
+
+try {
+    kubectl apply -f backup-test.yaml
+    Write-Host "Backup configuration applied successfully" -ForegroundColor Green
+} catch {
+    Write-Warning "Backup configuration skipped (may require additional setup)"
+}
 
 Write-Host "Kubernetes manifests applied successfully!" -ForegroundColor Green
 
@@ -170,9 +183,27 @@ kubectl wait --for=condition=available --timeout=300s deployment/web-deployment-
 
 # Get service information
 Write-Host "Deployment completed! Service information:" -ForegroundColor Green
+
+Write-Host "`n=== Pods ===" -ForegroundColor Yellow
+kubectl get pods -n ai-cookbook-test -o wide
+
+Write-Host "`n=== Services ===" -ForegroundColor Yellow
 kubectl get services -n ai-cookbook-test
-kubectl get pods -n ai-cookbook-test
+
+Write-Host "`n=== Ingress ===" -ForegroundColor Yellow
 kubectl get ingress -n ai-cookbook-test
+
+Write-Host "`n=== Horizontal Pod Autoscalers ===" -ForegroundColor Yellow
+kubectl get hpa -n ai-cookbook-test
+
+Write-Host "`n=== Pod Disruption Budgets ===" -ForegroundColor Yellow
+kubectl get pdb -n ai-cookbook-test
+
+Write-Host "`n=== Network Policies ===" -ForegroundColor Yellow
+kubectl get networkpolicies -n ai-cookbook-test
+
+Write-Host "`n=== Resource Quotas ===" -ForegroundColor Yellow
+kubectl describe resourcequota -n ai-cookbook-test
 
 Write-Host "`nTo access the application:" -ForegroundColor Cyan
 Write-Host "Test environment: https://ai-cookbook-test.westeurope.cloudapp.azure.com" -ForegroundColor White

@@ -18,8 +18,9 @@ spec:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxUnavailable: 1
-      maxSurge: 1
+      maxUnavailable: 25%
+      maxSurge: 25%
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
       app: web
@@ -40,12 +41,17 @@ spec:
         prometheus.io/path: "/metrics"
     spec:
       serviceAccountName: ai-cookbook-sa-test
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
         fsGroup: 2000
         seccompProfile:
           type: RuntimeDefault
+        runAsGroup: 1000
+        supplementalGroups: [1000]
       containers:
       - name: web
         image: aicookbookregistry.azurecr.io/ai-cookbook-web:1.0.0-test
@@ -66,12 +72,25 @@ spec:
           readOnlyRootFilesystem: true
           runAsNonRoot: true
           runAsUser: 1000
+          runAsGroup: 1000
           capabilities:
             drop:
             - ALL
+          seccompProfile:
+            type: RuntimeDefault
+        startupProbe:
+          httpGet:
+            path: /health/startup
+            port: 4200
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 12
+          successThreshold: 1
         livenessProbe:
           httpGet:
-            path: /
+            path: /health/live
             port: 4200
             scheme: HTTP
           initialDelaySeconds: 30
@@ -81,7 +100,7 @@ spec:
           successThreshold: 1
         readinessProbe:
           httpGet:
-            path: /
+            path: /health/ready
             port: 4200
             scheme: HTTP
           initialDelaySeconds: 5
@@ -129,5 +148,6 @@ spec:
                   values:
                   - test
               topologyKey: kubernetes.io/hostname
+
 
 

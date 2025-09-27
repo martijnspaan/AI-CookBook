@@ -1,6 +1,12 @@
 # AI Cookbook Test Environment Kubernetes Deployment
 # This file contains all resources needed for a complete test environment deployment
 # Apply in order: kubectl apply -f deploy-all-test.yaml
+# 
+# Prerequisites:
+# - Kubernetes cluster with RBAC enabled
+# - Ingress controller (nginx) installed
+# - Prometheus operator (optional, for monitoring)
+# - External secret operator (optional, for secret management)
 
 ---
 # Namespace

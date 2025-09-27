@@ -5,10 +5,11 @@ This project is an AI powered application that works with cooking recipes and gr
 
 ## Folder structure
 
-- The frontend application can be found in the 'Web' folder
-- The backend application and API can be found in the 'API' folder
-- Kubernetes templates and pipeline templates can be found in the 'k8s' folder
-- The example recipes can be found in the folder 'API/API.Application/recipes'
+- The frontend application must be managed in the 'Web' folder
+- The backend application and API must be managed in the 'API' folder
+- Kubernetes templates and pipeline templates must be managed in the 'k8s' folder
+- The example recipes must be managed in the folder 'API/API.Application/recipes'
+- Any Azure related scripts must be managed in the folder 'azure'
 
 ## Project rules
 
@@ -19,3 +20,7 @@ This project is an AI powered application that works with cooking recipes and gr
 
 - Don't write comments but make the code itself readible with descriptive names
 - Don't abbreviate variable names
+
+## Azure test environment
+
+- Any commands and actions performed on Azure are only allowed in the subscription 'Playground - masp' and resource group 'AI-CookBook'

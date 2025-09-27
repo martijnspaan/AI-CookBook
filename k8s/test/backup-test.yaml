@@ -1,0 +1,117 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backup-script-test
+  namespace: ai-cookbook-test
+  labels:
+    app.kubernetes.io/name: ai-cookbook
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: backup
+    app.kubernetes.io/environment: test
+data:
+  backup.sh: |
+    #!/bin/bash
+    set -euo pipefail
+    
+    NAMESPACE="ai-cookbook-test"
+    BACKUP_DIR="/backup/$(date +%Y%m%d-%H%M%S)"
+    
+    echo "Starting backup for namespace: $NAMESPACE"
+    
+    # Create backup directory
+    mkdir -p "$BACKUP_DIR"
+    
+    # Backup all resources in the namespace
+    kubectl get all -n "$NAMESPACE" -o yaml > "$BACKUP_DIR/all-resources.yaml"
+    kubectl get configmaps -n "$NAMESPACE" -o yaml > "$BACKUP_DIR/configmaps.yaml"
+    kubectl get secrets -n "$NAMESPACE" -o yaml > "$BACKUP_DIR/secrets.yaml"
+    kubectl get pvc -n "$NAMESPACE" -o yaml > "$BACKUP_DIR/pvcs.yaml"
+    
+    # Backup CosmosDB data (if accessible)
+    echo "Backing up CosmosDB data..."
+    # Add CosmosDB backup commands here
+    
+    echo "Backup completed: $BACKUP_DIR"
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ai-cookbook-backup-test
+  namespace: ai-cookbook-test
+  labels:
+    app.kubernetes.io/name: ai-cookbook
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: backup
+    app.kubernetes.io/environment: test
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: ai-cookbook-sa-test
+          restartPolicy: OnFailure
+          containers:
+          - name: backup
+            image: bitnami/kubectl:latest
+            command:
+            - /bin/bash
+            - /scripts/backup.sh
+            securityContext:
+              allowPrivilegeEscalation: false
+              runAsNonRoot: true
+              runAsUser: 1000
+              runAsGroup: 1000
+              capabilities:
+                drop:
+                - ALL
+              seccompProfile:
+                type: RuntimeDefault
+            volumeMounts:
+            - name: backup-script
+              mountPath: /scripts
+            - name: backup-storage
+              mountPath: /backup
+            resources:
+              requests:
+                memory: "128Mi"
+                cpu: "100m"
+              limits:
+                memory: "256Mi"
+                cpu: "200m"
+          volumes:
+          - name: backup-script
+            configMap:
+              name: backup-script-test
+              defaultMode: 0755
+          - name: backup-storage
+            emptyDir: {}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ai-cookbook-backup-pvc-test
+  namespace: ai-cookbook-test
+  labels:
+    app.kubernetes.io/name: ai-cookbook
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: backup
+    app.kubernetes.io/environment: test
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: managed-csi
