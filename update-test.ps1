@@ -18,10 +18,15 @@ param(
     [ValidateSet("api", "web", "all")]
     [string]$Image = "all",
     [string]$AzureContainerRegistry = "aicookbookregistry.azurecr.io",
-    [string]$ImageTag = "1.0.0-test",
+    [string]$ImageTag = "",
     [string]$ResourceGroup = "AI-CookBook",
     [string]$AksClusterName = "k8s-ai-cookbook"
 )
+
+# Generate timestamp-based tag if not provided
+if ([string]::IsNullOrEmpty($ImageTag)) {
+    $ImageTag = "test-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
+}
 
 Write-Host "Starting AI Cookbook test environment update process..." -ForegroundColor Green
 Write-Host "Target image(s): $Image" -ForegroundColor Cyan
@@ -111,44 +116,29 @@ if ($Image -eq "all" -or $Image -eq "web") {
     }
 }
 
-# Update image references in deployment files
-Write-Host "Updating image references in deployment files..." -ForegroundColor Yellow
+# Update deployment images using kubectl set image (no file modification needed)
+Write-Host "Updating deployment images..." -ForegroundColor Yellow
 
 if ($Image -eq "all" -or $Image -eq "api") {
-    # Update API deployment
-    $apiDeploymentContent = Get-Content "k8s/test/api-deployment-test.yaml" -Raw
-    $apiDeploymentContent = $apiDeploymentContent -replace "image:\s*.*ai-cookbook-api:.*", "image: $AzureContainerRegistry/ai-cookbook-api:$ImageTag"
-    Set-Content "k8s/test/api-deployment-test.yaml" -Value $apiDeploymentContent
+    Write-Host "Updating API deployment image..." -ForegroundColor Yellow
+    kubectl set image deployment/api-deployment-test api=$AzureContainerRegistry/ai-cookbook-api:$ImageTag -n ai-cookbook-test
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Failed to update API deployment image" -ForegroundColor Red
+        exit 1
+    }
     Write-Host "Updated API deployment image reference" -ForegroundColor Green
 }
 
 if ($Image -eq "all" -or $Image -eq "web") {
-    # Update Web deployment
-    $webDeploymentContent = Get-Content "k8s/test/web-deployment-test.yaml" -Raw
-    $webDeploymentContent = $webDeploymentContent -replace "image:\s*.*ai-cookbook-web:.*", "image: $AzureContainerRegistry/ai-cookbook-web:$ImageTag"
-    Set-Content "k8s/test/web-deployment-test.yaml" -Value $webDeploymentContent
+    Write-Host "Updating Web deployment image..." -ForegroundColor Yellow
+    kubectl set image deployment/web-deployment-test web=$AzureContainerRegistry/ai-cookbook-web:$ImageTag -n ai-cookbook-test
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Failed to update Web deployment image" -ForegroundColor Red
+        exit 1
+    }
     Write-Host "Updated Web deployment image reference" -ForegroundColor Green
-}
-
-# Apply updated deployments
-if ($Image -eq "all" -or $Image -eq "api") {
-    Write-Host "Applying updated API deployment..." -ForegroundColor Yellow
-    kubectl apply -f k8s/test/api-deployment-test.yaml
-
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "Failed to apply API deployment" -ForegroundColor Red
-        exit 1
-    }
-}
-
-if ($Image -eq "all" -or $Image -eq "web") {
-    Write-Host "Applying updated Web deployment..." -ForegroundColor Yellow
-    kubectl apply -f k8s/test/web-deployment-test.yaml
-
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "Failed to apply Web deployment" -ForegroundColor Red
-        exit 1
-    }
 }
 
 # Wait for rollouts to complete

@@ -10,10 +10,10 @@ param(
 Write-Host "Starting AI Cookbook update process..." -ForegroundColor Green
 Write-Host "Target image(s): $Image" -ForegroundColor Cyan
 
-# Build new Docker images
+# Build new Docker images for localhost environment
 if ($Image -eq "all" -or $Image -eq "api") {
-    Write-Host "Building API Docker image..." -ForegroundColor Yellow
-    docker build -f API/API.Application/Dockerfile -t ai-cookbook-api:latest API/
+    Write-Host "Building API Docker image for localhost..." -ForegroundColor Yellow
+    docker build -f API/API.Application/Dockerfile -t ai-cookbook-api:localhost API/
 
     if ($LASTEXITCODE -ne 0) {
         Write-Host "Failed to build API image" -ForegroundColor Red
@@ -22,8 +22,8 @@ if ($Image -eq "all" -or $Image -eq "api") {
 }
 
 if ($Image -eq "all" -or $Image -eq "web") {
-    Write-Host "Building Web Docker image..." -ForegroundColor Yellow
-    docker build -t ai-cookbook-web:latest Web/
+    Write-Host "Building Web Docker image for localhost..." -ForegroundColor Yellow
+    docker build -t ai-cookbook-web:localhost Web/
 
     if ($LASTEXITCODE -ne 0) {
         Write-Host "Failed to build Web image" -ForegroundColor Red

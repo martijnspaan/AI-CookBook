@@ -46,7 +46,7 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.pageTitleService.setPageTitle('Grocery List');
+    this.pageTitleService.setPageTitle('Grocery List 2');
   }
 
   private loadGroceryLists(): void {

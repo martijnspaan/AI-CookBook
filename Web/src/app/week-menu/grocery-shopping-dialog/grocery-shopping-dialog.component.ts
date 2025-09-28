@@ -41,7 +41,7 @@ export class GroceryShoppingDialogComponent implements OnInit, OnChanges {
   isLoadingGroceryLists: boolean = false;
 
   popupConfig: PopupConfig = {
-    title: 'Create Grocery List',
+    title: 'Create Grocery List 2',
     icon: 'fas fa-shopping-cart',
     showCloseButton: true,
     size: 'lg',

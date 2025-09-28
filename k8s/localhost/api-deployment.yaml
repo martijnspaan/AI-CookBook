@@ -45,7 +45,7 @@ spec:
           type: RuntimeDefault
       containers:
       - name: api
-        image: ai-cookbook-api:latest
+        image: ai-cookbook-api:localhost
         imagePullPolicy: IfNotPresent
         ports:
         - name: http
