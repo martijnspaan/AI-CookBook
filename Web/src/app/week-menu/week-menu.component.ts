@@ -36,6 +36,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   allWeekMenus: WeekMenu[] = [];
   isSaving: boolean = false;
   isCalendarLoading: boolean = true;
+  currentRecipe: Recipe | null = null;
   private destroySubject = new Subject<void>();
 
   constructor(
@@ -66,16 +67,19 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onMealSlotClicked(mealType: 'breakfast' | 'lunch' | 'dinner', date: Date) {
     this.selectedMealSlot = { mealType, date };
-    const currentRecipe = this.getCurrentRecipe();
+    const currentRecipe = this.getCurrentRecipe(mealType, date);
     this.recipeSelectionDialogService.openDialog(mealType, date, currentRecipe);
   }
 
-  getCurrentRecipe(): Recipe | null {
-    if (!this.selectedDate || !this.selectedMealType) return null;
+  getCurrentRecipe(mealType?: 'breakfast' | 'lunch' | 'dinner', date?: Date): Recipe | null {
+    const targetMealType = mealType || this.selectedMealType;
+    const targetDate = date || this.selectedDate;
     
-    const dateString = this.formatDateAsString(this.selectedDate);
+    if (!targetDate || !targetMealType) return null;
+    
+    const dateString = this.formatDateAsString(targetDate);
     const assignment = this.recipeAssignments.find(
-      assignment => assignment.date === dateString && assignment.mealType === this.selectedMealType
+      assignment => assignment.date === dateString && assignment.mealType === targetMealType
     );
     
     if (!assignment) return null;
@@ -505,6 +509,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
         this.showRecipeSelectionDialog = config.isVisible;
         this.selectedMealType = config.selectedMealType;
         this.selectedDate = config.selectedDate;
+        this.currentRecipe = config.currentRecipe;
       });
 
     this.recipeSelectionDialogService.recipeSelected$
