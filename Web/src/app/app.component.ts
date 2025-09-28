@@ -114,8 +114,8 @@ export class AppComponent implements OnInit, OnDestroy {
   private updateFooterForCurrentRoute(): void {
     const currentUrl = this.router.url;
     
-    // Only update footer for non-recipe-detail pages
-    if (!currentUrl.startsWith('/recipes/')) {
+    // Only update footer for non-recipe-detail and non-grocery-list-detail pages
+    if (!currentUrl.startsWith('/recipes/') && !currentUrl.startsWith('/grocery-list/')) {
       // Reset all button configurations
       this.resetFooterButtons();
       

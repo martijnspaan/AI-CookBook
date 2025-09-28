@@ -134,7 +134,23 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
 
 
   getFormattedDate(dateString: string): string {
-    const date = new Date(dateString);
+    let date: Date;
+    
+    // Handle ISO 8601 date strings properly to avoid timezone issues
+    if (dateString.includes('T') && dateString.includes('Z')) {
+      // If it's an ISO 8601 string with timezone, extract just the date part
+      const datePart = dateString.split('T')[0]; // Get YYYY-MM-DD part
+      const [year, month, day] = datePart.split('-').map(Number);
+      date = new Date(year, month - 1, day); // month is 0-indexed
+    } else if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      // If it's already in YYYY-MM-DD format, parse it as local date
+      const [year, month, day] = dateString.split('-').map(Number);
+      date = new Date(year, month - 1, day); // month is 0-indexed
+    } else {
+      // Otherwise, parse normally
+      date = new Date(dateString);
+    }
+    
     return date.toLocaleDateString('en-US', {
       weekday: 'long',
       year: 'numeric',
@@ -185,8 +201,14 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
     // Handle date string properly to avoid timezone issues
     let date: Date;
     
-    if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
-      // If it's in YYYY-MM-DD format, parse it as local date to avoid timezone issues
+    // Handle ISO 8601 date strings properly to avoid timezone issues
+    if (dateString.includes('T') && dateString.includes('Z')) {
+      // If it's an ISO 8601 string with timezone, extract just the date part
+      const datePart = dateString.split('T')[0]; // Get YYYY-MM-DD part
+      const [year, month, day] = datePart.split('-').map(Number);
+      date = new Date(year, month - 1, day); // month is 0-indexed
+    } else if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      // If it's already in YYYY-MM-DD format, parse it as local date
       const [year, month, day] = dateString.split('-').map(Number);
       date = new Date(year, month - 1, day); // month is 0-indexed
     } else {

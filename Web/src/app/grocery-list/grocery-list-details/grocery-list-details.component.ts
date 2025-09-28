@@ -28,7 +28,7 @@ interface AggregatedIngredient {
   state: IngredientState;
 }
 
-type IngredientState = 'in-basket' | 'bought-online';
+type IngredientState = 'on-list' | 'add-to-cart' | 'bought-online';
 
 interface DayGroup {
   day: string;
@@ -100,6 +100,31 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
+  private getFormattedShoppingDate(dateString: string): string {
+    let date: Date;
+    
+    // Handle ISO 8601 date strings properly to avoid timezone issues
+    if (dateString.includes('T') && dateString.includes('Z')) {
+      // If it's an ISO 8601 string with timezone, extract just the date part
+      const datePart = dateString.split('T')[0]; // Get YYYY-MM-DD part
+      const [year, month, day] = datePart.split('-').map(Number);
+      date = new Date(year, month - 1, day); // month is 0-indexed
+    } else if (dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+      // If it's already in YYYY-MM-DD format, parse it as local date
+      const [year, month, day] = dateString.split('-').map(Number);
+      date = new Date(year, month - 1, day); // month is 0-indexed
+    } else {
+      // Otherwise, parse normally
+      date = new Date(dateString);
+    }
+    
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+
   private loadGroceryListDetails(groceryListId: string): void {
     this.isLoading = true;
     this.errorMessage = null;
@@ -121,7 +146,8 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
       this.groceryList = groceryList as GroceryListWithRecipes;
       this.aggregatedIngredients = [];
       this.isLoading = false;
-      this.pageTitleService.setPageTitle('Grocery List Details');
+      const formattedDate = this.getFormattedShoppingDate(groceryList.dayOfGrocery);
+      this.pageTitleService.setPageTitle(`Groceries ${formattedDate}`);
       return;
     }
 
@@ -137,7 +163,8 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
       this.groceryList = groceryList as GroceryListWithRecipes;
       this.aggregatedIngredients = [];
       this.isLoading = false;
-      this.pageTitleService.setPageTitle('Grocery List Details');
+      const formattedDate = this.getFormattedShoppingDate(groceryList.dayOfGrocery);
+      this.pageTitleService.setPageTitle(`Groceries ${formattedDate}`);
       return;
     }
 
@@ -174,14 +201,16 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
         // Aggregate ingredients
         this.aggregateIngredients();
         this.isLoading = false;
-        this.pageTitleService.setPageTitle('Grocery List Details');
+        const formattedDate = this.getFormattedShoppingDate(groceryList.dayOfGrocery);
+        this.pageTitleService.setPageTitle(`Groceries ${formattedDate}`);
       },
       error: (error) => {
         console.error('Error loading recipes:', error);
         this.groceryList = groceryList as GroceryListWithRecipes;
         this.aggregatedIngredients = [];
         this.isLoading = false;
-        this.pageTitleService.setPageTitle('Grocery List Details');
+        const formattedDate = this.getFormattedShoppingDate(groceryList.dayOfGrocery);
+        this.pageTitleService.setPageTitle(`Groceries ${formattedDate}`);
       }
     });
   }
@@ -209,7 +238,7 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
               totalAmount: ingredient.amount.value,
               unit: ingredient.amount.unit,
               recipes: [meal.recipe!.title],
-              state: this.ingredientStates.get(key) || 'in-basket'
+              state: this.ingredientStates.get(key) || 'on-list'
             });
           }
         });
@@ -312,8 +341,8 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
     const key = this.getIngredientKey(ingredient);
     const currentState = ingredient.state;
     
-    // Cycle through states: in-basket -> bought-online -> in-basket
-    const stateOrder: IngredientState[] = ['in-basket', 'bought-online'];
+    // Cycle through states: on-list -> add-to-cart -> bought-online -> on-list
+    const stateOrder: IngredientState[] = ['on-list', 'add-to-cart', 'bought-online'];
     const currentIndex = stateOrder.indexOf(currentState);
     const nextIndex = (currentIndex + 1) % stateOrder.length;
     const nextState = stateOrder[nextIndex];
@@ -330,7 +359,8 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
 
   getStateIcon(state: IngredientState): string {
     const iconMap: { [key in IngredientState]: string } = {
-      'in-basket': 'fas fa-shopping-cart',
+      'on-list': 'fas fa-list',
+      'add-to-cart': 'fas fa-shopping-cart',
       'bought-online': 'fas fa-laptop'
     };
     return iconMap[state];
@@ -338,7 +368,8 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
 
   getStateClass(state: IngredientState): string {
     const classMap: { [key in IngredientState]: string } = {
-      'in-basket': 'state-in-basket',
+      'on-list': 'state-on-list',
+      'add-to-cart': 'state-add-to-cart',
       'bought-online': 'state-bought-online'
     };
     return classMap[state];
@@ -346,7 +377,8 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
 
   getStateLabel(state: IngredientState): string {
     const labelMap: { [key in IngredientState]: string } = {
-      'in-basket': 'In Basket',
+      'on-list': 'On List',
+      'add-to-cart': 'Add to Cart',
       'bought-online': 'Bought Online'
     };
     return labelMap[state];
@@ -374,5 +406,31 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
 
   private capitalizeFirstLetter(string: string): string {
     return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
+  // New methods for status-based ingredient filtering and grouping
+  getIngredientsByStatus(status: IngredientState): AggregatedIngredient[] {
+    return this.aggregatedIngredients.filter(ingredient => ingredient.state === status);
+  }
+
+  getIngredientTypeGroupsByStatus(status: IngredientState): IngredientTypeGroup[] {
+    const ingredientsByStatus = this.getIngredientsByStatus(status);
+    const typeGroups = new Map<string, AggregatedIngredient[]>();
+    
+    ingredientsByStatus.forEach(ingredient => {
+      const type = ingredient.type.toLowerCase();
+      if (!typeGroups.has(type)) {
+        typeGroups.set(type, []);
+      }
+      typeGroups.get(type)!.push(ingredient);
+    });
+    
+    // Convert to array and sort by type name
+    return Array.from(typeGroups.entries())
+      .map(([type, ingredients]) => ({
+        type: this.capitalizeFirstLetter(type),
+        ingredients: ingredients.sort((a, b) => a.name.localeCompare(b.name))
+      }))
+      .sort((a, b) => a.type.localeCompare(b.type));
   }
 }
