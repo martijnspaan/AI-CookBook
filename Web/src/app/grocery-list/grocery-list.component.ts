@@ -152,6 +152,59 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
     });
   }
 
+  private loadRecipesForSingleGroceryList(groceryList: GroceryList): Promise<GroceryListWithRecipes> {
+    // Collect unique recipe IDs from the grocery list
+    const recipeIds = new Set<string>();
+    groceryList.meals.forEach(meal => {
+      if (meal.recipeId) {
+        recipeIds.add(meal.recipeId);
+      }
+    });
+
+    if (recipeIds.size === 0) {
+      return Promise.resolve(groceryList as GroceryListWithRecipes);
+    }
+
+    // Fetch all recipes in parallel
+    const recipeObservables = Array.from(recipeIds).map(id =>
+      this.recipeService.getRecipeById(id).pipe(
+        catchError((error) => {
+          console.error(`Error fetching recipe ${id}:`, error);
+          return of(null); // Return null for failed requests
+        })
+      )
+    );
+
+    return new Promise<GroceryListWithRecipes>((resolve, reject) => {
+      forkJoin(recipeObservables).subscribe({
+        next: (recipes) => {
+          // Create a map of recipe ID to recipe title
+          const recipeMap = new Map<string, string>();
+          recipes.forEach(recipe => {
+            if (recipe) {
+              recipeMap.set(recipe.id, recipe.title);
+            }
+          });
+
+          // Update grocery list with recipe titles
+          const groceryListWithRecipes: GroceryListWithRecipes = {
+            ...groceryList,
+            meals: groceryList.meals.map(meal => ({
+              ...meal,
+              recipeTitle: meal.recipeId ? recipeMap.get(meal.recipeId) : undefined
+            }))
+          };
+
+          resolve(groceryListWithRecipes);
+        },
+        error: (error) => {
+          console.error('Error loading recipes:', error);
+          // Still return the grocery list even if recipe loading fails
+          resolve(groceryList as GroceryListWithRecipes);
+        }
+      });
+    });
+  }
 
   getFormattedDate(dateString: string): string {
     let date: Date;
@@ -276,14 +329,10 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
     // Find and update the grocery list in the array
     const index = this.groceryLists.findIndex(gl => gl.id === updatedGroceryList.id);
     if (index !== -1) {
-      // Convert the updated grocery list to include recipe titles
-      this.loadGroceryListsWithRecipes([updatedGroceryList]).then(() => {
-        // The loadGroceryListsWithRecipes method will update the groceryLists array
-        // We need to replace the specific item
-        const updatedWithRecipes = this.groceryLists.find(gl => gl.id === updatedGroceryList.id);
-        if (updatedWithRecipes) {
-          this.groceryLists[index] = updatedWithRecipes;
-        }
+      // Load recipes for just the updated grocery list
+      this.loadRecipesForSingleGroceryList(updatedGroceryList).then((updatedWithRecipes) => {
+        // Replace the specific item in the array
+        this.groceryLists[index] = updatedWithRecipes;
       });
     }
     this.closeEditDialog();

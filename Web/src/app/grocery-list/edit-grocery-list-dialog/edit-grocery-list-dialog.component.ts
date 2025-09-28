@@ -51,6 +51,7 @@ export class EditGroceryListDialogComponent implements OnInit, OnChanges {
   isLoadingGroceryLists: boolean = false;
   isLoadingRecipes: boolean = false;
   isUpdating: boolean = false;
+  recipeMap: Map<string, string> = new Map();
 
   popupConfig: PopupConfig = {
     title: 'Edit Grocery List',
@@ -75,9 +76,13 @@ export class EditGroceryListDialogComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isVisible'] && changes['isVisible'].currentValue === true && this.groceryList) {
       this.initializeForEdit();
+      // Refresh existing grocery lists when dialog becomes visible
+      this.loadExistingGroceryLists();
     }
     if (changes['groceryList'] && this.groceryList) {
       this.initializeForEdit();
+      // Refresh existing grocery lists when grocery list changes
+      this.loadExistingGroceryLists();
     }
     if (changes['recipeAssignments']) {
       this.generateMealSelections();
@@ -90,8 +95,8 @@ export class EditGroceryListDialogComponent implements OnInit, OnChanges {
     // Set the selected grocery day
     this.selectedGroceryDay = new Date(this.groceryList.dayOfGrocery);
     
-    // Generate meal selections from all available meals
-    this.generateMealSelections();
+    // Load recipes for the existing meals first
+    this.loadRecipesForMeals();
   }
 
   private loadRecipesForMeals(): void {
@@ -143,6 +148,10 @@ export class EditGroceryListDialogComponent implements OnInit, OnChanges {
         };
 
         this.groceryList = groceryListWithRecipes;
+        
+        // Store the recipe map for use in generateMealSelections
+        this.recipeMap = recipeMap;
+        
         this.generateMealSelections();
         this.isLoadingRecipes = false;
       },
@@ -180,8 +189,6 @@ export class EditGroceryListDialogComponent implements OnInit, OnChanges {
   }
 
   private generateMealSelections(): void {
-    if (!this.recipeAssignments || this.recipeAssignments.length === 0) return;
-
     this.mealSelections = [];
     
     const today = new Date();
@@ -193,39 +200,76 @@ export class EditGroceryListDialogComponent implements OnInit, OnChanges {
     const currentGroceryListMeals = new Set<string>();
     if (this.groceryList) {
       this.groceryList.meals.forEach(meal => {
-        const key = this.createMealKey(meal.dayOfMeal, meal.mealType, meal.recipeId);
+        // Convert ISO date to YYYY-MM-DD format for consistent comparison
+        const normalizedDate = this.normalizeDate(meal.dayOfMeal);
+        const key = this.createMealKey(normalizedDate, meal.mealType, meal.recipeId);
         currentGroceryListMeals.add(key);
       });
     }
     
-    // Generate meal selections from all recipe assignments
-    this.recipeAssignments.forEach(assignment => {
-      // Parse assignment.date (which is in YYYY-MM-DD format) as local date to avoid timezone issues
-      let mealDate: Date;
-      if (assignment.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
-        // Parse YYYY-MM-DD as local date
-        const [year, month, day] = assignment.date.split('-').map(Number);
-        mealDate = new Date(year, month - 1, day); // month is 0-indexed
-      } else {
-        // Fallback to normal parsing
-        mealDate = new Date(assignment.date);
-      }
-      mealDate.setHours(0, 0, 0, 0);
-      
-      if (mealDate >= today) {
-        const isAlreadyUsed = this.isAssignmentAlreadyUsed(assignment, alreadyUsedMeals);
-        const isInCurrentGroceryList = currentGroceryListMeals.has(this.createMealKey(assignment.date, assignment.mealType, assignment.recipeId));
+    // First, add existing grocery list meals to ensure they're always available for selection
+    if (this.groceryList) {
+      this.groceryList.meals.forEach(meal => {
+        const normalizedDate = this.normalizeDate(meal.dayOfMeal);
+        const mealDate = new Date(normalizedDate);
+        mealDate.setHours(0, 0, 0, 0);
         
-        this.mealSelections.push({
-          date: assignment.date,
-          mealType: assignment.mealType,
-          recipeTitle: assignment.recipeTitle,
-          recipeId: assignment.recipeId,
-          isSelected: isInCurrentGroceryList, // Selected if it's in the current grocery list
-          isAlreadyUsed: isAlreadyUsed
-        });
-      }
-    });
+        if (mealDate >= today) {
+          // Check if this meal is already in recipeAssignments to get the recipe title
+          const existingAssignment = this.recipeAssignments?.find(assignment => 
+            assignment.date === normalizedDate && 
+            assignment.mealType === meal.mealType && 
+            assignment.recipeId === meal.recipeId
+          );
+          
+          const recipeTitle = existingAssignment?.recipeTitle || this.recipeMap.get(meal.recipeId || '') || 'Loading...';
+          
+          this.mealSelections.push({
+            date: normalizedDate,
+            mealType: meal.mealType as 'breakfast' | 'lunch' | 'dinner',
+            recipeTitle: recipeTitle,
+            recipeId: meal.recipeId || '',
+            isSelected: true, // Always selected since it's in the current grocery list
+            isAlreadyUsed: false // Not already used since it's in the current grocery list
+          });
+        }
+      });
+    }
+    
+    // Then, add recipe assignments that are not already in the grocery list
+    if (this.recipeAssignments && this.recipeAssignments.length > 0) {
+      this.recipeAssignments.forEach(assignment => {
+        // Parse assignment.date (which is in YYYY-MM-DD format) as local date to avoid timezone issues
+        let mealDate: Date;
+        if (assignment.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+          // Parse YYYY-MM-DD as local date
+          const [year, month, day] = assignment.date.split('-').map(Number);
+          mealDate = new Date(year, month - 1, day); // month is 0-indexed
+        } else {
+          // Fallback to normal parsing
+          mealDate = new Date(assignment.date);
+        }
+        mealDate.setHours(0, 0, 0, 0);
+        
+        if (mealDate >= today) {
+          const isAlreadyUsed = this.isAssignmentAlreadyUsed(assignment, alreadyUsedMeals);
+          const assignmentKey = this.createMealKey(assignment.date, assignment.mealType, assignment.recipeId);
+          const isInCurrentGroceryList = currentGroceryListMeals.has(assignmentKey);
+          
+          // Only add if it's not already in the grocery list (to avoid duplicates)
+          if (!isInCurrentGroceryList) {
+            this.mealSelections.push({
+              date: assignment.date,
+              mealType: assignment.mealType,
+              recipeTitle: assignment.recipeTitle,
+              recipeId: assignment.recipeId,
+              isSelected: false, // Not selected by default
+              isAlreadyUsed: isAlreadyUsed
+            });
+          }
+        }
+      });
+    }
     
     this.updateMealsByDate();
   }
@@ -235,7 +279,9 @@ export class EditGroceryListDialogComponent implements OnInit, OnChanges {
     
     this.existingGroceryLists.forEach(groceryList => {
       groceryList.meals.forEach(meal => {
-        const mealKey = this.createMealKey(meal.dayOfMeal, meal.mealType, meal.recipeId);
+        // Convert ISO date to YYYY-MM-DD format for consistent comparison
+        const normalizedDate = this.normalizeDate(meal.dayOfMeal);
+        const mealKey = this.createMealKey(normalizedDate, meal.mealType, meal.recipeId);
         alreadyUsedMeals.add(mealKey);
       });
     });
@@ -244,7 +290,9 @@ export class EditGroceryListDialogComponent implements OnInit, OnChanges {
   }
 
   private isMealAlreadyUsed(meal: Meal, alreadyUsedMeals: Set<string>): boolean {
-    const mealKey = this.createMealKey(meal.dayOfMeal, meal.mealType, meal.recipeId);
+    // Convert ISO date to YYYY-MM-DD format for consistent comparison
+    const normalizedDate = this.normalizeDate(meal.dayOfMeal);
+    const mealKey = this.createMealKey(normalizedDate, meal.mealType, meal.recipeId);
     return alreadyUsedMeals.has(mealKey);
   }
 
@@ -293,6 +341,8 @@ export class EditGroceryListDialogComponent implements OnInit, OnChanges {
     if (!this.groceryList) return;
 
     this.isUpdating = true;
+    
+    // Get all selected meals (both existing and newly selected)
     const selectedMeals = this.mealSelections.filter(meal => meal.isSelected && !meal.isAlreadyUsed);
     
     // Convert MealSelection to Meal format for the API
@@ -312,6 +362,8 @@ export class EditGroceryListDialogComponent implements OnInit, OnChanges {
     this.groceryListService.updateGroceryList(this.groceryList.id, groceryListRequest).subscribe({
       next: (updatedGroceryList) => {
         this.isUpdating = false;
+        // Refresh existing grocery lists to reflect the changes
+        this.loadExistingGroceryLists();
         this.groceryListUpdated.emit(updatedGroceryList);
         this.closeDialog();
       },
