@@ -22,7 +22,7 @@
 
     <!-- Grocery Lists -->
     <div *ngIf="!isLoading && !errorMessage && groceryLists.length > 0" class="grocery-lists">
-      <div *ngFor="let groceryList of groceryLists" class="grocery-list-card">
+      <div *ngFor="let groceryList of groceryLists" class="grocery-list-card" (click)="viewGroceryListDetails(groceryList.id)">
         <div class="grocery-list-card-content">
           <!-- Header with date and delete button -->
           <div class="d-flex justify-content-between align-items-center mb-1">
@@ -30,7 +30,7 @@
             <button 
               type="button" 
               class="btn btn-outline-danger btn-sm delete-button"
-              (click)="deleteGroceryList(groceryList.id)"
+              (click)="deleteGroceryList(groceryList.id); $event.stopPropagation()"
               [disabled]="isDeleting"
               title="Delete grocery list">
               <i class="fas fa-trash"></i>

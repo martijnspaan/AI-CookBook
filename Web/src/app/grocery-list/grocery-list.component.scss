@@ -169,6 +169,20 @@
   border-radius: 0.5rem;
   padding: 0.75rem;
   margin-bottom: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: #e9ecef;
+    border-color: #007bff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.15);
+  }
+  
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.1);
+  }
 }
 
 .grocery-list-card-content {

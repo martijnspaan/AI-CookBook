@@ -1,0 +1,88 @@
+<div class="grocery-list-details-container">
+  <div class="grocery-list-details-content">
+
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading grocery list details...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="errorMessage && !isLoading" class="error-state">
+      <div class="error-icon">⚠️</div>
+      <p>{{ errorMessage }}</p>
+    </div>
+
+    <!-- Content -->
+    <div *ngIf="!isLoading && !errorMessage && groceryList" class="grocery-details-content">
+      
+      <!-- Meals Overview Section -->
+      <div class="meals-overview-section">
+        <h3 class="section-title">
+          <i class="fas fa-utensils me-2"></i>Planned Meals
+        </h3>
+        <div class="meals-overview">
+          <div class="meals-list-compact">
+            <div *ngFor="let meal of groceryList.meals" class="meal-item-row">
+              <span class="meal-name">{{ meal.recipeTitle || 'Loading...' }}</span>
+              <span class="badge bg-primary meal-type-badge">{{ getMealTypeLabel(meal.mealType) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ingredients Section -->
+      <div class="ingredients-section">
+        <h3 class="section-title">
+          <i class="fas fa-shopping-cart me-2"></i>Shopping List
+        </h3>
+        
+        <!-- Empty ingredients state -->
+        <div *ngIf="ingredientTypeGroups.length === 0" class="empty-ingredients">
+          <div class="empty-icon">🥘</div>
+          <p>No ingredients found for the planned meals.</p>
+        </div>
+
+        <!-- Grouped ingredients list -->
+        <div *ngIf="ingredientTypeGroups.length > 0" class="ingredients-grouped">
+          <div *ngFor="let typeGroup of ingredientTypeGroups" class="ingredient-type-group">
+            <div class="type-header">
+              <h5 class="type-title">{{ typeGroup.type }}</h5>
+            </div>
+            <div class="ingredients-list-compact">
+              <div *ngFor="let ingredient of typeGroup.ingredients" class="ingredient-item-compact">
+                <div class="ingredient-main-compact">
+                  <div class="ingredient-info">
+                    <span class="ingredient-name-compact">{{ ingredient.name }}</span>
+                    <span class="ingredient-amount-compact">{{ ingredient.totalAmount }} {{ ingredient.unit }}</span>
+                  </div>
+                  <div class="ingredient-state-buttons">
+                    <button 
+                      type="button" 
+                      class="btn btn-sm state-btn" 
+                      [ngClass]="ingredient.state === 'in-basket' ? 'state-in-basket active' : 'state-in-basket'"
+                      (click)="setIngredientState(ingredient, 'in-basket')"
+                      title="In Basket">
+                      <i class="fas fa-shopping-cart"></i>
+                    </button>
+                    <button 
+                      type="button" 
+                      class="btn btn-sm state-btn" 
+                      [ngClass]="ingredient.state === 'bought-online' ? 'state-bought-online active' : 'state-bought-online'"
+                      (click)="setIngredientState(ingredient, 'bought-online')"
+                      title="Bought Online">
+                      <i class="fas fa-laptop"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>

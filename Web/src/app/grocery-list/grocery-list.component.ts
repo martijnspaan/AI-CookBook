@@ -1,5 +1,6 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { PageTitleService } from '../services/page-title.service';
 import { GroceryListService } from '../services/grocery-list.service';
 import { RecipeService } from '../services/recipe.service';
@@ -38,7 +39,8 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
   constructor(
     private pageTitleService: PageTitleService,
     private groceryListService: GroceryListService,
-    private recipeService: RecipeService
+    private recipeService: RecipeService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -197,6 +199,10 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
       month: 'short',
       day: 'numeric'
     });
+  }
+
+  viewGroceryListDetails(groceryListId: string): void {
+    this.router.navigate(['/grocery-list', groceryListId]);
   }
 
   deleteGroceryList(groceryListId: string): void {
