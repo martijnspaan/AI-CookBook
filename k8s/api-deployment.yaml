@@ -45,7 +45,7 @@ spec:
           type: RuntimeDefault
       containers:
       - name: api
-        image: aicookbookregistry.azurecr.io/ai-cookbook-api:1.0.0-test
+        image: ai-cookbook-api:latest
         imagePullPolicy: IfNotPresent
         ports:
         - name: http
