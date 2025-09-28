@@ -62,7 +62,7 @@
                       <span class="ingredient-amount-compact">{{ ingredient.totalAmount }} {{ ingredient.unit }}</span>
                     </div>
                     <div class="ingredient-state-buttons">
-                      <!-- On List state: Show two choice buttons -->
+                      <!-- On List state: Show three choice buttons -->
                       <div *ngIf="ingredient.state === 'on-list'" class="choice-buttons">
                         <button 
                           type="button" 
@@ -77,6 +77,13 @@
                           (click)="setIngredientState(ingredient, 'bought-online')"
                           title="Bought Online">
                           <i class="fas fa-laptop"></i>
+                        </button>
+                        <button 
+                          type="button" 
+                          class="btn btn-sm choice-btn in-stock-btn" 
+                          (click)="setIngredientState(ingredient, 'in-stock')"
+                          title="In Stock">
+                          <i class="fas fa-home"></i>
                         </button>
                       </div>
                       
@@ -98,6 +105,17 @@
                           class="btn btn-sm state-btn state-bought-online active" 
                           (click)="setIngredientState(ingredient, 'on-list')"
                           title="Bought Online - Click to go back to list">
+                          <i class="fas fa-list"></i>
+                        </button>
+                      </div>
+                      
+                      <!-- In Stock state: Show back to list button -->
+                      <div *ngIf="ingredient.state === 'in-stock'" class="single-button">
+                        <button 
+                          type="button" 
+                          class="btn btn-sm state-btn state-in-stock active" 
+                          (click)="setIngredientState(ingredient, 'on-list')"
+                          title="In Stock - Click to go back to list">
                           <i class="fas fa-list"></i>
                         </button>
                       </div>
@@ -247,6 +265,99 @@
                         class="btn btn-sm state-btn state-bought-online active" 
                         (click)="setIngredientState(ingredient, 'on-list')"
                         title="Bought Online - Click to go back to list">
+                        <i class="fas fa-list"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- In Stock Section -->
+      <div class="ingredients-section">
+        <h3 class="section-title">
+          <i class="fas fa-home me-2"></i>In Stock
+          <span class="ingredient-count">({{ getIngredientsByStatus('in-stock').length }})</span>
+        </h3>
+        <div *ngIf="getIngredientsByStatus('in-stock').length === 0" class="empty-status-section">
+          <p class="text-muted">No ingredients marked as in stock yet</p>
+        </div>
+        <div *ngIf="getIngredientsByStatus('in-stock').length > 0" class="ingredients-grouped">
+          <div *ngFor="let typeGroup of getIngredientTypeGroupsByStatus('in-stock')" class="ingredient-type-group">
+            <div class="type-header">
+              <h5 class="type-title">{{ typeGroup.type }}</h5>
+            </div>
+            <div class="ingredients-list-compact">
+              <div *ngFor="let ingredient of typeGroup.ingredients" class="ingredient-item-compact" 
+                   [ngClass]="{
+                     'ingredient-completed': ingredient.state === 'add-to-cart' || ingredient.state === 'bought-online' || ingredient.state === 'in-stock',
+                     'add-to-cart-completed': ingredient.state === 'add-to-cart',
+                     'bought-online-completed': ingredient.state === 'bought-online',
+                     'in-stock-completed': ingredient.state === 'in-stock'
+                   }">
+                <div class="ingredient-main-compact">
+                  <div class="ingredient-info">
+                    <span class="ingredient-name-compact">{{ ingredient.name }}</span>
+                    <span class="ingredient-amount-compact">{{ ingredient.totalAmount }} {{ ingredient.unit }}</span>
+                  </div>
+                  <div class="ingredient-state-buttons">
+                    <!-- On List state: Show three choice buttons -->
+                    <div *ngIf="ingredient.state === 'on-list'" class="choice-buttons">
+                      <button 
+                        type="button" 
+                        class="btn btn-sm choice-btn add-to-cart-btn" 
+                        (click)="setIngredientState(ingredient, 'add-to-cart')"
+                        title="Add to Cart">
+                        <i class="fas fa-shopping-cart"></i>
+                      </button>
+                      <button 
+                        type="button" 
+                        class="btn btn-sm choice-btn bought-online-btn" 
+                        (click)="setIngredientState(ingredient, 'bought-online')"
+                        title="Bought Online">
+                        <i class="fas fa-laptop"></i>
+                      </button>
+                      <button 
+                        type="button" 
+                        class="btn btn-sm choice-btn in-stock-btn" 
+                        (click)="setIngredientState(ingredient, 'in-stock')"
+                        title="In Stock">
+                        <i class="fas fa-home"></i>
+                      </button>
+                    </div>
+                    
+                    <!-- Add to Cart state: Show back to list button -->
+                    <div *ngIf="ingredient.state === 'add-to-cart'" class="single-button">
+                      <button 
+                        type="button" 
+                        class="btn btn-sm state-btn state-add-to-cart active" 
+                        (click)="setIngredientState(ingredient, 'on-list')"
+                        title="Add to Cart - Click to go back to list">
+                        <i class="fas fa-list"></i>
+                      </button>
+                    </div>
+                    
+                    <!-- Bought Online state: Show back to list button -->
+                    <div *ngIf="ingredient.state === 'bought-online'" class="single-button">
+                      <button 
+                        type="button" 
+                        class="btn btn-sm state-btn state-bought-online active" 
+                        (click)="setIngredientState(ingredient, 'on-list')"
+                        title="Bought Online - Click to go back to list">
+                        <i class="fas fa-list"></i>
+                      </button>
+                    </div>
+                    
+                    <!-- In Stock state: Show back to list button -->
+                    <div *ngIf="ingredient.state === 'in-stock'" class="single-button">
+                      <button 
+                        type="button" 
+                        class="btn btn-sm state-btn state-in-stock active" 
+                        (click)="setIngredientState(ingredient, 'on-list')"
+                        title="In Stock - Click to go back to list">
                         <i class="fas fa-list"></i>
                       </button>
                     </div>

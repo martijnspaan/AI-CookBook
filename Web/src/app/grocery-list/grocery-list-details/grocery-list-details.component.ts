@@ -28,7 +28,7 @@ interface AggregatedIngredient {
   state: IngredientState;
 }
 
-type IngredientState = 'on-list' | 'add-to-cart' | 'bought-online';
+type IngredientState = 'on-list' | 'add-to-cart' | 'bought-online' | 'in-stock';
 
 interface DayGroup {
   day: string;
@@ -361,7 +361,8 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
     const iconMap: { [key in IngredientState]: string } = {
       'on-list': 'fas fa-list',
       'add-to-cart': 'fas fa-shopping-cart',
-      'bought-online': 'fas fa-laptop'
+      'bought-online': 'fas fa-laptop',
+      'in-stock': 'fas fa-home'
     };
     return iconMap[state];
   }
@@ -370,7 +371,8 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
     const classMap: { [key in IngredientState]: string } = {
       'on-list': 'state-on-list',
       'add-to-cart': 'state-add-to-cart',
-      'bought-online': 'state-bought-online'
+      'bought-online': 'state-bought-online',
+      'in-stock': 'state-in-stock'
     };
     return classMap[state];
   }
@@ -379,7 +381,8 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
     const labelMap: { [key in IngredientState]: string } = {
       'on-list': 'On List',
       'add-to-cart': 'Add to Cart',
-      'bought-online': 'Bought Online'
+      'bought-online': 'Bought Online',
+      'in-stock': 'In Stock'
     };
     return labelMap[state];
   }
