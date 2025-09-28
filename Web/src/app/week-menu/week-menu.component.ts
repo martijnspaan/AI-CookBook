@@ -85,8 +85,6 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onRecipeSelected(event: { recipe: Recipe; mealType: string }) {
-    console.log('onRecipeSelected called:', { event, selectedDate: this.selectedDate, selectedMealType: this.selectedMealType });
-    
     if (this.selectedDate) {
       const dateString = this.formatDateAsString(this.selectedDate);
       
@@ -104,13 +102,9 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
       };
       
       this.recipeAssignments.push(newAssignment);
-      console.log('Added recipe assignment:', newAssignment);
-      console.log('Current recipeAssignments:', this.recipeAssignments);
       
       // Save to API
       this.saveWeekMenuToApi();
-    } else {
-      console.log('No selectedDate, skipping recipe assignment');
     }
     
     this.resetSelection();
@@ -155,7 +149,6 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isCalendarLoading = true;
     this.weekMenuService.getWeekMenus().subscribe({
       next: (weekMenus) => {
-        console.log('Loading all week menus:', weekMenus);
         
         // Load ALL week menus and convert them to recipe assignments
         this.allWeekMenus = weekMenus;
@@ -247,107 +240,91 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private convertAllWeekMenusToRecipeAssignments(): void {
     this.recipeAssignments = [];
-
-    // Get the 14-day range starting from today
-    const today = DateTimeUtil.getCurrentDate();
-    const { endDate } = DateTimeUtil.getDateRange(today, 14);
-
-    console.log('Converting all week menus to recipe assignments for 14-day range:', {
-      startDate: today,
-      endDate: endDate,
-      allWeekMenus: this.allWeekMenus
-    });
+    const { startDate, endDate } = DateTimeUtil.getDateRange(DateTimeUtil.getCurrentDate(), 14);
 
     this.allWeekMenus.forEach(weekMenu => {
-      weekMenu.weekDays.forEach(weekDay => {
-        // Calculate the actual date for this week day
-        const weekStart = this.getStartOfWeekForWeekNumber(weekMenu.weekNumber, weekMenu.year);
-        const dayDate = new Date(weekStart);
-        
-        // Convert API day of week to JavaScript day offset
-        const dayOffset = DateTimeUtil.convertApiDayOfWeekToJavaScript(weekDay.dayOfWeek);
-        
-        dayDate.setDate(weekStart.getDate() + dayOffset);
-
-        // Only include assignments within our 14-day range
-        const isInRange = DateTimeUtil.isDateInRange(dayDate, today, endDate);
-        
-        console.log('Date range check:', {
-          dayDate: dayDate.toISOString(),
-          today: today.toISOString(),
-          endDate: endDate.toISOString(),
-          isInRange
-        });
-        
-        if (isInRange) {
-          if (weekDay.breakfastRecipeId) {
-            this.recipeAssignments.push({
-              date: this.formatDateAsString(dayDate),
-              mealType: 'breakfast',
-              recipeId: weekDay.breakfastRecipeId,
-              recipeTitle: 'Loading...'
-            });
-          }
-
-          if (weekDay.lunchRecipeId) {
-            this.recipeAssignments.push({
-              date: this.formatDateAsString(dayDate),
-              mealType: 'lunch',
-              recipeId: weekDay.lunchRecipeId,
-              recipeTitle: 'Loading...'
-            });
-          }
-
-          if (weekDay.dinnerRecipeId) {
-            this.recipeAssignments.push({
-              date: this.formatDateAsString(dayDate),
-              mealType: 'dinner',
-              recipeId: weekDay.dinnerRecipeId,
-              recipeTitle: 'Loading...'
-            });
-          }
-        }
-      });
+      this.processWeekMenuAssignments(weekMenu, startDate, endDate);
     });
 
-    console.log('Final recipe assignments:', this.recipeAssignments);
+    this.loadRecipeTitles();
+  }
+
+  private processWeekMenuAssignments(weekMenu: WeekMenu, startDate: Date, endDate: Date): void {
+    weekMenu.weekDays.forEach(weekDay => {
+      const dayDate = this.calculateDayDate(weekMenu, weekDay);
+      
+      if (DateTimeUtil.isDateInRange(dayDate, startDate, endDate)) {
+        this.addRecipeAssignmentsForDay(weekDay, dayDate);
+      }
+    });
+  }
+
+  private calculateDayDate(weekMenu: WeekMenu, weekDay: WeekDay): Date {
+    const weekStart = this.getStartOfWeekForWeekNumber(weekMenu.weekNumber, weekMenu.year);
+    const dayDate = new Date(weekStart);
+    const dayOffset = DateTimeUtil.convertApiDayOfWeekToJavaScript(weekDay.dayOfWeek);
+    dayDate.setDate(weekStart.getDate() + dayOffset);
+    return dayDate;
+  }
+
+  private addRecipeAssignmentsForDay(weekDay: WeekDay, dayDate: Date): void {
+    const dateString = this.formatDateAsString(dayDate);
     
-    // Fetch recipe titles for all assignments
-    if (this.recipeAssignments.length > 0) {
-      this.recipeService.getAllRecipes().subscribe({
-        next: (recipes: Recipe[]) => {
-          const recipeTitleMap = new Map<string, string>();
-          recipes.forEach((recipe: Recipe) => {
-            recipeTitleMap.set(recipe.id, recipe.title);
-          });
-          
-          this.recipeAssignments = this.recipeAssignments.map(assignment => ({
-            ...assignment,
-            recipeTitle: recipeTitleMap.get(assignment.recipeId) || 'Recipe not found'
-          }));
-        },
-        error: (error: any) => {
-          console.error('Error loading recipes for assignments:', error);
-          this.recipeAssignments = this.recipeAssignments.map(assignment => ({
-            ...assignment,
-            recipeTitle: 'Error loading recipe'
-          }));
-        }
+    if (weekDay.breakfastRecipeId) {
+      this.recipeAssignments.push({
+        date: dateString,
+        mealType: 'breakfast',
+        recipeId: weekDay.breakfastRecipeId,
+        recipeTitle: 'Loading...'
+      });
+    }
+
+    if (weekDay.lunchRecipeId) {
+      this.recipeAssignments.push({
+        date: dateString,
+        mealType: 'lunch',
+        recipeId: weekDay.lunchRecipeId,
+        recipeTitle: 'Loading...'
+      });
+    }
+
+    if (weekDay.dinnerRecipeId) {
+      this.recipeAssignments.push({
+        date: dateString,
+        mealType: 'dinner',
+        recipeId: weekDay.dinnerRecipeId,
+        recipeTitle: 'Loading...'
       });
     }
   }
 
-  private getStartOfWeekForWeekNumber(weekNumber: number, year: number): Date {
-    const weekStart = DateTimeUtil.getStartOfWeekForWeekNumber(weekNumber, year);
-    
-    console.log('Calculating week start (using known data points):', {
-      year,
-      weekNumber,
-      weekStart: weekStart.toISOString(),
-      weekStartLocal: weekStart.toLocaleDateString()
+  private loadRecipeTitles(): void {
+    if (this.recipeAssignments.length === 0) {
+      return;
+    }
+
+    this.recipeService.getAllRecipes().subscribe({
+      next: (recipes: Recipe[]) => {
+        const recipeTitleMap = new Map<string, string>();
+        recipes.forEach(recipe => recipeTitleMap.set(recipe.id, recipe.title));
+        
+        this.recipeAssignments = this.recipeAssignments.map(assignment => ({
+          ...assignment,
+          recipeTitle: recipeTitleMap.get(assignment.recipeId) || 'Recipe not found'
+        }));
+      },
+      error: (error: any) => {
+        console.error('Error loading recipes for assignments:', error);
+        this.recipeAssignments = this.recipeAssignments.map(assignment => ({
+          ...assignment,
+          recipeTitle: 'Error loading recipe'
+        }));
+      }
     });
-    
-    return weekStart;
+  }
+
+  private getStartOfWeekForWeekNumber(weekNumber: number, year: number): Date {
+    return DateTimeUtil.getStartOfWeekForWeekNumber(weekNumber, year);
   }
 
   private saveWeekMenuToApi(): void {
@@ -377,29 +354,9 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
       weekDays
     };
 
-    console.log('Saving week menu to API:', { 
-      request, 
-      recipeAssignments: this.recipeAssignments,
-      targetWeekForCalculation: targetWeekForCalculation,
-      weekNumber: weekNumber,
-      year: year,
-      selectedWeek: this.selectedWeek,
-      weekDays: weekDays
-    });
-    
-    // Log each weekDay to see if Monday has the recipe
-    weekDays.forEach((weekDay, index) => {
-      console.log(`WeekDay ${index}:`, {
-        dayOfWeek: weekDay.dayOfWeek,
-        breakfastRecipeId: weekDay.breakfastRecipeId,
-        lunchRecipeId: weekDay.lunchRecipeId,
-        dinnerRecipeId: weekDay.dinnerRecipeId
-      });
-    });
 
     this.weekMenuService.createOrUpdateWeekMenu(request).subscribe({
       next: (response) => {
-        console.log('Week menu saved successfully:', response);
         this.currentWeekMenu = {
           id: response.id,
           weekNumber: response.weekNumber,
@@ -417,23 +374,18 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private getWeekNumber(date: Date): number {
-    const weekNumber = DateTimeUtil.getWeekNumber(date);
-    
-    console.log('Calculating week number:', {
-      date: date.toISOString(),
-      weekNumber
-    });
-    
-    return weekNumber;
+    return DateTimeUtil.getWeekNumber(date);
   }
 
   private convertRecipeAssignmentsToWeekDays(): WeekDay[] {
-    const weekDays: WeekDay[] = [];
+    const assignmentsByDate = this.createAssignmentsByDateMap();
+    const targetWeek = this.determineTargetWeek();
+    const startOfWeek = this.getStartOfWeek(targetWeek);
     
-    console.log('Converting recipe assignments to week days:', this.recipeAssignments);
-    console.log('Selected week:', this.selectedWeek);
-    
-    // Create a map of assignments by date
+    return this.createWeekDaysFromAssignments(assignmentsByDate, startOfWeek);
+  }
+
+  private createAssignmentsByDateMap(): Map<string, RecipeAssignment[]> {
     const assignmentsByDate = new Map<string, RecipeAssignment[]>();
     this.recipeAssignments.forEach(assignment => {
       if (!assignmentsByDate.has(assignment.date)) {
@@ -441,63 +393,35 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       assignmentsByDate.get(assignment.date)!.push(assignment);
     });
+    return assignmentsByDate;
+  }
 
-    console.log('Assignments by date:', Object.fromEntries(assignmentsByDate));
-
-    // Determine which week to use for the conversion
-    // Use the selected week as the base, but ensure we include all assignments
-    let targetWeek = this.selectedWeek;
-    
-    // If we have assignments, check if any are outside the current week
-    if (this.recipeAssignments.length > 0) {
-      const selectedWeekStart = this.getStartOfWeek(this.selectedWeek);
-      const selectedWeekEnd = new Date(selectedWeekStart);
-      selectedWeekEnd.setDate(selectedWeekStart.getDate() + 6);
-      
-      console.log('Selected week range:', { 
-        start: selectedWeekStart, 
-        end: selectedWeekEnd,
-        selectedWeek: this.selectedWeek 
-      });
-      
-      // Check if any assignments are outside the selected week
-      const hasAssignmentsOutsideWeek = this.recipeAssignments.some(assignment => {
-        const assignmentDate = new Date(assignment.date);
-        const isOutside = assignmentDate < selectedWeekStart || assignmentDate > selectedWeekEnd;
-        console.log(`Assignment ${assignment.date} outside week:`, { 
-          assignmentDate, 
-          selectedWeekStart, 
-          selectedWeekEnd, 
-          isOutside 
-        });
-        return isOutside;
-      });
-      
-      console.log('Has assignments outside week:', hasAssignmentsOutsideWeek);
-      
-          if (hasAssignmentsOutsideWeek) {
-            // Use the week that contains the most recent assignment
-            // But prioritize the assignment that was just added (the last one in the array)
-            const mostRecentAssignment = this.recipeAssignments[this.recipeAssignments.length - 1];
-            targetWeek = new Date(mostRecentAssignment.date);
-            console.log('Switching to most recent assignment week (using last added):', { mostRecentAssignment, targetWeek });
-          }
+  private determineTargetWeek(): Date {
+    if (this.recipeAssignments.length === 0) {
+      return this.selectedWeek;
     }
 
-        // Get the start of the week (Monday) for the target week
-        const startOfWeek = this.getStartOfWeek(targetWeek);
-        console.log('Target week:', targetWeek);
-        console.log('Start of week:', startOfWeek);
-        
-        // Verify that the target week calculation is correct
-        console.log('Week calculation verification:', {
-          targetWeek,
-          startOfWeek,
-          targetWeekDayOfWeek: targetWeek.getDay(),
-          expectedMonday: startOfWeek.getDay() === 1 ? 'Correct' : 'Wrong'
-        });
+    const selectedWeekStart = this.getStartOfWeek(this.selectedWeek);
+    const selectedWeekEnd = new Date(selectedWeekStart);
+    selectedWeekEnd.setDate(selectedWeekStart.getDate() + 6);
     
-    // Create WeekDay objects for each day of the week
+    const hasAssignmentsOutsideWeek = this.recipeAssignments.some(assignment => {
+      const assignmentDate = new Date(assignment.date);
+      return assignmentDate < selectedWeekStart || assignmentDate > selectedWeekEnd;
+    });
+    
+    if (hasAssignmentsOutsideWeek) {
+      // Use the week that contains the most recently added assignment
+      const mostRecentAssignment = this.recipeAssignments[this.recipeAssignments.length - 1];
+      return new Date(mostRecentAssignment.date);
+    }
+    
+    return this.selectedWeek;
+  }
+
+  private createWeekDaysFromAssignments(assignmentsByDate: Map<string, RecipeAssignment[]>, startOfWeek: Date): WeekDay[] {
+    const weekDays: WeekDay[] = [];
+    
     for (let i = 0; i < 7; i++) {
       const currentDate = new Date(startOfWeek);
       currentDate.setDate(startOfWeek.getDate() + i);
@@ -512,11 +436,9 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
         dinnerRecipeId: dayAssignments.find(a => a.mealType === 'dinner')?.recipeId
       };
       
-      console.log(`Day ${i} (${dateString}):`, { currentDate, dayAssignments, weekDay });
       weekDays.push(weekDay);
     }
     
-    console.log('Final weekDays:', weekDays);
     return weekDays;
   }
 
