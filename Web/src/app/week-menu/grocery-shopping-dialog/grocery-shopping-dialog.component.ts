@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RecipeAssignment } from '../week-calendar/week-calendar.component';
 import { GroceryListService } from '../../services/grocery-list.service';
 import { GroceryList } from '../../models/grocery-list.model';
+import { ReusablePopupComponent, PopupConfig } from '../../shared/reusable-popup';
 
 export interface ShoppingDayOption {
   date: Date;
@@ -22,7 +23,7 @@ export interface MealSelection {
 @Component({
   selector: 'app-grocery-shopping-dialog',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReusablePopupComponent],
   templateUrl: './grocery-shopping-dialog.component.html',
   styleUrl: './grocery-shopping-dialog.component.scss'
 })
@@ -38,6 +39,16 @@ export class GroceryShoppingDialogComponent implements OnInit, OnChanges {
   mealsByDate: { date: string; meals: MealSelection[] }[] = [];
   existingGroceryLists: GroceryList[] = [];
   isLoadingGroceryLists: boolean = false;
+
+  popupConfig: PopupConfig = {
+    title: 'Create Grocery List',
+    showCloseButton: true,
+    size: 'lg',
+    height: 'lg',
+    showBackdrop: true,
+    closeOnBackdropClick: true,
+    closeOnEscape: true
+  };
 
   constructor(private groceryListService: GroceryListService) {}
 

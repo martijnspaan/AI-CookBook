@@ -129,35 +129,36 @@
   </div>
 
   <!-- Create/Edit Cookbook Modal -->
-  <div class="modal fade" id="cookbookModal" tabindex="-1" aria-labelledby="cookbookModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="cookbookModalLabel">{{ isEditingCookbook ? 'Edit Cookbook' : 'Create New Cookbook' }}</h5>
-          <button type="button" class="btn-close" (click)="cancelCookbookModal()" aria-label="Close"></button>
+  <app-reusable-popup
+    [isVisible]="showCookbookModal"
+    [config]="cookbookPopupConfig"
+    (popupClosed)="cancelCookbookModal()">
+    
+    <ng-template #popupHeader>
+      <h5 class="popup-title">{{ isEditingCookbook ? 'Edit Cookbook' : 'Create New Cookbook' }}</h5>
+    </ng-template>
+
+    <ng-template #popupBody>
+      <form [formGroup]="cookbookForm" (ngSubmit)="submitCookbookForm()">
+        <div class="mb-3">
+          <label for="title" class="form-label">Title *</label>
+          <input type="text" class="form-control" id="title" formControlName="title" required>
         </div>
-        <div class="modal-body">
-          <form [formGroup]="cookbookForm" (ngSubmit)="submitCookbookForm()">
-            <div class="mb-3">
-              <label for="title" class="form-label">Title *</label>
-              <input type="text" class="form-control" id="title" formControlName="title" required>
-            </div>
-            <div class="mb-3">
-              <label for="author" class="form-label">Author *</label>
-              <input type="text" class="form-control" id="author" formControlName="author" required>
-            </div>
-          </form>
+        <div class="mb-3">
+          <label for="author" class="form-label">Author *</label>
+          <input type="text" class="form-control" id="author" formControlName="author" required>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="cancelCookbookModal()">
-            <i class="fas fa-times me-2"></i>Cancel
-          </button>
-          <button type="button" class="btn btn-primary" (click)="submitCookbookForm()" [disabled]="cookbookForm.invalid || isSubmittingCookbook">
-            <span *ngIf="isSubmittingCookbook" class="spinner-border spinner-border-sm me-2" role="status"></span>
-            <i *ngIf="!isSubmittingCookbook" class="fas fa-save me-2"></i>
-            {{ isSubmittingCookbook ? 'Saving...' : (isEditingCookbook ? 'Update Cookbook' : 'Create Cookbook') }}
-          </button>
-        </div>
-      </div>
-  </div>
-</div>
+      </form>
+    </ng-template>
+
+    <ng-template #popupFooter>
+      <button type="button" class="btn btn-secondary" (click)="cancelCookbookModal()">
+        <i class="fas fa-times me-2"></i>Cancel
+      </button>
+      <button type="button" class="btn btn-primary" (click)="submitCookbookForm()" [disabled]="cookbookForm.invalid || isSubmittingCookbook">
+        <span *ngIf="isSubmittingCookbook" class="spinner-border spinner-border-sm me-2" role="status"></span>
+        <i *ngIf="!isSubmittingCookbook" class="fas fa-save me-2"></i>
+        {{ isSubmittingCookbook ? 'Saving...' : (isEditingCookbook ? 'Update Cookbook' : 'Create Cookbook') }}
+      </button>
+    </ng-template>
+  </app-reusable-popup>

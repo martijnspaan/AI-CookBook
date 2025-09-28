@@ -99,15 +99,17 @@
   </div>
 
   <!-- Create Recipe Modal -->
-  <div class="modal fade" id="createRecipeModal" tabindex="-1" aria-labelledby="createRecipeModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="createRecipeModalLabel">Create New Recipe</h5>
-          <button type="button" class="btn-close" (click)="cancelCreateRecipe()" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form [formGroup]="createRecipeForm" (ngSubmit)="submitCreateRecipeForm()">
+  <app-reusable-popup
+    [isVisible]="showCreateRecipeModal"
+    [config]="createRecipePopupConfig"
+    (popupClosed)="cancelCreateRecipe()">
+    
+    <ng-template #popupHeader>
+      <h5 class="popup-title">Create New Recipe</h5>
+    </ng-template>
+
+    <ng-template #popupBody>
+      <form [formGroup]="createRecipeForm" (ngSubmit)="submitCreateRecipeForm()">
             <div class="mb-3">
               <label for="title" class="form-label fw-bold">Title *</label>
               <input type="text" class="form-control" id="title" formControlName="title" required>
@@ -265,15 +267,14 @@
                 </button>
               </div>
             </div>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="cancelCreateRecipe()">Cancel</button>
-          <button type="button" class="btn btn-primary" (click)="submitCreateRecipeForm()" [disabled]="!isCreateButtonEnabled() || isCreatingRecipe">
-            <span *ngIf="isCreatingRecipe" class="spinner-border spinner-border-sm me-2" role="status"></span>
-            {{ isCreatingRecipe ? 'Creating...' : 'Create Recipe' }}
-          </button>
-        </div>
-      </div>
-  </div>
-</div>
+      </form>
+    </ng-template>
+
+    <ng-template #popupFooter>
+      <button type="button" class="btn btn-secondary" (click)="cancelCreateRecipe()">Cancel</button>
+      <button type="button" class="btn btn-primary" (click)="submitCreateRecipeForm()" [disabled]="!isCreateButtonEnabled() || isCreatingRecipe">
+        <span *ngIf="isCreatingRecipe" class="spinner-border spinner-border-sm me-2" role="status"></span>
+        {{ isCreatingRecipe ? 'Creating...' : 'Create Recipe' }}
+      </button>
+    </ng-template>
+  </app-reusable-popup>

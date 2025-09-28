@@ -1,105 +1,100 @@
-<div class="modal fade show d-block" *ngIf="isVisible" tabindex="-1" role="dialog">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">
-          <i class="fas fa-shopping-cart me-2"></i>
-          Create Grocery List
-        </h5>
-        <button type="button" class="btn-close" (click)="closeDialog()" aria-label="Close"></button>
+<app-reusable-popup
+  [isVisible]="isVisible"
+  [config]="popupConfig"
+  (popupClosed)="closeDialog()">
+  
+  <ng-template #popupHeader>
+    <h5 class="popup-title">
+      <i class="fas fa-shopping-cart me-2"></i>
+      Create Grocery List
+    </h5>
+  </ng-template>
+
+  <ng-template #popupBody>
+    <!-- Shopping Day Selection -->
+    <div class="mb-3">
+      <label class="form-label fw-bold">Choose your shopping day:</label>
+      <select 
+        class="form-select" 
+        [(ngModel)]="selectedShoppingDay" 
+        (change)="onShoppingDayChanged()">
+        <option *ngFor="let option of shoppingDayOptions" [ngValue]="option.date">
+          {{ option.displayText }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Meal Selection -->
+    <div class="mb-2 flex-grow-1 d-flex flex-column">
+      <div class="mb-2">
+        <label class="form-label fw-bold">Select meals to include:</label>
+        <div *ngIf="isLoadingGroceryLists" class="text-muted small">
+          <i class="fas fa-spinner fa-spin me-1"></i>
+          Loading existing grocery lists...
+        </div>
       </div>
       
-      <div class="modal-body">
-        <!-- Shopping Day Selection -->
-        <div class="mb-3">
-          <label class="form-label fw-bold">Choose your shopping day:</label>
-          <select 
-            class="form-select" 
-            [(ngModel)]="selectedShoppingDay" 
-            (change)="onShoppingDayChanged()">
-            <option *ngFor="let option of shoppingDayOptions" [ngValue]="option.date">
-              {{ option.displayText }}
-            </option>
-          </select>
-        </div>
-
-        <!-- Meal Selection -->
-        <div class="mb-2 flex-grow-1 d-flex flex-column">
-          <div class="mb-2">
-            <label class="form-label fw-bold">Select meals to include:</label>
-            <div *ngIf="isLoadingGroceryLists" class="text-muted small">
-              <i class="fas fa-spinner fa-spin me-1"></i>
-              Loading existing grocery lists...
-            </div>
+      <div class="meal-selection-container">
+        <div *ngFor="let dateGroup of mealsByDate" class="date-group mb-2">
+          <div class="date-header">
+            <h6 class="mb-1 text-primary">{{ getDisplayDate(dateGroup.date) }}</h6>
           </div>
           
-          <div class="meal-selection-container">
-            <div *ngFor="let dateGroup of mealsByDate" class="date-group mb-2">
-              <div class="date-header">
-                <h6 class="mb-1 text-primary">{{ getDisplayDate(dateGroup.date) }}</h6>
-              </div>
-              
-              <div class="meals-list">
-                <div *ngFor="let meal of dateGroup.meals" class="meal-row" [class.meal-already-used]="meal.isAlreadyUsed">
-                  <div class="form-check">
-                    <!-- Container for both checkbox and shopping cart icon to ensure same positioning -->
-                    <div class="form-check-input-container">
-                      <!-- Show checkbox for available meals -->
-                      <input 
-                        *ngIf="!meal.isAlreadyUsed"
-                        class="form-check-input" 
-                        type="checkbox" 
-                        [id]="'meal-' + meal.date + '-' + meal.mealType"
-                        [(ngModel)]="meal.isSelected"
-                        (change)="onMealSelectionChanged(meal)">
-                      
-                      <!-- Show grayed-out shopping cart icon for already used meals -->
-                      <div 
-                        *ngIf="meal.isAlreadyUsed"
-                        class="shopping-cart-icon-disabled"
-                        [id]="'meal-' + meal.date + '-' + meal.mealType">
-                        <i class="fas fa-shopping-cart"></i>
-                      </div>
-                    </div>
-                    
-                    <label 
-                      class="form-check-label d-flex align-items-center justify-content-between w-100" 
-                      [for]="'meal-' + meal.date + '-' + meal.mealType"
-                      [class.text-muted]="meal.isAlreadyUsed">
-                      <span class="recipe-name">
-                        {{ meal.recipeTitle }}
-                      </span>
-                      <span class="badge" [class.bg-primary]="!meal.isAlreadyUsed" [class.bg-secondary]="meal.isAlreadyUsed">
-                        {{ getMealTypeLabel(meal.mealType) }}
-                      </span>
-                    </label>
+          <div class="meals-list">
+            <div *ngFor="let meal of dateGroup.meals" class="meal-row" [class.meal-already-used]="meal.isAlreadyUsed">
+              <div class="form-check">
+                <!-- Container for both checkbox and shopping cart icon to ensure same positioning -->
+                <div class="form-check-input-container">
+                  <!-- Show checkbox for available meals -->
+                  <input 
+                    *ngIf="!meal.isAlreadyUsed"
+                    class="form-check-input" 
+                    type="checkbox" 
+                    [id]="'meal-' + meal.date + '-' + meal.mealType"
+                    [(ngModel)]="meal.isSelected"
+                    (change)="onMealSelectionChanged(meal)">
+                  
+                  <!-- Show grayed-out shopping cart icon for already used meals -->
+                  <div 
+                    *ngIf="meal.isAlreadyUsed"
+                    class="shopping-cart-icon-disabled"
+                    [id]="'meal-' + meal.date + '-' + meal.mealType">
+                    <i class="fas fa-shopping-cart"></i>
                   </div>
                 </div>
+                
+                <label 
+                  class="form-check-label d-flex align-items-center justify-content-between w-100" 
+                  [for]="'meal-' + meal.date + '-' + meal.mealType"
+                  [class.text-muted]="meal.isAlreadyUsed">
+                  <span class="recipe-name">
+                    {{ meal.recipeTitle }}
+                  </span>
+                  <span class="badge" [class.bg-primary]="!meal.isAlreadyUsed" [class.bg-secondary]="meal.isAlreadyUsed">
+                    {{ getMealTypeLabel(meal.mealType) }}
+                  </span>
+                </label>
               </div>
             </div>
           </div>
-          
-          <div *ngIf="mealSelections.length === 0" class="text-muted text-center py-3">
-            <i class="fas fa-info-circle me-2"></i>
-            No meals selected for this week. Please add some recipes to your week menu first.
-          </div>
         </div>
-
       </div>
       
-      <div class="modal-footer">
-        <button 
-          type="button" 
-          class="btn btn-success" 
-          [disabled]="getSelectedMealsCount() === 0"
-          (click)="createShoppingList()">
-          <i class="fas fa-shopping-cart me-2"></i>
-          Create Shopping List
-        </button>
+      <div *ngIf="mealSelections.length === 0" class="text-muted text-center py-3">
+        <i class="fas fa-info-circle me-2"></i>
+        No meals selected for this week. Please add some recipes to your week menu first.
       </div>
     </div>
-  </div>
-</div>
+  </ng-template>
 
-<!-- Backdrop -->
-<div class="modal-backdrop fade show" *ngIf="isVisible"></div>
+  <ng-template #popupFooter>
+    <button 
+      type="button" 
+      class="btn btn-success" 
+      [disabled]="getSelectedMealsCount() === 0"
+      (click)="createShoppingList()">
+      <i class="fas fa-shopping-cart me-2"></i>
+      Create Shopping List
+    </button>
+  </ng-template>
+</app-reusable-popup>

@@ -7,11 +7,12 @@ import { CookbookService } from '../services/cookbook.service';
 import { Cookbook, CreateCookbookRequest, UpdateCookbookRequest } from '../models/cookbook.model';
 import { PageTitleService } from '../services/page-title.service';
 import { CookbookModalService } from '../services/cookbook-modal.service';
+import { ReusablePopupComponent, PopupConfig } from '../shared/reusable-popup';
 
 @Component({
   selector: 'app-cookbooks',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, ReusablePopupComponent],
   templateUrl: './cookbooks.component.html',
   styleUrl: './cookbooks.component.scss'
 })
@@ -23,7 +24,20 @@ export class CookbooksComponent implements OnInit, OnDestroy, AfterViewInit {
   currentEditingCookbook: Cookbook | null = null;
   errorMessage: string | null = null;
   cookbookForm: FormGroup;
+  showCookbookModal = false;
   private readonly destroySubject = new Subject<void>();
+
+  get cookbookPopupConfig(): PopupConfig {
+    return {
+      title: this.isEditingCookbook ? 'Edit Cookbook' : 'Create New Cookbook',
+      showCloseButton: true,
+      size: 'md',
+      height: 'md',
+      showBackdrop: true,
+      closeOnBackdropClick: false,
+      closeOnEscape: true
+    };
+  }
 
   constructor(
     private readonly cookbookService: CookbookService,
@@ -79,7 +93,7 @@ export class CookbooksComponent implements OnInit, OnDestroy, AfterViewInit {
     this.isEditingCookbook = false;
     this.currentEditingCookbook = null;
     this.cookbookForm.reset();
-    this.showBootstrapModal();
+    this.showCookbookModal = true;
   }
 
   editCookbook(cookbook: Cookbook): void {
@@ -89,7 +103,7 @@ export class CookbooksComponent implements OnInit, OnDestroy, AfterViewInit {
       title: cookbook.title,
       author: cookbook.author
     });
-    this.showBootstrapModal();
+    this.showCookbookModal = true;
   }
 
   deleteCookbookWithConfirmation(cookbook: Cookbook): void {
@@ -129,7 +143,7 @@ export class CookbooksComponent implements OnInit, OnDestroy, AfterViewInit {
                 this.cookbooks.sort((a, b) => a.title.localeCompare(b.title));
               }
               this.isSubmittingCookbook = false;
-              this.hideCookbookModal();
+              this.showCookbookModal = false;
             },
             error: (error) => {
               console.error('Error updating cookbook:', error);
@@ -150,7 +164,7 @@ export class CookbooksComponent implements OnInit, OnDestroy, AfterViewInit {
               this.cookbooks.push(createdCookbook);
               this.cookbooks.sort((a, b) => a.title.localeCompare(b.title));
               this.isSubmittingCookbook = false;
-              this.hideCookbookModal();
+              this.showCookbookModal = false;
             },
             error: (error) => {
               console.error('Error creating cookbook:', error);
@@ -215,6 +229,6 @@ export class CookbooksComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   cancelCookbookModal(): void {
-    this.hideCookbookModal();
+    this.showCookbookModal = false;
   }
 }

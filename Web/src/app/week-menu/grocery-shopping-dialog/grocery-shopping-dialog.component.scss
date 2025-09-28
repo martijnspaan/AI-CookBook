@@ -1,45 +1,4 @@
-.modal {
-  z-index: 1055;
-}
-
-.modal-backdrop {
-  z-index: 1050;
-}
-
-.modal-dialog {
-  margin: 1.75rem auto;
-  max-width: 600px;
-  max-height: calc(100vh - 3.5rem);
-}
-
-.modal-content {
-  border: 1px solid rgba(0, 0, 0, 0.125);
-  border-radius: 0.5rem;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  max-height: calc(100vh - 3.5rem);
-  display: flex;
-  flex-direction: column;
-}
-
-.modal-header {
-  border-bottom: 1px solid #e9ecef;
-  background-color: #f8f9fa;
-  border-radius: 0.5rem 0.5rem 0 0;
-  flex-shrink: 0;
-  
-  .modal-title {
-    color: #495057;
-    font-weight: 600;
-  }
-}
-
-.modal-body {
-  padding: 1rem;
-  flex: 1;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
+// Content-specific styles only
 
 .meal-selection-container {
   flex: 1;
@@ -183,41 +142,35 @@
 }
 
 
-.modal-footer {
-  border-top: 1px solid #e9ecef;
-  background-color: #f8f9fa;
-  border-radius: 0 0 0.5rem 0.5rem;
-  flex-shrink: 0;
+// Button styles for footer
+.btn {
+  border-radius: 6px;
+  font-weight: 500;
+  padding: 0.5rem 1.5rem;
   
-  .btn {
-    border-radius: 6px;
-    font-weight: 500;
-    padding: 0.5rem 1.5rem;
+  &.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
     
-    &.btn-success {
-      background-color: #28a745;
-      border-color: #28a745;
-      
-      &:hover:not(:disabled) {
-        background-color: #218838;
-        border-color: #1e7e34;
-      }
-      
-      &:disabled {
-        background-color: #6c757d;
-        border-color: #6c757d;
-        opacity: 0.6;
-      }
+    &:hover:not(:disabled) {
+      background-color: #218838;
+      border-color: #1e7e34;
     }
     
-    &.btn-secondary {
+    &:disabled {
       background-color: #6c757d;
       border-color: #6c757d;
-      
-      &:hover {
-        background-color: #5a6268;
-        border-color: #545b62;
-      }
+      opacity: 0.6;
+    }
+  }
+  
+  &.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    
+    &:hover {
+      background-color: #5a6268;
+      border-color: #545b62;
     }
   }
 }
@@ -241,22 +194,8 @@
   }
 }
 
-// Responsive adjustments
+// Responsive adjustments for content
 @media (max-width: 400px) {
-  .modal-dialog {
-    margin: 0.5rem;
-    max-width: calc(100% - 1rem);
-    max-height: calc(100vh - 1rem);
-  }
-  
-  .modal-content {
-    max-height: calc(100vh - 1rem);
-  }
-  
-  .modal-body {
-    padding: 0.75rem;
-  }
-  
   .date-group .meals-list .meal-row .form-check-label {
     flex-direction: row;
     align-items: center !important;
@@ -271,17 +210,5 @@
     .badge {
       flex-shrink: 0;
     }
-  }
-}
-
-@media (min-width: 401px) and (max-width: 768px) {
-  .modal-dialog {
-    margin: 1rem;
-    max-width: calc(100% - 2rem);
-    max-height: calc(100vh - 2rem);
-  }
-  
-  .modal-content {
-    max-height: calc(100vh - 2rem);
   }
 }

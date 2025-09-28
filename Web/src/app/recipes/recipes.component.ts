@@ -11,11 +11,12 @@ import { Recipe, Ingredient, CreateRecipeRequest } from '../models/recipe.model'
 import { Cookbook } from '../models/cookbook.model';
 import { PageTitleService } from '../services/page-title.service';
 import { RecipeCardComponent } from '../shared/recipe-card/recipe-card.component';
+import { ReusablePopupComponent, PopupConfig } from '../shared/reusable-popup';
 
 @Component({
   selector: 'app-recipes',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RecipeCardComponent],
+  imports: [CommonModule, ReactiveFormsModule, RecipeCardComponent, ReusablePopupComponent],
   templateUrl: './recipes.component.html',
   styleUrl: './recipes.component.scss'
 })
@@ -28,7 +29,18 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   errorMessage: string | null = null;
   createRecipeForm: FormGroup;
   availableMealTypes = ['Breakfast', 'Lunch', 'Dinner'];
+  showCreateRecipeModal = false;
   private readonly destroySubject = new Subject<void>();
+
+  createRecipePopupConfig: PopupConfig = {
+    title: 'Create New Recipe',
+    showCloseButton: true,
+    size: 'xl',
+    height: 'lg',
+    showBackdrop: true,
+    closeOnBackdropClick: false,
+    closeOnEscape: true
+  };
 
   constructor(
     private readonly recipeService: RecipeService,
@@ -163,7 +175,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.addEmptyIngredient();
     this.addEmptyRecipeStep();
     this.addEmptyTag();
-    this.showBootstrapModal();
+    this.showCreateRecipeModal = true;
   }
 
   private resetCreateRecipeForm(): void {
@@ -267,7 +279,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
           next: (createdRecipe) => {
             this.recipes.unshift(createdRecipe);
             this.isCreatingRecipe = false;
-            this.hideCreateRecipeModal();
+            this.showCreateRecipeModal = false;
           },
           error: (error) => {
             console.error('Error creating recipe:', error);
@@ -359,7 +371,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   cancelCreateRecipe(): void {
-    this.hideCreateRecipeModal();
+    this.showCreateRecipeModal = false;
   }
 
   isCreateButtonEnabled(): boolean {
