@@ -77,7 +77,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.pageTitleService.setPageTitle('Recipe Collection BLAAT 2');
+    this.pageTitleService.setPageTitle('Recipe Collection');
   }
 
   ngOnDestroy(): void {
