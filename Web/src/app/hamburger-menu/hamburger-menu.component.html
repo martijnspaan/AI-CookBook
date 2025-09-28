@@ -26,19 +26,19 @@
       </div>
       <a 
         class="menu-item" 
+        routerLink="/cookbooks" 
+        (click)="closeMenu()"
+        routerLinkActive="active">
+        <i class="fas fa-book me-2"></i>
+        Cookbooks
+      </a>
+      <a 
+        class="menu-item" 
         routerLink="/recipes" 
         (click)="closeMenu()"
         routerLinkActive="active">
         <i class="fas fa-utensils me-2"></i>
         All Recipes
-      </a>
-      <a 
-        class="menu-item" 
-        routerLink="/grocery-list" 
-        (click)="closeMenu()"
-        routerLinkActive="active">
-        <i class="fas fa-shopping-cart me-2"></i>
-        Grocery List
       </a>
       <a 
         class="menu-item" 
@@ -50,11 +50,11 @@
       </a>
       <a 
         class="menu-item" 
-        routerLink="/cookbooks" 
+        routerLink="/grocery-list" 
         (click)="closeMenu()"
         routerLinkActive="active">
-        <i class="fas fa-book me-2"></i>
-        Cookbooks
+        <i class="fas fa-shopping-cart me-2"></i>
+        Grocery List
       </a>
     </div>
   </div>

@@ -87,6 +87,7 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<UpdateCookbookUseCase>();
         services.AddScoped<DeleteCookbookUseCase>();
         services.AddScoped<CreateGroceryListUseCase>();
+        services.AddScoped<UpdateGroceryListUseCase>();
         services.AddScoped<GetAllGroceryListsUseCase>();
         services.AddScoped<DeleteGroceryListUseCase>();
 

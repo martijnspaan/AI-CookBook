@@ -30,6 +30,12 @@ export class GroceryListService {
     );
   }
 
+  updateGroceryList(groceryListId: string, groceryListRequest: CreateGroceryListRequest): Observable<GroceryList> {
+    return this.httpClient.put<GroceryList>(`${this.apiBaseUrl}/${groceryListId}`, groceryListRequest).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   deleteGroceryList(groceryListId: string): Observable<void> {
     return this.httpClient.delete<void>(`${this.apiBaseUrl}/${groceryListId}`).pipe(
       catchError(this.handleError)

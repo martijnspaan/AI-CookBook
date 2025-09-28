@@ -4,10 +4,21 @@ import { Router } from '@angular/router';
 import { PageTitleService } from '../services/page-title.service';
 import { GroceryListService } from '../services/grocery-list.service';
 import { RecipeService } from '../services/recipe.service';
+import { WeekMenuService } from '../services/week-menu.service';
 import { GroceryList, Meal } from '../models/grocery-list.model';
 import { Recipe } from '../models/recipe.model';
+import { WeekMenu } from '../models/week-menu.model';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { EditGroceryListDialogComponent } from './edit-grocery-list-dialog/edit-grocery-list-dialog.component';
+
+// Import the RecipeAssignment interface
+interface RecipeAssignment {
+  date: string;
+  mealType: 'breakfast' | 'lunch' | 'dinner';
+  recipeId: string;
+  recipeTitle: string;
+}
 
 interface MealWithRecipe extends Meal {
   recipeTitle?: string;
@@ -25,7 +36,7 @@ interface DayGroup {
 @Component({
   selector: 'app-grocery-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, EditGroceryListDialogComponent],
   templateUrl: './grocery-list.component.html',
   styleUrl: './grocery-list.component.scss'
 })
@@ -35,16 +46,21 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
   isLoading: boolean = true;
   errorMessage: string | null = null;
   isDeleting: boolean = false;
+  showEditDialog: boolean = false;
+  selectedGroceryListForEdit: GroceryListWithRecipes | null = null;
+  recipeAssignments: RecipeAssignment[] = [];
 
   constructor(
     private pageTitleService: PageTitleService,
     private groceryListService: GroceryListService,
     private recipeService: RecipeService,
+    private weekMenuService: WeekMenuService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadGroceryLists();
+    this.loadWeekMenus();
   }
 
   ngAfterViewInit(): void {
@@ -67,12 +83,12 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private loadGroceryListsWithRecipes(groceryLists: GroceryList[]): void {
+  private loadGroceryListsWithRecipes(groceryLists: GroceryList[]): Promise<void> {
     
     if (groceryLists.length === 0) {
       this.groceryLists = [];
       this.isLoading = false;
-      return;
+      return Promise.resolve();
     }
 
     // Collect all unique recipe IDs from all grocery lists
@@ -89,7 +105,7 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
     if (recipeIds.size === 0) {
       this.groceryLists = groceryLists as GroceryListWithRecipes[];
       this.isLoading = false;
-      return;
+      return Promise.resolve();
     }
 
     // Fetch all recipes in parallel
@@ -102,33 +118,37 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
       )
     );
 
-    forkJoin(recipeObservables).subscribe({
-      next: (recipes) => {
-        // Create a map of recipe ID to recipe title
-        const recipeMap = new Map<string, string>();
-        recipes.forEach(recipe => {
-          if (recipe) {
-            recipeMap.set(recipe.id, recipe.title);
-          }
-        });
+    return new Promise<void>((resolve, reject) => {
+      forkJoin(recipeObservables).subscribe({
+        next: (recipes) => {
+          // Create a map of recipe ID to recipe title
+          const recipeMap = new Map<string, string>();
+          recipes.forEach(recipe => {
+            if (recipe) {
+              recipeMap.set(recipe.id, recipe.title);
+            }
+          });
 
-        // Update grocery lists with recipe titles
-        this.groceryLists = groceryLists.map(groceryList => ({
-          ...groceryList,
-          meals: groceryList.meals.map(meal => ({
-            ...meal,
-            recipeTitle: meal.recipeId ? recipeMap.get(meal.recipeId) : undefined
-          }))
-        }));
+          // Update grocery lists with recipe titles
+          this.groceryLists = groceryLists.map(groceryList => ({
+            ...groceryList,
+            meals: groceryList.meals.map(meal => ({
+              ...meal,
+              recipeTitle: meal.recipeId ? recipeMap.get(meal.recipeId) : undefined
+            }))
+          }));
 
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error loading recipes:', error);
-        // Still show grocery lists even if recipe loading fails
-        this.groceryLists = groceryLists as GroceryListWithRecipes[];
-        this.isLoading = false;
-      }
+          this.isLoading = false;
+          resolve();
+        },
+        error: (error) => {
+          console.error('Error loading recipes:', error);
+          // Still show grocery lists even if recipe loading fails
+          this.groceryLists = groceryLists as GroceryListWithRecipes[];
+          this.isLoading = false;
+          resolve();
+        }
+      });
     });
   }
 
@@ -244,6 +264,166 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
         this.isDeleting = false;
       }
     });
+  }
+
+  editGroceryList(groceryList: GroceryListWithRecipes, event: Event): void {
+    event.stopPropagation();
+    this.selectedGroceryListForEdit = groceryList;
+    this.showEditDialog = true;
+  }
+
+  onGroceryListUpdated(updatedGroceryList: GroceryList): void {
+    // Find and update the grocery list in the array
+    const index = this.groceryLists.findIndex(gl => gl.id === updatedGroceryList.id);
+    if (index !== -1) {
+      // Convert the updated grocery list to include recipe titles
+      this.loadGroceryListsWithRecipes([updatedGroceryList]).then(() => {
+        // The loadGroceryListsWithRecipes method will update the groceryLists array
+        // We need to replace the specific item
+        const updatedWithRecipes = this.groceryLists.find(gl => gl.id === updatedGroceryList.id);
+        if (updatedWithRecipes) {
+          this.groceryLists[index] = updatedWithRecipes;
+        }
+      });
+    }
+    this.closeEditDialog();
+  }
+
+  closeEditDialog(): void {
+    this.showEditDialog = false;
+    this.selectedGroceryListForEdit = null;
+  }
+
+  private loadWeekMenus(): void {
+    this.weekMenuService.getWeekMenus().subscribe({
+      next: (weekMenus) => {
+        this.convertWeekMenusToRecipeAssignments(weekMenus);
+      },
+      error: (error) => {
+        console.error('Error loading week menus:', error);
+        // Don't show error to user as this is not critical for grocery list functionality
+      }
+    });
+  }
+
+  private convertWeekMenusToRecipeAssignments(weekMenus: WeekMenu[]): void {
+    this.recipeAssignments = [];
+    
+    // Collect all unique recipe IDs to fetch
+    const recipeIdsToFetch = new Set<string>();
+    
+    weekMenus.forEach(weekMenu => {
+      weekMenu.weekDays.forEach(weekDay => {
+        if (weekDay.breakfastRecipeId) recipeIdsToFetch.add(weekDay.breakfastRecipeId);
+        if (weekDay.lunchRecipeId) recipeIdsToFetch.add(weekDay.lunchRecipeId);
+        if (weekDay.dinnerRecipeId) recipeIdsToFetch.add(weekDay.dinnerRecipeId);
+      });
+    });
+    
+    if (recipeIdsToFetch.size === 0) {
+      return;
+    }
+    
+    // Fetch all recipes in parallel
+    const recipeObservables = Array.from(recipeIdsToFetch).map(id =>
+      this.recipeService.getRecipeById(id).pipe(
+        catchError((error) => {
+          console.error(`Error fetching recipe ${id}:`, error);
+          return of(null);
+        })
+      )
+    );
+    
+    forkJoin(recipeObservables).subscribe({
+      next: (recipes) => {
+        // Create a map of recipe ID to recipe title
+        const recipeMap = new Map<string, string>();
+        recipes.forEach(recipe => {
+          if (recipe) {
+            recipeMap.set(recipe.id, recipe.title);
+          }
+        });
+        
+        // Convert week menus to recipe assignments
+        weekMenus.forEach(weekMenu => {
+          const startOfWeek = this.getStartOfWeekFromWeekNumber(weekMenu.year, weekMenu.weekNumber);
+          
+          weekMenu.weekDays.forEach(weekDay => {
+            const currentDate = new Date(startOfWeek);
+            // API uses: 1=Monday, 2=Tuesday, ..., 6=Saturday, 0=Sunday
+            // JavaScript uses: 0=Sunday, 1=Monday, ..., 6=Saturday
+            let dayOffset = weekDay.dayOfWeek;
+            if (weekDay.dayOfWeek === 0) {
+              // Sunday in API (0) should be day 6 in JavaScript week (Sunday)
+              dayOffset = 6;
+            } else {
+              // Monday (1) to Saturday (6) in API should be day 0 to 5 in JavaScript week
+              dayOffset = weekDay.dayOfWeek - 1;
+            }
+            currentDate.setDate(startOfWeek.getDate() + dayOffset);
+            
+            const dateString = currentDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+            
+            // Add breakfast assignment
+            if (weekDay.breakfastRecipeId) {
+              this.recipeAssignments.push({
+                date: dateString,
+                mealType: 'breakfast',
+                recipeId: weekDay.breakfastRecipeId,
+                recipeTitle: recipeMap.get(weekDay.breakfastRecipeId) || 'Loading...'
+              });
+            }
+            
+            // Add lunch assignment
+            if (weekDay.lunchRecipeId) {
+              this.recipeAssignments.push({
+                date: dateString,
+                mealType: 'lunch',
+                recipeId: weekDay.lunchRecipeId,
+                recipeTitle: recipeMap.get(weekDay.lunchRecipeId) || 'Loading...'
+              });
+            }
+            
+            // Add dinner assignment
+            if (weekDay.dinnerRecipeId) {
+              this.recipeAssignments.push({
+                date: dateString,
+                mealType: 'dinner',
+                recipeId: weekDay.dinnerRecipeId,
+                recipeTitle: recipeMap.get(weekDay.dinnerRecipeId) || 'Loading...'
+              });
+            }
+          });
+        });
+      },
+      error: (error) => {
+        console.error('Error loading recipes for week menus:', error);
+      }
+    });
+  }
+
+  private getStartOfWeek(date: Date): Date {
+    const startOfWeek = new Date(date);
+    const day = startOfWeek.getDay();
+    const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
+    startOfWeek.setDate(diff);
+    startOfWeek.setHours(0, 0, 0, 0);
+    return startOfWeek;
+  }
+
+  private getStartOfWeekFromWeekNumber(year: number, weekNumber: number): Date {
+    // Create a date for January 4th of the given year (always in week 1)
+    const jan4 = new Date(year, 0, 4);
+    const jan4Day = jan4.getDay();
+    const jan4WeekStart = new Date(jan4);
+    jan4WeekStart.setDate(jan4.getDate() - jan4Day + 1); // Monday of week 1
+    
+    // Calculate the start of the requested week
+    const weekStart = new Date(jan4WeekStart);
+    weekStart.setDate(jan4WeekStart.getDate() + (weekNumber - 1) * 7);
+    weekStart.setHours(0, 0, 0, 0);
+    
+    return weekStart;
   }
 
 }

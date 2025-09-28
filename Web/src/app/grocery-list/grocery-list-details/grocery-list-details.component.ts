@@ -349,12 +349,32 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
     
     ingredient.state = nextState;
     this.ingredientStates.set(key, nextState);
+    
+    // Prevent page scrolling when ingredient state changes
+    // by maintaining the current scroll position
+    const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const currentScrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+    
+    // Use setTimeout to ensure the DOM has updated before restoring scroll position
+    setTimeout(() => {
+      window.scrollTo(currentScrollLeft, currentScrollTop);
+    }, 0);
   }
 
   setIngredientState(ingredient: AggregatedIngredient, state: IngredientState): void {
     const key = this.getIngredientKey(ingredient);
     ingredient.state = state;
     this.ingredientStates.set(key, state);
+    
+    // Prevent page scrolling when ingredient state changes
+    // by maintaining the current scroll position
+    const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    const currentScrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+    
+    // Use setTimeout to ensure the DOM has updated before restoring scroll position
+    setTimeout(() => {
+      window.scrollTo(currentScrollLeft, currentScrollTop);
+    }, 0);
   }
 
   getStateIcon(state: IngredientState): string {

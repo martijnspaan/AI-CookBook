@@ -66,6 +66,24 @@ public static class GroceryListController
         .WithName("CreateGroceryList")
         .WithOpenApi();
 
+        // PUT /api/grocerylists/{id} - Update an existing grocery list
+        endpoints.MapPut("/api/grocerylists/{id}", async (string id, UpdateGroceryListUseCaseInput input, UpdateGroceryListUseCase updateGroceryListUseCase) =>
+        {
+            UpdateGroceryListUseCaseInput updateInput = input with { Id = id };
+            UpdateGroceryListUseCaseOutput output = await updateGroceryListUseCase.Execute(updateInput);
+
+            if (output.IsSuccess)
+            {
+                return Results.Json(output.GroceryList);
+            }
+            else
+            {
+                return Results.Json(new { error = output.ErrorMessage }, statusCode: 404);
+            }
+        })
+        .WithName("UpdateGroceryList")
+        .WithOpenApi();
+
         // DELETE /api/grocerylists/{id} - Delete a grocery list
         endpoints.MapDelete("/api/grocerylists/{id}", async (string id, [FromServices] DeleteGroceryListUseCase deleteGroceryListUseCase) =>
         {

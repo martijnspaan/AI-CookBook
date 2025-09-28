@@ -285,6 +285,10 @@
   margin-left: 0.5rem !important;
 }
 
+.gap-2 {
+  gap: 0.5rem !important;
+}
+
 .small {
   font-size: 0.875em !important;
 }
@@ -348,6 +352,17 @@
     cursor: not-allowed;
   }
 
+  &.btn-outline-primary {
+    background-color: transparent;
+    color: #007bff;
+    border: 1px solid #007bff;
+
+    &:hover:not(:disabled) {
+      background-color: #007bff;
+      color: white;
+    }
+  }
+
   &.btn-outline-danger {
     background-color: transparent;
     color: #dc3545;
@@ -364,6 +379,7 @@
     font-size: 0.8rem;
   }
 
+  &.edit-button,
   &.delete-button {
     min-width: 32px;
     height: 32px;

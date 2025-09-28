@@ -24,17 +24,26 @@
     <div *ngIf="!isLoading && !errorMessage && groceryLists.length > 0" class="grocery-lists">
       <div *ngFor="let groceryList of groceryLists" class="grocery-list-card" (click)="viewGroceryListDetails(groceryList.id)">
         <div class="grocery-list-card-content">
-          <!-- Header with date and delete button -->
+          <!-- Header with date and action buttons -->
           <div class="d-flex justify-content-between align-items-center mb-1">
             <h5 class="grocery-list-title mb-0">{{ getFormattedDate(groceryList.dayOfGrocery) }}</h5>
-            <button 
-              type="button" 
-              class="btn btn-outline-danger btn-sm delete-button"
-              (click)="deleteGroceryList(groceryList.id); $event.stopPropagation()"
-              [disabled]="isDeleting"
-              title="Delete grocery list">
-              <i class="fas fa-trash"></i>
-            </button>
+            <div class="d-flex gap-2">
+              <button 
+                type="button" 
+                class="btn btn-outline-primary btn-sm edit-button"
+                (click)="editGroceryList(groceryList, $event)"
+                title="Edit grocery list">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button 
+                type="button" 
+                class="btn btn-outline-danger btn-sm delete-button"
+                (click)="deleteGroceryList(groceryList.id); $event.stopPropagation()"
+                [disabled]="isDeleting"
+                title="Delete grocery list">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
           </div>
 
           <!-- Meals section grouped by day -->
@@ -56,5 +65,14 @@
       </div>
     </div>
   </div>
+
+  <!-- Edit Grocery List Dialog -->
+  <app-edit-grocery-list-dialog
+    [isVisible]="showEditDialog"
+    [groceryList]="selectedGroceryListForEdit"
+    [recipeAssignments]="recipeAssignments"
+    (groceryListUpdated)="onGroceryListUpdated($event)"
+    (dialogClosed)="closeEditDialog()">
+  </app-edit-grocery-list-dialog>
 
 </div>
