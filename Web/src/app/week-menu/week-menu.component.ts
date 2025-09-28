@@ -13,6 +13,7 @@ import { GroceryListDialogService } from '../services/grocery-list-dialog.servic
 import { GroceryListService } from '../services/grocery-list.service';
 import { WeekMenu, WeekDay, CreateOrUpdateWeekMenuRequest } from '../models/week-menu.model';
 import { forkJoin, Observable, Subject } from 'rxjs';
+import { DateTimeUtil } from '../utils/date-time.util';
 import { takeUntil } from 'rxjs/operators';
 
 @Component({
@@ -248,9 +249,8 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     this.recipeAssignments = [];
 
     // Get the 14-day range starting from today
-    const today = new Date();
-    const endDate = new Date(today);
-    endDate.setDate(today.getDate() + 13);
+    const today = DateTimeUtil.getCurrentDate();
+    const { endDate } = DateTimeUtil.getDateRange(today, 14);
 
     console.log('Converting all week menus to recipe assignments for 14-day range:', {
       startDate: today,
@@ -264,32 +264,18 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
         const weekStart = this.getStartOfWeekForWeekNumber(weekMenu.weekNumber, weekMenu.year);
         const dayDate = new Date(weekStart);
         
-        // API uses: 1=Monday, 2=Tuesday, ..., 6=Saturday, 0=Sunday
-        // JavaScript uses: 0=Sunday, 1=Monday, ..., 6=Saturday
-        let dayOffset = weekDay.dayOfWeek;
-        if (weekDay.dayOfWeek === 0) {
-          // Sunday in API (0) should be day 6 in JavaScript week (Sunday)
-          dayOffset = 6;
-        } else {
-          // Monday-Saturday in API (1-6) should be Monday-Saturday in JavaScript (1-6)
-          dayOffset = weekDay.dayOfWeek - 1;
-        }
+        // Convert API day of week to JavaScript day offset
+        const dayOffset = DateTimeUtil.convertApiDayOfWeekToJavaScript(weekDay.dayOfWeek);
         
         dayDate.setDate(weekStart.getDate() + dayOffset);
 
         // Only include assignments within our 14-day range
-        // Normalize dates to avoid timezone issues
-        const normalizedDayDate = new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate());
-        const normalizedToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        const normalizedEndDate = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
-        
-        const isInRange = normalizedDayDate >= normalizedToday && normalizedDayDate <= normalizedEndDate;
+        const isInRange = DateTimeUtil.isDateInRange(dayDate, today, endDate);
         
         console.log('Date range check:', {
           dayDate: dayDate.toISOString(),
-          normalizedDayDate: normalizedDayDate.toISOString(),
-          normalizedToday: normalizedToday.toISOString(),
-          normalizedEndDate: normalizedEndDate.toISOString(),
+          today: today.toISOString(),
+          endDate: endDate.toISOString(),
           isInRange
         });
         
@@ -352,25 +338,11 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private getStartOfWeekForWeekNumber(weekNumber: number, year: number): Date {
-    // Based on the backend data, October 1st, 2025 is stored in week 40
-    // This means week 40 starts on September 29th, 2025
-    // Let me work backwards from known data points
-    
-    // Known data points from backend:
-    // - October 1st, 2025 = Week 40
-    // - September 28th, 2025 = Week 39 (based on previous logs)
-    
-    // Calculate week 40 start date (September 29th, 2025)
-    const week40Start = new Date(2025, 8, 29); // September 29th, 2025
-    
-    // Calculate the start of the target week
-    const weekStart = new Date(week40Start);
-    weekStart.setDate(week40Start.getDate() + (weekNumber - 40) * 7);
+    const weekStart = DateTimeUtil.getStartOfWeekForWeekNumber(weekNumber, year);
     
     console.log('Calculating week start (using known data points):', {
       year,
       weekNumber,
-      week40Start: week40Start.toISOString(),
       weekStart: weekStart.toISOString(),
       weekStartLocal: weekStart.toLocaleDateString()
     });
@@ -445,28 +417,10 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private getWeekNumber(date: Date): number {
-    // Use the same logic as getStartOfWeekForWeekNumber but in reverse
-    // We know from backend data that October 1st, 2025 = Week 40
-    // So we can work backwards from known data points
-    
-    const year = date.getFullYear();
-    
-    // Known data points from backend:
-    // - October 1st, 2025 = Week 40
-    // - September 28th, 2025 = Week 39
-    
-    // Calculate the week number based on the known week 40 start date (September 29th, 2025)
-    const week40Start = new Date(2025, 8, 29); // September 29th, 2025
-    
-    // Calculate the difference in days from the week 40 start
-    const diffTime = date.getTime() - week40Start.getTime();
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    const weekNumber = 40 + Math.floor(diffDays / 7);
+    const weekNumber = DateTimeUtil.getWeekNumber(date);
     
     console.log('Calculating week number:', {
       date: date.toISOString(),
-      week40Start: week40Start.toISOString(),
-      diffDays,
       weekNumber
     });
     
@@ -552,7 +506,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
       const dayAssignments = assignmentsByDate.get(dateString) || [];
       
       const weekDay: WeekDay = {
-        dayOfWeek: currentDate.getDay(),
+        dayOfWeek: DateTimeUtil.getApiDayOfWeek(currentDate),
         breakfastRecipeId: dayAssignments.find(a => a.mealType === 'breakfast')?.recipeId,
         lunchRecipeId: dayAssignments.find(a => a.mealType === 'lunch')?.recipeId,
         dinnerRecipeId: dayAssignments.find(a => a.mealType === 'dinner')?.recipeId
@@ -567,20 +521,11 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private getStartOfWeek(date: Date): Date {
-    const startOfWeek = new Date(date);
-    const day = startOfWeek.getDay();
-    const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
-    startOfWeek.setDate(diff);
-    startOfWeek.setHours(0, 0, 0, 0);
-    return startOfWeek;
+    return DateTimeUtil.getStartOfWeek(date);
   }
 
   private formatDateAsString(date: Date): string {
-    // Format date as YYYY-MM-DD without timezone conversion
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+    return DateTimeUtil.formatDateAsString(date);
   }
 
   private fetchRecipeTitlesAndUpdateAssignments(recipeIds: string[], assignments: RecipeAssignment[]): void {

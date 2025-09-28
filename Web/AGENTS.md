@@ -104,3 +104,34 @@ The frontend is built as a modern Angular web application with a mobile-first re
 - **Shared Modules**: Create shared modules for common functionality
 - **Barrel Exports**: Use barrel exports for clean import statements
 - **File Naming**: Follow consistent file naming conventions (kebab-case for files, PascalCase for components)
+
+## 🛠️ Utility Classes & Shared Code
+
+### Utils Folder Structure
+- **Location**: `src/app/utils/` - Central location for reusable utility classes
+- **Purpose**: Contains stateless utility classes that provide common functionality across the application
+- **Naming Convention**: Use descriptive names ending with `.util.ts` (e.g., `date-time.util.ts`)
+
+### DateTimeUtil Class
+- **Purpose**: Centralized date and time calculations for consistent behavior across the application
+- **Key Features**:
+  - Week number calculations matching backend C# Calendar.GetWeekOfYear behavior
+  - Date range operations (14-day ranges, date comparisons)
+  - Day-of-week conversions between API and JavaScript formats
+  - Date formatting and parsing utilities
+  - Timezone-safe date operations
+
+### Utility Class Guidelines
+- **Stateless**: All utility classes should be stateless with static methods only
+- **Pure Functions**: Methods should be pure functions with no side effects
+- **Comprehensive Documentation**: Include JSDoc comments for all public methods
+- **Type Safety**: Use TypeScript's type system for better code quality
+- **Testing**: Write comprehensive unit tests for all utility methods
+- **Reusability**: Design utilities to be reusable across different components and features
+
+### When to Create Utility Classes
+- **Common Operations**: When functionality is used in multiple components
+- **Complex Logic**: When business logic becomes too complex for component methods
+- **External Dependencies**: When dealing with external APIs or data formats
+- **Mathematical Calculations**: For complex calculations that need consistency
+- **Data Transformations**: For data formatting, parsing, or conversion operations
