@@ -54,6 +54,11 @@ export class AppComponent implements OnInit, OnDestroy {
   footerButtonClass = 'btn-primary';
   private footerButtonClickHandler: (() => void) | null = null;
 
+  // Computed property to determine if footer should be visible
+  get shouldShowFooter(): boolean {
+    return this.showLeftButton || this.showRightButton || this.showFooterButton;
+  }
+
   constructor(
     private pageTitleService: PageTitleService,
     private router: Router,
