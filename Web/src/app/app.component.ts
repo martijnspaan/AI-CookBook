@@ -7,7 +7,7 @@ import { RecipeSelectionDialogComponent } from './week-menu/recipe-selection-dia
 import { PageTitleService } from './services/page-title.service';
 import { CookbookModalService } from './services/cookbook-modal.service';
 import { RecipeModalService } from './services/recipe-modal.service';
-import { GroceryShoppingDialogService } from './services/grocery-shopping-dialog.service';
+import { GroceryListDialogService } from './services/grocery-list-dialog.service';
 import { RecipeSelectionDialogService, RecipeSelectionDialogData } from './services/recipe-selection-dialog.service';
 import { FooterService, FooterButtonConfig } from './services/footer.service';
 import { filter, takeUntil } from 'rxjs/operators';
@@ -59,7 +59,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private router: Router,
     private cookbookModalService: CookbookModalService,
     private recipeModalService: RecipeModalService,
-    private groceryShoppingDialogService: GroceryShoppingDialogService,
+    private groceryListDialogService: GroceryListDialogService,
     private recipeSelectionDialogService: RecipeSelectionDialogService,
     private footerService: FooterService
   ) {}
@@ -127,10 +127,10 @@ export class AppComponent implements OnInit, OnDestroy {
         this.rightButtonClickHandler = () => this.openCreateRecipeModal();
       } else if (currentUrl === '/week-menu') {
         this.showRightButton = true;
-        this.rightButtonText = 'Create Groceries List';
+        this.rightButtonText = 'Create Grocery List';
         this.rightButtonIcon = 'fas fa-shopping-cart';
         this.rightButtonClass = 'btn-success';
-        this.rightButtonClickHandler = () => this.createGroceriesList();
+        this.rightButtonClickHandler = () => this.createGroceryList();
       } else if (currentUrl === '/cookbooks') {
         this.showRightButton = true;
         this.rightButtonText = 'Create New Cookbook';
@@ -199,8 +199,8 @@ export class AppComponent implements OnInit, OnDestroy {
     this.recipeModalService.openCreateRecipeModal();
   }
   
-  private createGroceriesList(): void {
-    this.groceryShoppingDialogService.openGroceryShoppingDialog();
+  private createGroceryList(): void {
+    this.groceryListDialogService.openGroceryListDialog();
   }
   
   private openCreateCookbookModal(): void {

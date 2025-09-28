@@ -1,7 +1,7 @@
 namespace API.Application.Dtos;
 
 public record CreateGroceryListUseCaseInput(
-    string DayOfShopping,
+    string DayOfGrocery,
     List<GroceryListMealInput> Meals);
 
 public record GroceryListMealInput(

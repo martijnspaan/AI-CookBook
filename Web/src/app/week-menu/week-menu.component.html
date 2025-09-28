@@ -34,12 +34,12 @@
       (dialogClosed)="onDialogClosed()">
     </app-recipe-selection-dialog>
 
-    <!-- Grocery Shopping Dialog -->
-    <app-grocery-shopping-dialog
-      [isVisible]="showGroceryShoppingDialog"
+    <!-- Grocery List Dialog -->
+    <app-grocery-list-dialog
+      [isVisible]="showGroceryListDialog"
       [recipeAssignments]="recipeAssignments"
-      (shoppingListCreated)="onGroceryShoppingListCreated($event)"
-      (dialogClosed)="onGroceryShoppingDialogClosed()">
-    </app-grocery-shopping-dialog>
+      (groceryListCreated)="onGroceryListCreated($event)"
+      (dialogClosed)="onGroceryListDialogClosed()">
+    </app-grocery-list-dialog>
   </div>
 </div>

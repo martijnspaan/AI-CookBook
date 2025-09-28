@@ -26,13 +26,13 @@
         <div class="grocery-list-card-content">
           <!-- Header with date and delete button -->
           <div class="d-flex justify-content-between align-items-center mb-1">
-            <h5 class="grocery-list-title mb-0">{{ getFormattedDate(groceryList.dayOfShopping) }}</h5>
+            <h5 class="grocery-list-title mb-0">{{ getFormattedDate(groceryList.dayOfGrocery) }}</h5>
             <button 
               type="button" 
               class="btn btn-outline-danger btn-sm delete-button"
               (click)="deleteGroceryList(groceryList.id)"
               [disabled]="isDeleting"
-              title="Delete shopping list">
+              title="Delete grocery list">
               <i class="fas fa-trash"></i>
             </button>
           </div>

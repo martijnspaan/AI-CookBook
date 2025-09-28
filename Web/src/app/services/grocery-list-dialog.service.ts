@@ -1,25 +1,25 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
-export interface GroceryShoppingDialogConfig {
+export interface GroceryListDialogConfig {
   isVisible: boolean;
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class GroceryShoppingDialogService {
-  private dialogState = new BehaviorSubject<GroceryShoppingDialogConfig>({
+export class GroceryListDialogService {
+  private dialogState = new BehaviorSubject<GroceryListDialogConfig>({
     isVisible: false
   });
 
   public dialogState$ = this.dialogState.asObservable();
 
-  openGroceryShoppingDialog(): void {
+  openGroceryListDialog(): void {
     this.dialogState.next({ isVisible: true });
   }
 
-  closeGroceryShoppingDialog(): void {
+  closeGroceryListDialog(): void {
     this.dialogState.next({ isVisible: false });
   }
 }

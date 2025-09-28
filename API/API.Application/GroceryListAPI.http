@@ -3,7 +3,7 @@ POST https://localhost:7149/api/grocerylists
 Content-Type: application/json
 
 {
-  "dayOfShopping": "2024-01-15T10:00:00.000Z",
+  "dayOfGrocery": "2024-01-15T10:00:00.000Z",
   "meals": [
     {
       "dayOfMeal": "2024-01-15T00:00:00.000Z",

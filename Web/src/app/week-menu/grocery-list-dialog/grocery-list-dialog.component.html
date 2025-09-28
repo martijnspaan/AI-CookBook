@@ -4,14 +4,14 @@
   (popupClosed)="closeDialog()">
   
   <ng-template #popupBody>
-    <!-- Shopping Day Selection -->
+    <!-- Grocery Day Selection -->
     <div class="mb-3">
-      <label class="form-label fw-bold">Choose your shopping day:</label>
+      <label class="form-label fw-bold">Choose your grocery day:</label>
       <select 
         class="form-select" 
-        [(ngModel)]="selectedShoppingDay" 
-        (change)="onShoppingDayChanged()">
-        <option *ngFor="let option of shoppingDayOptions" [ngValue]="option.date">
+        [(ngModel)]="selectedGroceryDay" 
+        (change)="onGroceryDayChanged()">
+        <option *ngFor="let option of groceryDayOptions" [ngValue]="option.date">
           {{ option.displayText }}
         </option>
       </select>
@@ -36,7 +36,7 @@
           <div class="meals-list">
             <div *ngFor="let meal of dateGroup.meals" class="meal-row" [class.meal-already-used]="meal.isAlreadyUsed">
               <div class="form-check">
-                <!-- Container for both checkbox and shopping cart icon to ensure same positioning -->
+                <!-- Container for both checkbox and grocery cart icon to ensure same positioning -->
                 <div class="form-check-input-container">
                   <!-- Show checkbox for available meals -->
                   <input 
@@ -47,10 +47,10 @@
                     [(ngModel)]="meal.isSelected"
                     (change)="onMealSelectionChanged(meal)">
                   
-                  <!-- Show grayed-out shopping cart icon for already used meals -->
+                  <!-- Show grayed-out grocery cart icon for already used meals -->
                   <div 
                     *ngIf="meal.isAlreadyUsed"
-                    class="shopping-cart-icon-disabled"
+                    class="grocery-cart-icon-disabled"
                     [id]="'meal-' + meal.date + '-' + meal.mealType">
                     <i class="fas fa-shopping-cart"></i>
                   </div>
@@ -85,9 +85,9 @@
       type="button" 
       class="btn btn-success" 
       [disabled]="getSelectedMealsCount() === 0"
-      (click)="createShoppingList()">
+      (click)="createGroceryList()">
       <i class="fas fa-shopping-cart me-2"></i>
-      Create Shopping List
+      Create Grocery List
     </button>
   </ng-template>
 </app-reusable-popup>

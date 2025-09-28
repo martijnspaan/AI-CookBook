@@ -4,12 +4,12 @@ import { Router } from '@angular/router';
 import { WeekCalendarComponent, RecipeAssignment } from './week-calendar/week-calendar.component';
 import { RecipeSelectionDialogService } from '../services/recipe-selection-dialog.service';
 import { RecipeSelectionDialogComponent } from './recipe-selection-dialog/recipe-selection-dialog.component';
-import { GroceryShoppingDialogComponent, MealSelection } from './grocery-shopping-dialog/grocery-shopping-dialog.component';
+import { GroceryListDialogComponent, MealSelection } from './grocery-list-dialog/grocery-list-dialog.component';
 import { Recipe } from '../models/recipe.model';
 import { PageTitleService } from '../services/page-title.service';
 import { WeekMenuService } from '../services/week-menu.service';
 import { RecipeService } from '../services/recipe.service';
-import { GroceryShoppingDialogService } from '../services/grocery-shopping-dialog.service';
+import { GroceryListDialogService } from '../services/grocery-list-dialog.service';
 import { GroceryListService } from '../services/grocery-list.service';
 import { WeekMenu, WeekDay, CreateOrUpdateWeekMenuRequest } from '../models/week-menu.model';
 import { forkJoin, Observable, Subject } from 'rxjs';
@@ -18,7 +18,7 @@ import { takeUntil } from 'rxjs/operators';
 @Component({
   selector: 'app-week-menu',
   standalone: true,
-  imports: [CommonModule, WeekCalendarComponent, RecipeSelectionDialogComponent, GroceryShoppingDialogComponent],
+  imports: [CommonModule, WeekCalendarComponent, RecipeSelectionDialogComponent, GroceryListDialogComponent],
   templateUrl: './week-menu.component.html',
   styleUrl: './week-menu.component.scss'
 })
@@ -30,7 +30,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   recipeAssignments: RecipeAssignment[] = [];
   recipes: Recipe[] = [];
   showRecipeSelectionDialog: boolean = false;
-  showGroceryShoppingDialog: boolean = false;
+  showGroceryListDialog: boolean = false;
   currentWeekMenu: WeekMenu | null = null;
   isSaving: boolean = false;
   isCalendarLoading: boolean = true;
@@ -40,7 +40,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     private pageTitleService: PageTitleService,
     private weekMenuService: WeekMenuService,
     private recipeService: RecipeService,
-    private groceryShoppingDialogService: GroceryShoppingDialogService,
+    private groceryListDialogService: GroceryListDialogService,
     private recipeSelectionDialogService: RecipeSelectionDialogService,
     private groceryListService: GroceryListService,
     private router: Router
@@ -49,7 +49,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.loadWeekMenus();
     this.loadAllRecipes();
-    this.subscribeToGroceryShoppingDialog();
+    this.subscribeToGroceryListDialog();
     this.subscribeToRecipeSelectionDialog();
   }
 
@@ -377,11 +377,11 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  private subscribeToGroceryShoppingDialog(): void {
-    this.groceryShoppingDialogService.dialogState$
+  private subscribeToGroceryListDialog(): void {
+    this.groceryListDialogService.dialogState$
       .pipe(takeUntil(this.destroySubject))
       .subscribe(config => {
-        this.showGroceryShoppingDialog = config.isVisible;
+        this.showGroceryListDialog = config.isVisible;
       });
   }
 
@@ -418,7 +418,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     this.destroySubject.complete();
   }
 
-  onGroceryShoppingListCreated(event: { selectedDay: Date; selectedMeals: MealSelection[] }): void {
+  onGroceryListCreated(event: { selectedDay: Date; selectedMeals: MealSelection[] }): void {
     
     // Convert MealSelection to Meal format for the API
     const meals = event.selectedMeals.map(meal => {
@@ -430,14 +430,14 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     const groceryListRequest = {
-      dayOfShopping: event.selectedDay.toISOString(),
+      dayOfGrocery: event.selectedDay.toISOString(),
       meals: meals
     };
 
 
     this.groceryListService.createGroceryList(groceryListRequest).subscribe({
       next: (groceryList) => {
-        this.groceryShoppingDialogService.closeGroceryShoppingDialog();
+        this.groceryListDialogService.closeGroceryListDialog();
         this.router.navigate(['/grocery-list']);
       },
       error: (error) => {
@@ -452,7 +452,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     return days[date.getDay()];
   }
 
-  onGroceryShoppingDialogClosed(): void {
-    this.groceryShoppingDialogService.closeGroceryShoppingDialog();
+  onGroceryListDialogClosed(): void {
+    this.groceryListDialogService.closeGroceryListDialog();
   }
 }

@@ -212,7 +212,7 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
       },
       error: (error) => {
         console.error('Error deleting grocery list:', error);
-        this.errorMessage = 'Failed to delete shopping list. Please try again.';
+        this.errorMessage = 'Failed to delete grocery list. Please try again.';
         this.isDeleting = false;
       }
     });

@@ -6,13 +6,13 @@ export interface Meal {
 
 export interface GroceryList {
   id: string;
-  dayOfShopping: string;
+  dayOfGrocery: string;
   meals: Meal[];
   createdAt: string;
   updatedAt: string;
 }
 
 export interface CreateGroceryListRequest {
-  dayOfShopping: string;
+  dayOfGrocery: string;
   meals: Meal[];
 }

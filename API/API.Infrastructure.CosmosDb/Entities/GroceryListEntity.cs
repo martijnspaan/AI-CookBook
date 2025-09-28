@@ -5,8 +5,8 @@ namespace API.Infrastructure.CosmosDb.Entities;
 
 public class GroceryListEntity : BaseCosmosDbEntity
 {
-    [JsonProperty("DayOfShopping")]
-    public DateTime DayOfShopping { get; set; }
+    [JsonProperty("DayOfGrocery")]
+    public DateTime DayOfGrocery { get; set; }
 
     [JsonProperty("Meals")]
     public List<Meal> Meals { get; set; } = new();

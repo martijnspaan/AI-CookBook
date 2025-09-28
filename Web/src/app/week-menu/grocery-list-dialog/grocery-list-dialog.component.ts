@@ -6,7 +6,7 @@ import { GroceryListService } from '../../services/grocery-list.service';
 import { GroceryList } from '../../models/grocery-list.model';
 import { ReusablePopupComponent, PopupConfig } from '../../shared/reusable-popup';
 
-export interface ShoppingDayOption {
+export interface GroceryDayOption {
   date: Date;
   displayText: string;
 }
@@ -21,27 +21,27 @@ export interface MealSelection {
 }
 
 @Component({
-  selector: 'app-grocery-shopping-dialog',
+  selector: 'app-grocery-list-dialog',
   standalone: true,
   imports: [CommonModule, FormsModule, ReusablePopupComponent],
-  templateUrl: './grocery-shopping-dialog.component.html',
-  styleUrl: './grocery-shopping-dialog.component.scss'
+  templateUrl: './grocery-list-dialog.component.html',
+  styleUrl: './grocery-list-dialog.component.scss'
 })
-export class GroceryShoppingDialogComponent implements OnInit, OnChanges {
+export class GroceryListDialogComponent implements OnInit, OnChanges {
   @Input() isVisible: boolean = false;
   @Input() recipeAssignments: RecipeAssignment[] = [];
   @Output() dialogClosed = new EventEmitter<void>();
-  @Output() shoppingListCreated = new EventEmitter<{ selectedDay: Date; selectedMeals: MealSelection[] }>();
+  @Output() groceryListCreated = new EventEmitter<{ selectedDay: Date; selectedMeals: MealSelection[] }>();
 
-  selectedShoppingDay: Date = new Date();
-  shoppingDayOptions: ShoppingDayOption[] = [];
+  selectedGroceryDay: Date = new Date();
+  groceryDayOptions: GroceryDayOption[] = [];
   mealSelections: MealSelection[] = [];
   mealsByDate: { date: string; meals: MealSelection[] }[] = [];
   existingGroceryLists: GroceryList[] = [];
   isLoadingGroceryLists: boolean = false;
 
   popupConfig: PopupConfig = {
-    title: 'Create Grocery List 2',
+    title: 'Create Grocery List',
     icon: 'fas fa-shopping-cart',
     showCloseButton: true,
     size: 'lg',
@@ -54,13 +54,13 @@ export class GroceryShoppingDialogComponent implements OnInit, OnChanges {
   constructor(private groceryListService: GroceryListService) {}
 
   ngOnInit(): void {
-    this.generateShoppingDayOptions();
+    this.generateGroceryDayOptions();
     this.loadExistingGroceryLists();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isVisible'] && changes['isVisible'].currentValue === true) {
-      this.generateShoppingDayOptions();
+      this.generateGroceryDayOptions();
       this.loadExistingGroceryLists();
     }
     if (changes['recipeAssignments']) {
@@ -68,9 +68,9 @@ export class GroceryShoppingDialogComponent implements OnInit, OnChanges {
     }
   }
 
-  private generateShoppingDayOptions(): void {
+  private generateGroceryDayOptions(): void {
     const today = new Date();
-    this.shoppingDayOptions = [];
+    this.groceryDayOptions = [];
     
     for (let i = 0; i < 14; i++) {
       const date = new Date(today);
@@ -80,13 +80,13 @@ export class GroceryShoppingDialogComponent implements OnInit, OnChanges {
       const dateString = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
       const displayText = `${dayName}, ${dateString}`;
       
-      this.shoppingDayOptions.push({
+      this.groceryDayOptions.push({
         date: date,
         displayText: displayText
       });
     }
     
-    this.selectedShoppingDay = this.shoppingDayOptions[0].date;
+    this.selectedGroceryDay = this.groceryDayOptions[0].date;
   }
 
   private loadExistingGroceryLists(): void {
@@ -186,8 +186,8 @@ export class GroceryShoppingDialogComponent implements OnInit, OnChanges {
     }
   }
 
-  onShoppingDayChanged(): void {
-    // You can add logic here if needed when shopping day changes
+  onGroceryDayChanged(): void {
+    // You can add logic here if needed when grocery day changes
   }
 
   onMealSelectionChanged(meal: MealSelection): void {
@@ -207,10 +207,10 @@ export class GroceryShoppingDialogComponent implements OnInit, OnChanges {
     return this.mealSelections.filter(meal => meal.isSelected && !meal.isAlreadyUsed).length;
   }
 
-  createShoppingList(): void {
+  createGroceryList(): void {
     const selectedMeals = this.mealSelections.filter(meal => meal.isSelected && !meal.isAlreadyUsed);
-    this.shoppingListCreated.emit({
-      selectedDay: this.selectedShoppingDay,
+    this.groceryListCreated.emit({
+      selectedDay: this.selectedGroceryDay,
       selectedMeals: selectedMeals
     });
   }

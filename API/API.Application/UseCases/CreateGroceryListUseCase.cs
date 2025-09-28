@@ -11,9 +11,9 @@ public class CreateGroceryListUseCase(ICosmosDbRepository<GroceryListEntity> rep
         try
         {
             // Convert string to DateTime
-            if (!DateTime.TryParse(input.DayOfShopping, out DateTime dayOfShopping))
+            if (!DateTime.TryParse(input.DayOfGrocery, out DateTime dayOfGrocery))
             {
-                return CreateGroceryListUseCaseOutput.Failure("Invalid dayOfShopping format. Expected ISO 8601 format.");
+                return CreateGroceryListUseCaseOutput.Failure("Invalid dayOfGrocery format. Expected ISO 8601 format.");
             }
 
             // Convert GroceryListMealInput to Meal entities
@@ -25,7 +25,7 @@ public class CreateGroceryListUseCase(ICosmosDbRepository<GroceryListEntity> rep
 
             GroceryListEntity groceryList = new GroceryListEntity
             {
-                DayOfShopping = dayOfShopping,
+                DayOfGrocery = dayOfGrocery,
                 Meals = meals
             };
 
