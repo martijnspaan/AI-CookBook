@@ -1,0 +1,760 @@
+# AI Cookbook Kubernetes Deployment
+# This file contains all resources needed for a complete deployment
+# Apply in order: kubectl apply -f deploy-all.yaml
+
+---
+# Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ai-cookbook
+  labels:
+    name: ai-cookbook
+    app.kubernetes.io/name: ai-cookbook
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+  annotations:
+    description: "AI Cookbook application namespace"
+    contact: "AI Cookbook Team"
+
+---
+# Resource Quota and Limits
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: ai-cookbook-resource-quota
+  namespace: ai-cookbook
+  labels:
+    app.kubernetes.io/name: ai-cookbook
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: resource-quota
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: "2Gi"
+    limits.cpu: "4"
+    limits.memory: "4Gi"
+    persistentvolumeclaims: "4"
+    pods: "10"
+    services: "5"
+    secrets: "10"
+    configmaps: "10"
+    count/deployments.apps: "5"
+    count/ingresses.networking.k8s.io: "2"
+
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: ai-cookbook-limit-range
+  namespace: ai-cookbook
+  labels:
+    app.kubernetes.io/name: ai-cookbook
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: limit-range
+spec:
+  limits:
+  - default:
+      cpu: "500m"
+      memory: "512Mi"
+    defaultRequest:
+      cpu: "100m"
+      memory: "128Mi"
+    type: Container
+  - max:
+      cpu: "2"
+      memory: "2Gi"
+    min:
+      cpu: "50m"
+      memory: "64Mi"
+    type: Container
+  - max:
+      storage: "10Gi"
+    min:
+      storage: "1Gi"
+    type: PersistentVolumeClaim
+
+---
+# Service Account and RBAC
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ai-cookbook-sa
+  namespace: ai-cookbook
+  labels:
+    app.kubernetes.io/name: ai-cookbook
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: rbac
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: ai-cookbook-role
+  namespace: ai-cookbook
+  labels:
+    app.kubernetes.io/name: ai-cookbook
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: rbac
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "endpoints", "persistentvolumeclaims", "events", "configmaps", "secrets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "daemonsets", "replicasets", "statefulsets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["networking.k8s.io"]
+  resources: ["ingresses", "networkpolicies"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["policy"]
+  resources: ["poddisruptionbudgets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ai-cookbook-rolebinding
+  namespace: ai-cookbook
+  labels:
+    app.kubernetes.io/name: ai-cookbook
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: rbac
+subjects:
+- kind: ServiceAccount
+  name: ai-cookbook-sa
+  namespace: ai-cookbook
+roleRef:
+  kind: Role
+  name: ai-cookbook-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+# ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ai-cookbook-config
+  namespace: ai-cookbook
+  labels:
+    app.kubernetes.io/name: ai-cookbook
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: config
+  annotations:
+    config.kubernetes.io/local-config: "true"
+    description: "AI Cookbook application configuration"
+data:
+  # API Configuration
+  API_TITLE: "AI Cookbook API"
+  API_VERSION: "v1"
+  API_DESCRIPTION: "A minimal API for the AI Cookbook project"
+  API_CONTACT_NAME: "AI Cookbook Team"
+  API_CONTACT_EMAIL: "contact@aicookbook.com"
+  
+  # CORS Configuration - More restrictive headers
+  CORS_ALLOWED_ORIGINS: "http://localhost:4200,http://localhost:3000,http://localhost:8080"
+  CORS_ALLOWED_METHODS: "GET,POST,PUT,DELETE,OPTIONS"
+  CORS_ALLOWED_HEADERS: "Content-Type,Authorization,X-Requested-With,Accept,Origin"
+  CORS_ALLOW_CREDENTIALS: "true"
+  CORS_MAX_AGE: "3600"
+  
+  # Swagger Configuration
+  SWAGGER_ENABLED: "true"
+  SWAGGER_ROUTE_PREFIX: ""
+  SWAGGER_DOCUMENT_TITLE: "AI Cookbook API Documentation"
+  
+  # Recipes Configuration
+  RECIPES_PATH: "recipes"
+  
+  # CosmosDB Configuration
+  COSMOSDB_DATABASE_NAME: "CookBook"
+  COSMOSDB_CONTAINER_NAME: "Recipes"
+  COSMOSDB_WEEK_MENU_CONTAINER_NAME: "WeekMenu"
+  COSMOSDB_COOKBOOK_CONTAINER_NAME: "Cookbooks"
+  COSMOSDB_GROCERY_LIST_CONTAINER_NAME: "GroceryLists"
+  COSMOSDB_PARTITION_KEY_PATH: "/id"
+  COSMOSDB_THROUGHPUT: "400"
+  COSMOSDB_CREATE_IF_NOT_EXISTS: "true"
+  
+  # Health Check Configuration
+  HEALTH_CHECK_ENABLED: "true"
+  HEALTH_CHECK_PATH: "/health"
+  HEALTH_CHECK_INTERVAL: "30s"
+  
+  # Logging Configuration
+  LOG_LEVEL: "Information"
+  LOG_FORMAT: "json"
+
+---
+# Secret (WARNING: Replace with external secret management in production)
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ai-cookbook-secrets
+  namespace: ai-cookbook
+  labels:
+    app.kubernetes.io/name: ai-cookbook
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: secrets
+  annotations:
+    description: "AI Cookbook application secrets"
+    # This should be replaced with external secret management in production
+    secret.kubernetes.io/managed-by: "external-secrets"
+type: Opaque
+data:
+  # Base64 encoded values - replace with your actual values
+  # To encode: echo -n "your-value" | base64
+  # WARNING: This is for development only. In production, use external secret management
+  COSMOSDB_CONNECTION_STRING: "QWNjb3VudEVuZHBvaW50PWh0dHBzOi8vY29zbW9zLWFpLWNvb2tib29rLmRvY3VtZW50cy5henVyZS5jb206NDQzLztBY2NvdW50S2V5PTA3ZXRhR05TVW8zU0VKUTBPYnFNM0dxRXAzN1l0VUlwbXBGaEZPU3BuYnZQZnpmYndmNDdtWVdZbmp5MkNPeHpVTXh1NUEwbHlxcFBBQ0RiRm9PcDF3PT0="
+  # Add additional secrets as needed
+  # JWT_SECRET: ""
+  # API_KEY: ""
+
+---
+# TLS Secret (Replace with actual certificate)
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ai-cookbook-tls
+  namespace: ai-cookbook
+  labels:
+    app.kubernetes.io/name: ai-cookbook
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: tls
+  annotations:
+    description: "TLS certificate for AI Cookbook ingress"
+type: kubernetes.io/tls
+data:
+  # Replace with your actual base64 encoded certificate and key
+  # To generate: kubectl create secret tls ai-cookbook-tls --cert=path/to/cert.pem --key=path/to/key.pem --dry-run=client -o yaml
+  tls.crt: ""  # Base64 encoded certificate
+  tls.key: ""  # Base64 encoded private key
+
+---
+# API Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-deployment
+  namespace: ai-cookbook
+  labels:
+    app: api
+    app.kubernetes.io/name: ai-cookbook-api
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: api
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: api
+      app.kubernetes.io/name: ai-cookbook-api
+  template:
+    metadata:
+      labels:
+        app: api
+        app.kubernetes.io/name: ai-cookbook-api
+        app.kubernetes.io/part-of: ai-cookbook
+        app.kubernetes.io/version: "1.0.0"
+        app.kubernetes.io/component: api
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "4201"
+        prometheus.io/path: "/metrics"
+        checksum/config: "placeholder"
+    spec:
+      serviceAccountName: ai-cookbook-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 2000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: api
+        image: ai-cookbook-api:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 4201
+          protocol: TCP
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Development"
+        - name: ASPNETCORE_URLS
+          value: "http://+:4201"
+        envFrom:
+        - configMapRef:
+            name: ai-cookbook-config
+        - secretRef:
+            name: ai-cookbook-secrets
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+            - ALL
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 4201
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+          successThreshold: 1
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 4201
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+          successThreshold: 1
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: var-tmp
+          mountPath: /var/tmp
+      volumes:
+      - name: tmp
+        emptyDir: {}
+      - name: var-tmp
+        emptyDir: {}
+      nodeSelector:
+        kubernetes.io/os: linux
+      tolerations:
+      - key: "node-role.kubernetes.io/master"
+        operator: "Exists"
+        effect: "NoSchedule"
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - api
+              topologyKey: kubernetes.io/hostname
+
+---
+# Web Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-deployment
+  namespace: ai-cookbook
+  labels:
+    app: web
+    app.kubernetes.io/name: ai-cookbook-web
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: web
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: web
+      app.kubernetes.io/name: ai-cookbook-web
+  template:
+    metadata:
+      labels:
+        app: web
+        app.kubernetes.io/name: ai-cookbook-web
+        app.kubernetes.io/part-of: ai-cookbook
+        app.kubernetes.io/version: "1.0.0"
+        app.kubernetes.io/component: web
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "4200"
+        prometheus.io/path: "/metrics"
+        checksum/config: "placeholder"
+    spec:
+      serviceAccountName: ai-cookbook-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 2000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: web
+        image: ai-cookbook-web:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 4200
+          protocol: TCP
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+            - ALL
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 4200
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+          successThreshold: 1
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 4200
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+          successThreshold: 1
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: var-tmp
+          mountPath: /var/tmp
+      volumes:
+      - name: tmp
+        emptyDir: {}
+      - name: var-tmp
+        emptyDir: {}
+      nodeSelector:
+        kubernetes.io/os: linux
+      tolerations:
+      - key: "node-role.kubernetes.io/master"
+        operator: "Exists"
+        effect: "NoSchedule"
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - web
+              topologyKey: kubernetes.io/hostname
+
+---
+# Pod Disruption Budgets
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: api-pdb
+  namespace: ai-cookbook
+  labels:
+    app: api
+    app.kubernetes.io/name: ai-cookbook-api
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: api
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: api
+      app.kubernetes.io/name: ai-cookbook-api
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: web-pdb
+  namespace: ai-cookbook
+  labels:
+    app: web
+    app.kubernetes.io/name: ai-cookbook-web
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: web
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: web
+      app.kubernetes.io/name: ai-cookbook-web
+
+---
+# Services
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+  namespace: ai-cookbook
+  labels:
+    app: api
+    app.kubernetes.io/name: ai-cookbook-api
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: api
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:region:account:certificate/certificate-id"
+spec:
+  selector:
+    app: api
+    app.kubernetes.io/name: ai-cookbook-api
+  ports:
+  - name: http
+    port: 4201
+    targetPort: 4201
+    protocol: TCP
+  type: ClusterIP
+  sessionAffinity: None
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-service
+  namespace: ai-cookbook
+  labels:
+    app: web
+    app.kubernetes.io/name: ai-cookbook-web
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: web
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-ports: "https"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:region:account:certificate/certificate-id"
+spec:
+  selector:
+    app: web
+    app.kubernetes.io/name: ai-cookbook-web
+  ports:
+  - name: http
+    port: 4200
+    targetPort: 4200
+    protocol: TCP
+  type: ClusterIP
+  sessionAffinity: None
+
+---
+# Ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ai-cookbook-ingress
+  namespace: ai-cookbook
+  labels:
+    app.kubernetes.io/name: ai-cookbook
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: ingress
+  annotations:
+    # CORS Configuration - More restrictive
+    nginx.ingress.kubernetes.io/cors-allow-origin: "http://localhost:4200,http://localhost:3000,http://localhost:8080"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET,POST,PUT,DELETE,OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "Content-Type,Authorization,X-Requested-With,Accept,Origin"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    nginx.ingress.kubernetes.io/cors-max-age: "3600"
+    
+    # Rate Limiting
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    nginx.ingress.kubernetes.io/rate-limit-connections: "10"
+    nginx.ingress.kubernetes.io/rate-limit-requests: "100"
+    
+    # Security Headers
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "X-Frame-Options: DENY";
+      more_set_headers "X-Content-Type-Options: nosniff";
+      more_set_headers "X-XSS-Protection: 1; mode=block";
+      more_set_headers "Referrer-Policy: strict-origin-when-cross-origin";
+      more_set_headers "Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; frame-ancestors 'none';";
+    
+    # SSL Configuration
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-protocols: "TLSv1.2 TLSv1.3"
+    nginx.ingress.kubernetes.io/ssl-ciphers: "ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA384"
+    
+    # Health Check
+    nginx.ingress.kubernetes.io/health-check-path: "/health"
+    nginx.ingress.kubernetes.io/health-check-interval: "30s"
+    
+    # Monitoring
+    nginx.ingress.kubernetes.io/enable-access-log: "true"
+    nginx.ingress.kubernetes.io/enable-rewrite-log: "true"
+    
+    # Client Body Size
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - localhost
+    - ai-cookbook.local
+    secretName: ai-cookbook-tls
+  rules:
+  - host: localhost
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-service
+            port:
+              number: 4200
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: api-service
+            port:
+              number: 4201
+  - host: ai-cookbook.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: web-service
+            port:
+              number: 4200
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: api-service
+            port:
+              number: 4201
+
+---
+# Network Policies
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: ai-cookbook-network-policy
+  namespace: ai-cookbook
+  labels:
+    app.kubernetes.io/name: ai-cookbook
+    app.kubernetes.io/part-of: ai-cookbook
+    app.kubernetes.io/version: "1.0.0"
+    app.kubernetes.io/managed-by: kubectl
+    app.kubernetes.io/component: network-policy
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: ai-cookbook
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ai-cookbook
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/part-of: ai-cookbook
+    ports:
+    - protocol: TCP
+      port: 4200
+    - protocol: TCP
+      port: 4201
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 4200
+    - protocol: TCP
+      port: 4201
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: ai-cookbook
+    ports:
+    - protocol: TCP
+      port: 4200
+    - protocol: TCP
+      port: 4201
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 443
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 53
+    - protocol: UDP
+      port: 53
