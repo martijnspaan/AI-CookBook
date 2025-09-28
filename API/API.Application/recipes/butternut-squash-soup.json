@@ -2,6 +2,9 @@
   "Title": "Pompoensoep",
   "Description": "Romige geroosterde pompoensoep met warme kruiden.",
   "Tags": ["soep", "vegetarisch", "herfst"],
+  "CookbookId": "ff19c2c1-9763-45fc-bb37-45c7b1897a9e",
+  "Page": 123,
+  "MealTypes": ["Lunch", "Dinner"],
   "Ingredients": [
     {
       "name": "Butternutpompoen",

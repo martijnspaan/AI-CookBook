@@ -1,7 +1,10 @@
 {
   "Title": "Pannenkoeken",
   "Description": "Luchtige ontbijtpannenkoeken.",
-  "Tags": ["ontbijt", "zoet", "kinderen"],
+  "Tags": ["zoet", "kinderen"],
+  "CookbookId": null,
+  "Page": null,
+  "MealTypes": ["Breakfast"],
   "Ingredients": [
     {
       "name": "Zelfrijzend bakmeel",

@@ -1,7 +1,10 @@
 {
   "Title": "Kip Caesar Salade",
   "Description": "Knapperige romaine sla met Caesar dressing, gegrilde kip en croutons.",
-  "Tags": ["salade", "kip", "snel", "lunch"],
+  "Tags": ["salade", "kip", "snel"],
+  "CookbookId": null,
+  "Page": null,
+  "MealTypes": ["Dinner"],
   "Ingredients": [
     {
       "name": "Kipfilets",

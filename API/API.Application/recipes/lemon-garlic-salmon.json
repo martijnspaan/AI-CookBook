@@ -1,7 +1,10 @@
 {
   "Title": "Citroen Knoflook Zalm",
   "Description": "Ovengebakken zalm met frisse citroen en knoflook.",
-  "Tags": ["zeevruchten", "gezond", "diner", "glutenvrij"],
+  "Tags": ["zeevruchten", "gezond", "glutenvrij"],
+  "CookbookId": "73e19499-327a-4f30-8dae-cb2151768497",
+  "Page": null,
+  "MealTypes": [],
   "Ingredients": [
     {
       "name": "Zalmfilets",

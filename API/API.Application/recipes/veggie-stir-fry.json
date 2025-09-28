@@ -2,6 +2,9 @@
   "Title": "Groente Roerbak",
   "Description": "Kleurrijke groenten geroerbakt in een hartige soja-gember saus.",
   "Tags": ["vegetarisch", "veganistisch", "roerbak", "snel"],
+  "CookbookId": null,
+  "Page": null,
+  "MealTypes": ["Breakfast", "Lunch"],
   "Ingredients": [
     {
       "name": "Wortelen",

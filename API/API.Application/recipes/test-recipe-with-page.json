@@ -1,0 +1,22 @@
+{
+  "Title": "Test Recipe with Page",
+  "Description": "A test recipe to verify page field functionality",
+  "Tags": ["test", "page"],
+  "CookbookId": null,
+  "Page": null,
+  "MealTypes": ["Dinner"],
+  "Ingredients": [
+    {
+      "name": "Test Ingredient",
+      "type": "vegetable",
+      "amount": {
+        "value": 1,
+        "unit": "piece"
+      }
+    }
+  ],
+  "Recipe": [
+    "Step 1: Test",
+    "Step 2: Verify page field"
+  ]
+}
