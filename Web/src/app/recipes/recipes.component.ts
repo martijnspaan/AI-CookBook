@@ -34,6 +34,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   createRecipePopupConfig: PopupConfig = {
     title: 'Create New Recipe',
+    icon: 'fas fa-utensils',
     showCloseButton: true,
     size: 'xl',
     height: 'lg',

@@ -7,12 +7,12 @@
   <!-- Popup Content -->
   <div class="popup-content" [ngClass]="[sizeClass, heightClass]">
     <!-- Popup Header -->
-    <div class="popup-header" *ngIf="headerTemplate || config.title">
-      <ng-container *ngIf="headerTemplate; else defaultHeader">
-        <ng-container *ngTemplateOutlet="headerTemplate"></ng-container>
-      </ng-container>
-      <ng-template #defaultHeader>
-        <h4 class="popup-title">{{ config.title }}</h4>
+    <div class="popup-header" *ngIf="config.title">
+      <div class="d-flex justify-content-between align-items-center w-100">
+        <h4 class="popup-title mb-0">
+          <i *ngIf="config.icon" [class]="config.icon" class="me-2"></i>
+          {{ config.title }}
+        </h4>
         <button 
           *ngIf="config.showCloseButton"
           type="button" 
@@ -21,7 +21,7 @@
           (click)="closePopup()">
           <span aria-hidden="true">&times;</span>
         </button>
-      </ng-template>
+      </div>
     </div>
     
     <!-- Popup Body -->

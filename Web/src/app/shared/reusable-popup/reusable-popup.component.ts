@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 
 export interface PopupConfig {
   title: string;
+  icon?: string;
   showCloseButton?: boolean;
   size?: 'sm' | 'md' | 'lg' | 'xl';
   height?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
@@ -34,7 +35,6 @@ export class ReusablePopupComponent implements OnInit, OnDestroy, OnChanges {
   };
   @Output() popupClosed = new EventEmitter<void>();
 
-  @ContentChild('popupHeader', { static: false }) headerTemplate?: TemplateRef<any>;
   @ContentChild('popupBody', { static: false }) bodyTemplate?: TemplateRef<any>;
   @ContentChild('popupFooter', { static: false }) footerTemplate?: TemplateRef<any>;
 

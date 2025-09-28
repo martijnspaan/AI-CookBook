@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { WeekCalendarComponent, RecipeAssignment } from './week-calendar/week-calendar.component';
 import { RecipeSelectionDialogService } from '../services/recipe-selection-dialog.service';
+import { RecipeSelectionDialogComponent } from './recipe-selection-dialog/recipe-selection-dialog.component';
 import { GroceryShoppingDialogComponent, MealSelection } from './grocery-shopping-dialog/grocery-shopping-dialog.component';
 import { Recipe } from '../models/recipe.model';
 import { PageTitleService } from '../services/page-title.service';
@@ -17,7 +18,7 @@ import { takeUntil } from 'rxjs/operators';
 @Component({
   selector: 'app-week-menu',
   standalone: true,
-  imports: [CommonModule, WeekCalendarComponent, GroceryShoppingDialogComponent],
+  imports: [CommonModule, WeekCalendarComponent, RecipeSelectionDialogComponent, GroceryShoppingDialogComponent],
   templateUrl: './week-menu.component.html',
   styleUrl: './week-menu.component.scss'
 })
@@ -28,6 +29,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedMealSlot: { mealType: 'breakfast' | 'lunch' | 'dinner'; date: Date } | null = null;
   recipeAssignments: RecipeAssignment[] = [];
   recipes: Recipe[] = [];
+  showRecipeSelectionDialog: boolean = false;
   showGroceryShoppingDialog: boolean = false;
   currentWeekMenu: WeekMenu | null = null;
   isSaving: boolean = false;
@@ -61,8 +63,6 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onMealSlotClicked(mealType: 'breakfast' | 'lunch' | 'dinner', date: Date) {
-    this.selectedMealType = mealType;
-    this.selectedDate = date;
     this.selectedMealSlot = { mealType, date };
     const currentRecipe = this.getCurrentRecipe();
     this.recipeSelectionDialogService.openDialog(mealType, date, currentRecipe);
@@ -386,6 +386,14 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private subscribeToRecipeSelectionDialog(): void {
+    this.recipeSelectionDialogService.dialogState$
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe(config => {
+        this.showRecipeSelectionDialog = config.isVisible;
+        this.selectedMealType = config.selectedMealType;
+        this.selectedDate = config.selectedDate;
+      });
+
     this.recipeSelectionDialogService.recipeSelected$
       .pipe(takeUntil(this.destroySubject))
       .subscribe(event => {

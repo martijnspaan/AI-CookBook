@@ -30,6 +30,7 @@ export class CookbooksComponent implements OnInit, OnDestroy, AfterViewInit {
   get cookbookPopupConfig(): PopupConfig {
     return {
       title: this.isEditingCookbook ? 'Edit Cookbook' : 'Create New Cookbook',
+      icon: 'fas fa-book',
       showCloseButton: true,
       size: 'md',
       height: 'md',
