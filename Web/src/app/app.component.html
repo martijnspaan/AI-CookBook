@@ -36,4 +36,15 @@
     [buttonClass]="footerButtonClass"
     (buttonClick)="onFooterButtonClick()">
   </app-footer>
+
+  <!-- Global Recipe Selection Dialog -->
+  <app-recipe-selection-dialog
+    [isVisible]="recipeDialogState.isVisible"
+    [selectedMealType]="recipeDialogState.selectedMealType"
+    [selectedDate]="recipeDialogState.selectedDate"
+    [currentRecipe]="recipeDialogState.currentRecipe"
+    (recipeSelected)="onRecipeSelected($event)"
+    (recipeRemoved)="onRecipeRemoved($event)"
+    (dialogClosed)="onRecipeDialogClosed()">
+  </app-recipe-selection-dialog>
 </div>

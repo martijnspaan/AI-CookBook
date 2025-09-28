@@ -3,18 +3,21 @@ import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HamburgerMenuComponent } from './hamburger-menu/hamburger-menu.component';
 import { FooterComponent } from './footer/footer.component';
+import { RecipeSelectionDialogComponent } from './week-menu/recipe-selection-dialog/recipe-selection-dialog.component';
 import { PageTitleService } from './services/page-title.service';
 import { CookbookModalService } from './services/cookbook-modal.service';
 import { RecipeModalService } from './services/recipe-modal.service';
 import { GroceryShoppingDialogService } from './services/grocery-shopping-dialog.service';
+import { RecipeSelectionDialogService, RecipeSelectionDialogData } from './services/recipe-selection-dialog.service';
 import { FooterService, FooterButtonConfig } from './services/footer.service';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
+import { Recipe } from './models/recipe.model';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HamburgerMenuComponent, FooterComponent, CommonModule],
+  imports: [RouterOutlet, HamburgerMenuComponent, FooterComponent, RecipeSelectionDialogComponent, CommonModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
@@ -22,6 +25,14 @@ export class AppComponent implements OnInit, OnDestroy {
   readonly applicationTitle = 'AI Cookbook';
   currentPageTitle = 'AI Cookbook';
   private readonly destroySubject = new Subject<void>();
+  
+  // Recipe selection dialog state
+  recipeDialogState: RecipeSelectionDialogData = {
+    isVisible: false,
+    selectedMealType: null,
+    selectedDate: null,
+    currentRecipe: null
+  };
   
   // Footer button configuration
   showLeftButton = false;
@@ -49,6 +60,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private cookbookModalService: CookbookModalService,
     private recipeModalService: RecipeModalService,
     private groceryShoppingDialogService: GroceryShoppingDialogService,
+    private recipeSelectionDialogService: RecipeSelectionDialogService,
     private footerService: FooterService
   ) {}
 
@@ -79,6 +91,13 @@ export class AppComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroySubject))
       .subscribe(config => {
         this.updateFooterFromService(config);
+      });
+    
+    // Subscribe to recipe selection dialog state
+    this.recipeSelectionDialogService.dialogState$
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe(state => {
+        this.recipeDialogState = state;
       });
     
     // Defer initial footer update to avoid change detection issues
@@ -186,5 +205,21 @@ export class AppComponent implements OnInit, OnDestroy {
   
   private openCreateCookbookModal(): void {
     this.cookbookModalService.openCreateCookbookModal();
+  }
+  
+  // Recipe selection dialog event handlers
+  onRecipeSelected(event: { recipe: Recipe; mealType: string }): void {
+    // Forward the event to the week menu component through the service
+    this.recipeSelectionDialogService.selectRecipe(event.recipe, event.mealType);
+  }
+  
+  onRecipeRemoved(event: { mealType: string; date: Date }): void {
+    // Forward the event to the week menu component through the service
+    this.recipeSelectionDialogService.removeRecipe(event.mealType, event.date);
+  }
+  
+  onRecipeDialogClosed(): void {
+    // Forward the event to the week menu component through the service
+    this.recipeSelectionDialogService.closeDialog();
   }
 }

@@ -15,7 +15,10 @@ import { MultiSelectDropdownComponent, MultiSelectOption } from '../../shared/mu
   standalone: true,
   imports: [CommonModule, FormsModule, RecipeCardComponent, MultiSelectDropdownComponent],
   templateUrl: './recipe-selection-dialog.component.html',
-  styleUrl: './recipe-selection-dialog.component.scss'
+  styleUrl: './recipe-selection-dialog.component.scss',
+  host: {
+    '[class.dialog-visible]': 'isVisible'
+  }
 })
 export class RecipeSelectionDialogComponent implements OnInit, OnDestroy, OnChanges {
   @Input() isVisible: boolean = false;

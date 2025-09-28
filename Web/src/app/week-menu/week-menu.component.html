@@ -22,16 +22,6 @@
       (mealSlotClicked)="onMealSlotClicked($event.mealType, $event.date)">
     </app-week-calendar>
 
-    <!-- Recipe Selection Dialog -->
-    <app-recipe-selection-dialog
-      [isVisible]="showRecipeDialog"
-      [selectedMealType]="selectedMealType"
-      [selectedDate]="selectedDate"
-      [currentRecipe]="getCurrentRecipe()"
-      (recipeSelected)="onRecipeSelected($event)"
-      (recipeRemoved)="onRecipeRemoved($event)"
-      (dialogClosed)="onDialogClosed()">
-    </app-recipe-selection-dialog>
 
     <!-- Grocery Shopping Dialog -->
     <app-grocery-shopping-dialog
