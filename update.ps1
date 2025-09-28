@@ -10,6 +10,19 @@ param(
 Write-Host "Starting AI Cookbook update process..." -ForegroundColor Green
 Write-Host "Target image(s): $Image" -ForegroundColor Cyan
 
+# Check if we're on the correct context for localhost
+$currentContext = kubectl config current-context
+Write-Host "Current kubectl context: $currentContext" -ForegroundColor Cyan
+
+if ($currentContext -eq "k8s-ai-cookbook") {
+    Write-Host "Warning: You appear to be on the Azure AKS context. This script is for localhost updates." -ForegroundColor Yellow
+    Write-Host "Please switch to your local context (e.g., 'docker-desktop' or 'kind-ai-cookbook-local') first." -ForegroundColor Yellow
+    Write-Host "Available contexts:" -ForegroundColor Yellow
+    kubectl config get-contexts
+    Write-Host "To switch context, run: kubectl config use-context <context-name>" -ForegroundColor Yellow
+    exit 1
+}
+
 # Build new Docker images for localhost environment
 if ($Image -eq "all" -or $Image -eq "api") {
     Write-Host "Building API Docker image for localhost..." -ForegroundColor Yellow

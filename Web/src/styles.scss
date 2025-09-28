@@ -72,7 +72,11 @@ p {
   }
 }
 
-// Badge color overrides
+// Badge color overrides - softer colors
+.bg-primary {
+  background-color: #6c9bd1 !important; // Softer blue for meal type badges
+}
+
 .bg-secondary {
-  background-color: #198754 !important; // Green color for recipe tags
+  background-color: #7fb069 !important; // Softer green for recipe tag badges
 }

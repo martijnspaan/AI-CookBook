@@ -49,6 +49,10 @@ if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
     exit 1
 }
 
+# Store current kubectl context to restore later
+$originalContext = kubectl config current-context
+Write-Host "Current kubectl context: $originalContext" -ForegroundColor Cyan
+
 # Azure authentication and setup
 Write-Host "Performing Azure setup..." -ForegroundColor Yellow
 
@@ -174,3 +178,15 @@ Write-Host "Update completed successfully for: $($updatedServices -join ', ')" -
 Write-Host "Test environment: https://ai-cookbook-test.westeurope.cloudapp.azure.com" -ForegroundColor Cyan
 Write-Host "API endpoints: https://ai-cookbook-test.westeurope.cloudapp.azure.com/api" -ForegroundColor Cyan
 Write-Host "API Swagger: https://ai-cookbook-test.westeurope.cloudapp.azure.com/api/swagger" -ForegroundColor Cyan
+
+# Restore original kubectl context
+Write-Host "Restoring original kubectl context: $originalContext" -ForegroundColor Yellow
+kubectl config use-context $originalContext
+
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "Successfully restored kubectl context to: $originalContext" -ForegroundColor Green
+} else {
+    Write-Host "Warning: Failed to restore kubectl context. You may need to manually switch back to your local context." -ForegroundColor Yellow
+    Write-Host "Available contexts:" -ForegroundColor Yellow
+    kubectl config get-contexts
+}
