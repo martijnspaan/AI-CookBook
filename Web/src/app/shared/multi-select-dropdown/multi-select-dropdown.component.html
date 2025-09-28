@@ -1,0 +1,101 @@
+<div class="multi-select-dropdown" [class.disabled]="disabled">
+  <!-- Dropdown Button -->
+  <div 
+    class="dropdown-button"
+    [class.open]="isOpen"
+    [class.disabled]="disabled"
+    (click)="toggleDropdown()"
+    (keydown)="onKeyDown($event)"
+    tabindex="0"
+    role="button"
+    [attr.aria-expanded]="isOpen"
+    [attr.aria-haspopup]="true">
+    
+    <span class="button-text">{{ getDisplayText() }}</span>
+    
+    <div class="button-actions">
+      <!-- Clear button (only show when items are selected) -->
+      <button 
+        *ngIf="selectedValues.length > 0 && !disabled"
+        type="button"
+        class="clear-button"
+        (click)="clearSelection(); $event.stopPropagation()"
+        title="Clear selection"
+        aria-label="Clear selection">
+        <i class="fas fa-times"></i>
+      </button>
+      
+      <!-- Dropdown arrow -->
+      <i class="dropdown-arrow fas fa-chevron-down" [class.rotated]="isOpen"></i>
+    </div>
+  </div>
+
+  <!-- Dropdown Menu -->
+  <div 
+    *ngIf="isOpen"
+    class="multi-select-dropdown-menu"
+    [style.max-height]="maxHeight">
+    
+    <!-- Search Input (if there are many options) -->
+    <div *ngIf="options.length > 5" class="search-container">
+      <input 
+        type="text"
+        class="search-input"
+        placeholder="Search options..."
+        [(ngModel)]="searchTerm"
+        (input)="onSearchInput($event)"
+        (click)="$event.stopPropagation()">
+    </div>
+
+    <!-- Select All / Clear All Actions -->
+    <div *ngIf="filteredOptions.length > 0" class="action-buttons">
+      <button 
+        type="button"
+        class="action-button select-all"
+        (click)="selectAll()"
+        [disabled]="areAllOptionsSelected()">
+        Select All
+      </button>
+      <button 
+        type="button"
+        class="action-button clear-all"
+        (click)="clearSelection()"
+        [disabled]="selectedValues.length === 0">
+        Clear All
+      </button>
+    </div>
+
+    <!-- Options List -->
+    <div class="options-container">
+      <div 
+        *ngFor="let option of filteredOptions"
+        class="option-item"
+        [class.selected]="isSelected(option)"
+        [class.disabled]="option.disabled"
+        (click)="toggleSelection(option)"
+        (keydown)="onOptionKeyDown($event, option)"
+        tabindex="0"
+        role="option"
+        [attr.aria-selected]="isSelected(option)">
+        
+        <div class="option-content">
+          <input 
+            type="checkbox"
+            [checked]="isSelected(option)"
+            [disabled]="option.disabled"
+            (change)="toggleSelection(option)"
+            (click)="$event.stopPropagation()"
+            class="option-checkbox">
+          
+          <span class="option-label">{{ option.label }}</span>
+        </div>
+      </div>
+
+      <!-- No results message -->
+      <div *ngIf="filteredOptions.length === 0" class="no-results">
+        <i class="fas fa-search"></i>
+        <span>No options found</span>
+      </div>
+    </div>
+  </div>
+</div>

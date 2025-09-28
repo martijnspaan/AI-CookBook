@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, ChangeDetectorRef, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
@@ -8,15 +8,16 @@ import { CookbookService } from '../../services/cookbook.service';
 import { Recipe } from '../../models/recipe.model';
 import { Cookbook } from '../../models/cookbook.model';
 import { RecipeCardComponent } from '../../shared/recipe-card/recipe-card.component';
+import { MultiSelectDropdownComponent, MultiSelectOption } from '../../shared/multi-select-dropdown/multi-select-dropdown.component';
 
 @Component({
   selector: 'app-recipe-selection-dialog',
   standalone: true,
-  imports: [CommonModule, FormsModule, RecipeCardComponent],
+  imports: [CommonModule, FormsModule, RecipeCardComponent, MultiSelectDropdownComponent],
   templateUrl: './recipe-selection-dialog.component.html',
   styleUrl: './recipe-selection-dialog.component.scss'
 })
-export class RecipeSelectionDialogComponent implements OnInit, OnDestroy {
+export class RecipeSelectionDialogComponent implements OnInit, OnDestroy, OnChanges {
   @Input() isVisible: boolean = false;
   @Input() selectedMealType: 'breakfast' | 'lunch' | 'dinner' | null = null;
   @Input() selectedDate: Date | null = null;
@@ -35,17 +36,14 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy {
   
   selectedMealTypeFilters: string[] = [];
   selectedCookbookFilters: string[] = [];
-  availableMealTypes: string[] = [];
-  
-  showMealTypeDropdown = false;
-  showCookbookDropdown = false;
+  mealTypeOptions: MultiSelectOption[] = [];
+  cookbookOptions: MultiSelectOption[] = [];
   
   private readonly destroySubject = new Subject<void>();
 
   constructor(
     private readonly recipeService: RecipeService,
-    private readonly cookbookService: CookbookService,
-    private readonly cdr: ChangeDetectorRef
+    private readonly cookbookService: CookbookService
   ) {}
 
   ngOnInit(): void {
@@ -60,8 +58,8 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy {
     this.destroySubject.complete();
   }
 
-  ngOnChanges(): void {
-    if (this.isVisible) {
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['isVisible'] && this.isVisible) {
       this.loadAllRecipes();
       this.loadCookbooks();
     }
@@ -96,6 +94,10 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (cookbooks) => {
           this.cookbooks = cookbooks;
+          this.cookbookOptions = cookbooks.map(cookbook => ({
+            value: cookbook.id,
+            label: cookbook.title
+          }));
           this.isLoadingCookbooks = false;
         },
         error: (error) => {
@@ -112,7 +114,12 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy {
         mealTypes.add(mealType);
       });
     });
-    this.availableMealTypes = Array.from(mealTypes).sort();
+    this.mealTypeOptions = Array.from(mealTypes)
+      .sort()
+      .map(mealType => ({
+        value: mealType,
+        label: mealType.charAt(0).toUpperCase() + mealType.slice(1)
+      }));
   }
 
   applyFilters(): void {
@@ -143,117 +150,16 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy {
     this.applyFilters();
   }
 
-  toggleMealTypeFilter(mealType: string, event?: Event): void {
-    if (event) {
-      event.stopPropagation();
-    }
-    
-    const index = this.selectedMealTypeFilters.indexOf(mealType);
-    if (index > -1) {
-      this.selectedMealTypeFilters.splice(index, 1);
-    } else {
-      this.selectedMealTypeFilters.push(mealType);
-    }
-    
+  onMealTypeSelectionChanged(selectedValues: string[]): void {
+    this.selectedMealTypeFilters = selectedValues;
     this.applyFilters();
-    
-    // Close dropdown to show the updated text
-    setTimeout(() => {
-      this.showMealTypeDropdown = false;
-      this.cdr.detectChanges();
-    }, 10);
   }
 
-  toggleCookbookFilter(cookbookId: string, event?: Event): void {
-    if (event) {
-      event.stopPropagation();
-    }
-    
-    const index = this.selectedCookbookFilters.indexOf(cookbookId);
-    if (index > -1) {
-      this.selectedCookbookFilters.splice(index, 1);
-    } else {
-      this.selectedCookbookFilters.push(cookbookId);
-    }
-    
+  onCookbookSelectionChanged(selectedValues: string[]): void {
+    this.selectedCookbookFilters = selectedValues;
     this.applyFilters();
-    
-    // Close dropdown to show the updated text
-    setTimeout(() => {
-      this.showCookbookDropdown = false;
-      this.cdr.detectChanges();
-    }, 10);
   }
 
-  isMealTypeSelected(mealType: string): boolean {
-    return this.selectedMealTypeFilters.includes(mealType);
-  }
-
-  isCookbookSelected(cookbookId: string): boolean {
-    return this.selectedCookbookFilters.includes(cookbookId);
-  }
-
-
-  getMealTypeDisplayText(): string {
-    if (this.selectedMealTypeFilters.length === 0) {
-      return 'All Meal Types';
-    } else if (this.selectedMealTypeFilters.length === 1) {
-      return this.selectedMealTypeFilters[0];
-    } else {
-      return `${this.selectedMealTypeFilters.length} types selected`;
-    }
-  }
-
-  getCookbookDisplayText(): string {
-    if (this.selectedCookbookFilters.length === 0) {
-      return 'All Cookbooks';
-    } else if (this.selectedCookbookFilters.length === 1) {
-      const cookbook = this.cookbooks.find(c => c.id === this.selectedCookbookFilters[0]);
-      return cookbook ? cookbook.title : 'Unknown Cookbook';
-    } else {
-      return `${this.selectedCookbookFilters.length} cookbooks selected`;
-    }
-  }
-
-  toggleMealTypeDropdown(): void {
-    const wasOpen = this.showMealTypeDropdown;
-    this.showMealTypeDropdown = !this.showMealTypeDropdown;
-    this.showCookbookDropdown = false;
-    
-    // If we're closing the dropdown, force display text update
-    if (wasOpen && !this.showMealTypeDropdown) {
-      this.cdr.detectChanges();
-    }
-  }
-
-  toggleCookbookDropdown(): void {
-    const wasOpen = this.showCookbookDropdown;
-    this.showCookbookDropdown = !this.showCookbookDropdown;
-    this.showMealTypeDropdown = false;
-    
-    // If we're closing the dropdown, force display text update
-    if (wasOpen && !this.showCookbookDropdown) {
-      this.cdr.detectChanges();
-    }
-  }
-
-  onMealTypeDropdownBlur(): void {
-    // Force display text update when button loses focus
-    if (this.showMealTypeDropdown) {
-      this.showMealTypeDropdown = false;
-    }
-    // Always trigger change detection to ensure display text is updated
-    this.cdr.detectChanges();
-  }
-
-  onCookbookDropdownBlur(): void {
-    // Force display text update when button loses focus
-    if (this.showCookbookDropdown) {
-      this.showCookbookDropdown = false;
-    }
-    // Always trigger change detection to ensure display text is updated
-    this.cdr.detectChanges();
-  }
 
 
   selectRecipe(recipe: Recipe): void {
@@ -286,23 +192,6 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy {
     }
   }
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: Event): void {
-    // Close dropdowns when clicking outside
-    const target = event.target as HTMLElement;
-    if (!target.closest('.custom-dropdown')) {
-      const wasMealTypeOpen = this.showMealTypeDropdown;
-      const wasCookbookOpen = this.showCookbookDropdown;
-      
-      this.showMealTypeDropdown = false;
-      this.showCookbookDropdown = false;
-      
-      // Trigger change detection if dropdowns were open
-      if (wasMealTypeOpen || wasCookbookOpen) {
-        this.cdr.detectChanges();
-      }
-    }
-  }
 
   getDateDisplayString(): string {
     if (!this.selectedDate) return '';

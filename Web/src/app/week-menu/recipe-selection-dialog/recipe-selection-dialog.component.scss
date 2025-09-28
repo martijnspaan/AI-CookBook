@@ -22,7 +22,8 @@
   max-width: 600px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
+  position: relative;
 }
 
 .dialog-header {
@@ -65,6 +66,7 @@
 .dialog-body {
   padding: 0 1.5rem 1.5rem 1.5rem;
   overflow-y: auto;
+  overflow-x: visible;
   flex: 1;
 }
 
@@ -73,82 +75,12 @@
   border: 1px solid #e9ecef;
   border-radius: 8px;
   padding: 0.75rem;
+  overflow: visible;
   
-  .custom-dropdown {
-    position: relative;
+  .filter-dropdown {
     flex: 1;
     min-width: 120px;
-    
-    .dropdown-toggle {
-      width: 100%;
-      font-size: 0.8rem;
-      text-align: left;
-      border: 1px solid #ced4da;
-      border-radius: 6px;
-      padding: 0.25rem 0.5rem;
-      background-color: white;
-      
-      &:after {
-        float: right;
-        margin-top: 0.3rem;
-      }
-      
-      &.active {
-        border-color: #007bff;
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-      }
-      
-      &:focus {
-        border-color: #007bff;
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-      }
-      
-      &:disabled {
-        background-color: #e9ecef;
-        opacity: 0.6;
-      }
-    }
-    
-    .dropdown-menu {
-      position: absolute;
-      top: 100%;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      background-color: white;
-      border: 1px solid #ced4da;
-      border-radius: 6px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      max-height: 200px;
-      overflow-y: auto;
-      display: none;
-      
-      &.show {
-        display: block;
-      }
-      
-      .dropdown-item {
-        padding: 0.5rem;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        font-size: 0.8rem;
-        
-        &:hover {
-          background-color: #f8f9fa;
-        }
-        
-        input[type="checkbox"] {
-          margin: 0;
-          cursor: pointer;
-        }
-        
-        span {
-          cursor: pointer;
-          flex: 1;
-        }
-      }
-    }
+    overflow: visible;
   }
   
   .clear-filters-btn {
@@ -300,22 +232,8 @@
       gap: 0.5rem;
     }
     
-    .custom-dropdown {
+    .filter-dropdown {
       min-width: 100px;
-      
-      .dropdown-toggle {
-        font-size: 0.75rem;
-        padding: 0.2rem 0.4rem;
-      }
-      
-      .dropdown-menu {
-        max-height: 150px;
-        
-        .dropdown-item {
-          padding: 0.4rem;
-          font-size: 0.75rem;
-        }
-      }
     }
     
     .clear-filters-btn {

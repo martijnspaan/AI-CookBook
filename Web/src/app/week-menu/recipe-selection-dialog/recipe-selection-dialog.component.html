@@ -27,45 +27,24 @@
       <!-- Filter Section -->
       <div class="filter-section mb-4">
         <div class="d-flex align-items-center gap-3">
-          <div class="custom-dropdown">
-            <button 
-              type="button" 
-              class="btn btn-outline-secondary btn-sm dropdown-toggle"
-              (click)="toggleMealTypeDropdown()"
-              (blur)="onMealTypeDropdownBlur()"
-              [class.active]="showMealTypeDropdown">
-              {{ getMealTypeDisplayText() }}
-            </button>
-            <div class="dropdown-menu" [class.show]="showMealTypeDropdown">
-              <div class="dropdown-item" *ngFor="let mealType of availableMealTypes">
-                <input 
-                  type="checkbox" 
-                  [checked]="isMealTypeSelected(mealType)"
-                  (change)="toggleMealTypeFilter(mealType, $event)">
-                <span class="ms-2" (click)="toggleMealTypeFilter(mealType, $event)">{{ mealType | titlecase }}</span>
-              </div>
-            </div>
+          <div class="filter-dropdown">
+            <app-multi-select-dropdown
+              [options]="mealTypeOptions"
+              [selectedValues]="selectedMealTypeFilters"
+              [placeholder]="'All Meal Types'"
+              [disabled]="false"
+              (selectionChanged)="onMealTypeSelectionChanged($event)">
+            </app-multi-select-dropdown>
           </div>
           
-          <div class="custom-dropdown">
-            <button 
-              type="button" 
-              class="btn btn-outline-secondary btn-sm dropdown-toggle"
-              (click)="toggleCookbookDropdown()"
-              (blur)="onCookbookDropdownBlur()"
-              [class.active]="showCookbookDropdown"
-              [disabled]="isLoadingCookbooks">
-              {{ getCookbookDisplayText() }}
-            </button>
-            <div class="dropdown-menu" [class.show]="showCookbookDropdown">
-              <div class="dropdown-item" *ngFor="let cookbook of cookbooks">
-                <input 
-                  type="checkbox" 
-                  [checked]="isCookbookSelected(cookbook.id)"
-                  (change)="toggleCookbookFilter(cookbook.id, $event)">
-                <span class="ms-2" (click)="toggleCookbookFilter(cookbook.id, $event)">{{ cookbook.title }}</span>
-              </div>
-            </div>
+          <div class="filter-dropdown">
+            <app-multi-select-dropdown
+              [options]="cookbookOptions"
+              [selectedValues]="selectedCookbookFilters"
+              [placeholder]="'All Cookbooks'"
+              [disabled]="isLoadingCookbooks"
+              (selectionChanged)="onCookbookSelectionChanged($event)">
+            </app-multi-select-dropdown>
           </div>
           
           <button 
