@@ -1,35 +1,77 @@
-# Project Description
-This project is an AI powered application that works with cooking recipes and grocery lists. A week schedule can be made by selecting recipes per day and grocery lists for that week can be generated from the recipes.
+# AI Cookbook - Agent Guidelines
 
-# Project Instructions
+## 🍳 Project Overview
 
-## Agent rules [IMPORTANT]
+The AI Cookbook is an intelligent culinary application that revolutionizes meal planning and grocery management. The system enables users to create weekly meal schedules by selecting recipes, and automatically generates comprehensive grocery lists based on the chosen recipes.
 
-- Whenever the agents wants to go for a completely different approach while investiging an issue, always consult with the user first before taking that approach.
+## 🤖 Agent Protocol
 
-## Folder structure
+### Decision Making Authority
+- **CRITICAL**: Before implementing any alternative approaches or major architectural changes during issue investigation, you MUST consult with the user first
+- Always explain your reasoning and present options when proposing solutions
+- Maintain transparency in your decision-making process
 
-- The frontend application must be managed in the 'Web' folder
-- The backend application and API must be managed in the 'API' folder
-- Kubernetes templates and pipeline templates must be managed in the 'k8s' folder
-- The example recipes must be managed in the folder 'API/API.Application/recipes'
-- Any Azure related scripts must be managed in the folder 'azure'
+### Communication Standards
+- Provide clear, actionable explanations for all recommendations
+- Break down complex tasks into manageable steps
+- Report progress regularly during long-running operations
 
-## Project rules
+## 📁 Project Architecture
 
-- When running powershell of bash scripts, never use '&&' for command chaining, instead run each command separately.
-- When running scripts always check in the current folder.
+### Directory Structure & Responsibilities
+```
+├── Web/                    # Angular frontend application
+├── API/                    # .NET Core backend services & APIs
+├── k8s/                    # Kubernetes manifests & deployment configs
+├── azure/                  # Azure infrastructure scripts & templates
+└── API/API.Application/recipes/  # Recipe data files (JSON format)
+```
 
-## Coding style
+### Development Environment Standards
+- **Frontend**: Angular application with responsive design
+- **Backend**: .NET Core API following clean architecture principles
+- **Infrastructure**: Kubernetes orchestration with Azure cloud integration
+- **Testing**: Comprehensive unit and integration testing suite
 
-- Don't write comments but make the code itself readible with descriptive names
-- Don't abbreviate variable names
+## 🛠️ Development Workflow
 
-## Azure test environment
+### Script Execution Guidelines
+- **NEVER** use command chaining operators (`&&`, `;`) in PowerShell or Bash scripts
+- Execute each command individually for better error handling and debugging
+- Always verify current working directory before running scripts
+- Implement proper error checking and logging for all script operations
 
-- Any commands and actions performed on Azure are only allowed in the subscription 'Playground - masp' and resource group 'AI-CookBook'
-- Should use best practise for managing azure resources including descriptive names
+### Code Quality Standards
+- **Self-Documenting Code**: Write code that tells a story through descriptive names
+- **No Comments Policy**: Eliminate the need for comments through clear, expressive code
+- **Full Variable Names**: Avoid abbreviations; use complete, meaningful names
+- **Consistent Naming**: Follow established naming conventions throughout the project
 
-## Debugging and analyzing
+## ☁️ Azure Environment Management
 
-- When testing the application, always test on the localhost k8s cluster. Web application runs on port 4200 and the API runs on port 4201
+### Security & Scope
+- **Restricted Environment**: All Azure operations limited to:
+  - Subscription: `Playground - masp`
+  - Resource Group: `AI-CookBook`
+- **Resource Naming**: Implement descriptive, standardized naming conventions
+- **Best Practices**: Follow Azure Well-Architected Framework principles
+
+### Infrastructure Standards
+- Use Infrastructure as Code (IaC) for all resource provisioning
+- Implement proper tagging strategies for cost management and governance
+- Follow least-privilege access principles
+
+## 🧪 Testing & Validation
+
+### Local Development Testing
+- **Primary Environment**: Always test on localhost Kubernetes cluster
+- **Port Configuration**:
+  - Web Application: `http://localhost:4200`
+  - API Service: `http://localhost:4201`
+- **Deployment Verification**: Confirm successful pod deployment before testing
+- **End-to-End Validation**: Test complete user workflows, not just individual components
+
+### Quality Assurance
+- Implement automated testing at multiple levels (unit, integration, e2e)
+- Validate responsive design across different device sizes
+- Test error handling and edge cases thoroughly
