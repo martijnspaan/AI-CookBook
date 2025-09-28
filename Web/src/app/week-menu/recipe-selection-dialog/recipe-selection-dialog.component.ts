@@ -65,6 +65,7 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy, OnChan
     if (changes['isVisible'] && this.isVisible) {
       this.loadAllRecipes();
       this.loadCookbooks();
+      this.preselectMealTypeFilter();
     }
   }
 
@@ -123,6 +124,20 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy, OnChan
         value: mealType,
         label: mealType.charAt(0).toUpperCase() + mealType.slice(1)
       }));
+  }
+
+  preselectMealTypeFilter(): void {
+    if (this.selectedMealType) {
+      // Convert lowercase meal type to proper case to match recipe data
+      const properCaseMealType = this.selectedMealType.charAt(0).toUpperCase() + this.selectedMealType.slice(1);
+      // Pre-select the meal type filter based on the selected meal slot
+      this.selectedMealTypeFilters = [properCaseMealType];
+    } else {
+      // Clear the filter if no specific meal type is selected
+      this.selectedMealTypeFilters = [];
+    }
+    // Apply the pre-selected filter
+    this.applyFilters();
   }
 
   applyFilters(): void {
