@@ -54,7 +54,7 @@ spec:
         supplementalGroups: [1000]
       containers:
       - name: api
-        image: aicookbookregistry.azurecr.io/aicookbookregistry.azurecr.io/aicookbookregistry.azurecr.io/aicookbookregistry.azurecr.io/ai-cookbook-api:1.0.0-test
+        image: aicookbookregistry.azurecr.io/ai-cookbook-api:1.0.0-test
         imagePullPolicy: Always
         ports:
         - name: http
@@ -90,36 +90,6 @@ spec:
             - ALL
           seccompProfile:
             type: RuntimeDefault
-        startupProbe:
-          httpGet:
-            path: /health/startup
-            port: 4201
-            scheme: HTTP
-          initialDelaySeconds: 10
-          periodSeconds: 5
-          timeoutSeconds: 3
-          failureThreshold: 12
-          successThreshold: 1
-        livenessProbe:
-          httpGet:
-            path: /health/live
-            port: 4201
-            scheme: HTTP
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
-          successThreshold: 1
-        readinessProbe:
-          httpGet:
-            path: /health/ready
-            port: 4201
-            scheme: HTTP
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          timeoutSeconds: 3
-          failureThreshold: 3
-          successThreshold: 1
         volumeMounts:
         - name: tmp
           mountPath: /tmp
@@ -152,6 +122,8 @@ spec:
                   values:
                   - test
               topologyKey: kubernetes.io/hostname
+
+
 
 
 
