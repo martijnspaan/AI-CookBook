@@ -1,0 +1,164 @@
+<!-- Popup Overlay -->
+<div class="popup-overlay" *ngIf="isVisible" (click)="onClose()">
+  <!-- Popup Content -->
+  <div class="popup-content" (click)="$event.stopPropagation()">
+    <!-- Popup Header -->
+    <div class="popup-header">
+      <h3 class="popup-title">
+        <i [class]="headerIcon + ' mr-2'"></i>
+        {{ headerTitle }}
+      </h3>
+      <button class="popup-close" (click)="onClose()" type="button">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <!-- Popup Body -->
+    <div class="popup-body">
+      <p class="popup-description mb-4">
+        Get in touch with us! Fill out the form below and we'll get back to you as soon as possible.
+      </p>
+
+      <form class="popup-form" (ngSubmit)="onSubmit()">
+        <!-- Name and Email Row -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              [(ngModel)]="formData.name"
+              name="name"
+              placeholder="Enter your full name" 
+              required>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Email Address *</label>
+            <input 
+              type="email" 
+              class="form-control" 
+              [(ngModel)]="formData.email"
+              name="email"
+              placeholder="Enter your email address" 
+              required>
+          </div>
+        </div>
+
+        <!-- Phone and Subject Row -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Phone Number</label>
+            <input 
+              type="tel" 
+              class="form-control" 
+              [(ngModel)]="formData.phone"
+              name="phone"
+              placeholder="(555) 123-4567">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">Subject *</label>
+            <select 
+              class="form-select" 
+              [(ngModel)]="formData.subject"
+              name="subject"
+              required>
+              <option 
+                *ngFor="let subject of subjects" 
+                [value]="subject.value">
+                {{ subject.label }}
+              </option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Dietary Preferences -->
+        <div class="form-group">
+          <label class="form-label">Dietary Preferences</label>
+          <div class="checkbox-grid">
+            <label class="checkbox-item">
+              <input 
+                type="checkbox" 
+                [(ngModel)]="formData.dietaryPreferences.vegetarian"
+                name="vegetarian">
+              <span class="checkbox-label">Vegetarian</span>
+            </label>
+            <label class="checkbox-item">
+              <input 
+                type="checkbox" 
+                [(ngModel)]="formData.dietaryPreferences.vegan"
+                name="vegan">
+              <span class="checkbox-label">Vegan</span>
+            </label>
+            <label class="checkbox-item">
+              <input 
+                type="checkbox" 
+                [(ngModel)]="formData.dietaryPreferences.glutenFree"
+                name="glutenFree">
+              <span class="checkbox-label">Gluten-Free</span>
+            </label>
+            <label class="checkbox-item">
+              <input 
+                type="checkbox" 
+                [(ngModel)]="formData.dietaryPreferences.dairyFree"
+                name="dairyFree">
+              <span class="checkbox-label">Dairy-Free</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Message -->
+        <div class="form-group">
+          <label class="form-label">Message *</label>
+          <textarea 
+            class="form-textarea" 
+            [(ngModel)]="formData.message"
+            name="message"
+            placeholder="Tell us about your inquiry..." 
+            rows="4" 
+            required>
+          </textarea>
+        </div>
+
+        <!-- Terms Agreement -->
+        <div class="form-group">
+          <label class="checkbox-item">
+            <input 
+              type="checkbox" 
+              [(ngModel)]="formData.agreeToTerms"
+              name="agreeToTerms"
+              required>
+            <span class="checkbox-label">
+              I agree to the 
+              <a href="#" class="link-primary">Terms of Service</a> 
+              and 
+              <a href="#" class="link-primary">Privacy Policy</a>
+            </span>
+          </label>
+        </div>
+      </form>
+    </div>
+
+    <!-- Popup Footer -->
+    <div class="popup-footer">
+      <div class="button-group">
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          (click)="onCancel()">
+          <i class="fas fa-times mr-2"></i>
+          Cancel
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-primary" 
+          (click)="onSubmit()"
+          [disabled]="!isFormValid()">
+          <i class="fas fa-paper-plane mr-2"></i>
+          Send Message
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

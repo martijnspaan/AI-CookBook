@@ -10,10 +10,20 @@
         A modern, nature-inspired design system featuring pastel green colors, 
         clean typography, and reusable components for cooking and healthy living.
       </p>
-      <div class="flex flex-wrap justify-center gap-4">
+      <div class="flex flex-wrap justify-center gap-4 mb-6">
         <span class="badge badge-primary">Cooking</span>
         <span class="badge badge-secondary">Healthy</span>
         <span class="badge badge-accent">Nature</span>
+      </div>
+      
+      <!-- Popup Demo Button -->
+      <div class="flex justify-center">
+        <button 
+          class="btn btn-primary btn-lg" 
+          (click)="openPopupDemo()">
+          <i class="fas fa-window-maximize mr-2"></i>
+          View Popup Demo
+        </button>
       </div>
     </div>
   </section>
@@ -369,4 +379,36 @@
       </div>
     </div>
   </section>
+
+  <!-- Accordion Showcase -->
+  <section class="accordion-showcase bg-neutral-50">
+    <div class="container mx-auto p-6">
+      <h2 class="font-secondary text-3xl text-primary-800 mb-8 text-center">
+        Interactive Components
+      </h2>
+      
+      <div class="max-w-4xl mx-auto">
+        <div class="card p-6">
+          <h3 class="font-secondary text-2xl text-primary-700 mb-6">Accordion Component</h3>
+          <p class="text-primary-600 mb-6">
+            Collapsible content sections that help organize information in a space-efficient way. 
+            Perfect for FAQs, documentation, and feature explanations.
+          </p>
+          
+          <app-accordion 
+            [sections]="accordionSections"
+            [allowMultiple]="true">
+          </app-accordion>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Popup Demo Component -->
+  <app-popup-demo 
+    [isVisible]="showPopupDemo" 
+    [headerIcon]="'fas fa-envelope'"
+    [headerTitle]="'Get in Touch'"
+    (close)="closePopupDemo()">
+  </app-popup-demo>
 </div>

@@ -76,6 +76,12 @@
   &:focus {
     box-shadow: 0 0 0 3px var(--color-primary-200);
   }
+  
+  &:disabled {
+    background-color: var(--color-neutral-300) !important;
+    color: var(--color-neutral-500) !important;
+    border-color: var(--color-neutral-300) !important;
+  }
 }
 
 .btn-secondary {

@@ -1,7 +1,12 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { PopupDemoComponent } from '../shared/popup-demo/popup-demo.component';
+import { AccordionComponent, AccordionSection } from '../shared/accordion/accordion.component';
 
 @Component({
   selector: 'app-showcase-menu',
+  standalone: true,
+  imports: [CommonModule, PopupDemoComponent, AccordionComponent],
   templateUrl: './showcase-menu.component.html',
   styleUrls: ['./showcase-menu.component.scss']
 })
@@ -65,8 +70,78 @@ export class ShowcaseMenuComponent {
 
   categories = ['All', 'Appetizers', 'Main Course', 'Breakfast', 'Lunch', 'Dessert'];
   selectedCategory = 'All';
+  showPopupDemo = false;
 
   filteredItems = this.menuItems;
+
+  // Accordion sections for showcase
+  accordionSections: AccordionSection[] = [
+    {
+      id: 'design-tokens',
+      title: 'Design Tokens',
+      icon: 'fas fa-palette',
+      content: `
+        <p>Design tokens are the foundational elements of our design system, providing consistent values for colors, typography, spacing, and other visual properties.</p>
+        <ul>
+          <li><strong>Colors:</strong> Primary (#3ba85c), Secondary (#8b9a4a), Accent (#f97316), Neutral (#78716c)</li>
+          <li><strong>Typography:</strong> Font families, sizes, weights, and line heights</li>
+          <li><strong>Spacing:</strong> Consistent spacing scale from 0.25rem to 4rem</li>
+          <li><strong>Border Radius:</strong> Standardized corner rounding values</li>
+          <li><strong>Shadows:</strong> Elevation and depth system</li>
+        </ul>
+        <p>These tokens ensure visual consistency across all components and make it easy to maintain brand identity.</p>
+      `
+    },
+    {
+      id: 'components',
+      title: 'Reusable Components',
+      icon: 'fas fa-puzzle-piece',
+      content: `
+        <p>Our component library includes pre-built, accessible components that follow design system principles.</p>
+        <ul>
+          <li><strong>Buttons:</strong> Primary, secondary, accent, outline, and ghost variants</li>
+          <li><strong>Forms:</strong> Input fields, selects, checkboxes, and textareas</li>
+          <li><strong>Cards:</strong> Information containers with headers, bodies, and footers</li>
+          <li><strong>Modals:</strong> Overlay dialogs for user interactions</li>
+          <li><strong>Accordions:</strong> Collapsible content sections</li>
+          <li><strong>Badges:</strong> Status indicators and labels</li>
+        </ul>
+        <p>All components are built with accessibility in mind and follow WCAG 2.1 AA guidelines.</p>
+      `
+    },
+    {
+      id: 'accessibility',
+      title: 'Accessibility Standards',
+      icon: 'fas fa-universal-access',
+      content: `
+        <p>Our design system prioritizes accessibility to ensure all users can effectively use our applications.</p>
+        <ul>
+          <li><strong>Color Contrast:</strong> All text meets WCAG 2.1 AA contrast requirements</li>
+          <li><strong>Keyboard Navigation:</strong> Full keyboard accessibility for all interactive elements</li>
+          <li><strong>Screen Readers:</strong> Proper ARIA labels and semantic HTML structure</li>
+          <li><strong>Focus Management:</strong> Clear focus indicators and logical tab order</li>
+          <li><strong>Responsive Design:</strong> Mobile-first approach with touch-friendly targets</li>
+        </ul>
+        <p>We regularly test our components with assistive technologies to ensure the best possible user experience.</p>
+      `
+    },
+    {
+      id: 'implementation',
+      title: 'Implementation Guide',
+      icon: 'fas fa-code',
+      content: `
+        <p>Learn how to implement and customize our design system in your projects.</p>
+        <ul>
+          <li><strong>Installation:</strong> <code>npm install @ai-cookbook/design-system</code></li>
+          <li><strong>Import Styles:</strong> Include our CSS variables and component styles</li>
+          <li><strong>Use Components:</strong> Import and use pre-built Angular components</li>
+          <li><strong>Customization:</strong> Override CSS custom properties for theming</li>
+          <li><strong>Best Practices:</strong> Follow our coding standards and guidelines</li>
+        </ul>
+        <p>Check our documentation for detailed implementation examples and API references.</p>
+      `
+    }
+  ];
 
   filterByCategory(category: string) {
     this.selectedCategory = category;
@@ -95,5 +170,13 @@ export class ShowcaseMenuComponent {
       'Chocolate': 'badge-accent'
     };
     return tagClasses[tag] || 'badge-primary';
+  }
+
+  openPopupDemo() {
+    this.showPopupDemo = true;
+  }
+
+  closePopupDemo() {
+    this.showPopupDemo = false;
   }
 }
