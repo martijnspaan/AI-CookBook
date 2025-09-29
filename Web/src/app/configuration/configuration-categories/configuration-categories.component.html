@@ -1,0 +1,8 @@
+<app-configuration-tab
+  [items]="categories"
+  title="Categories"
+  placeholder="e.g., Vegetables, Meat, Dairy, Seasoning"
+  emptyMessage="No ingredient categories available. Add categories to organize your ingredients."
+  (itemAdded)="onCategoryAdded($event)"
+  (itemDeleted)="onCategoryDeleted($event)">
+</app-configuration-tab>

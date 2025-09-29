@@ -1,0 +1,46 @@
+<div class="configuration-container">
+  <div class="configuration-content">
+    
+
+    <!-- Accordion Sections -->
+    <div class="accordion-container">
+      <div 
+        *ngFor="let section of sections" 
+        class="accordion-section"
+        [class.expanded]="isExpanded(section)">
+        
+        <!-- Section Header -->
+        <div 
+          class="section-header"
+          (click)="toggleSection(section)"
+          [attr.aria-expanded]="isExpanded(section)"
+          role="button"
+          tabindex="0"
+          (keydown.enter)="toggleSection(section)"
+          (keydown.space)="toggleSection(section); $event.preventDefault()">
+          
+          <div class="section-icon">
+            <i [class]="getSectionIcon(section)"></i>
+          </div>
+          
+          <h3 class="section-title">{{ getSectionTitle(section) }}</h3>
+          
+          <div class="section-toggle">
+            <i class="fas fa-chevron-down" [class.rotated]="isExpanded(section)"></i>
+          </div>
+        </div>
+
+        <!-- Section Content -->
+        <div class="section-content" [class.show]="isExpanded(section)">
+          <div class="section-content-inner">
+            <app-configuration-tags *ngIf="section === 'tags'"></app-configuration-tags>
+            <app-configuration-ingredients *ngIf="section === 'ingredients'"></app-configuration-ingredients>
+            <app-configuration-units *ngIf="section === 'units'"></app-configuration-units>
+            <app-configuration-categories *ngIf="section === 'categories'"></app-configuration-categories>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

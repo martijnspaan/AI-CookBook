@@ -1,0 +1,8 @@
+<app-configuration-tab
+  [items]="ingredients"
+  title="Ingredients"
+  placeholder="e.g., Chicken Breast, Olive Oil"
+  emptyMessage="No ingredients available. Add your first ingredient to build your recipe database."
+  (itemAdded)="onIngredientAdded($event)"
+  (itemDeleted)="onIngredientDeleted($event)">
+</app-configuration-tab>

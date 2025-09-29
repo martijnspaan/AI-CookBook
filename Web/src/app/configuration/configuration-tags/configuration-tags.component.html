@@ -1,0 +1,8 @@
+<app-configuration-tab
+  [items]="tags"
+  title="Tags"
+  placeholder="e.g., Vegetarian, Quick & Easy"
+  emptyMessage="No tags available. Add your first tag to categorize recipes."
+  (itemAdded)="onTagAdded($event)"
+  (itemDeleted)="onTagDeleted($event)">
+</app-configuration-tab>

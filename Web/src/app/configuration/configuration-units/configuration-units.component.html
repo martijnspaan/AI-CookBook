@@ -1,0 +1,8 @@
+<app-configuration-tab
+  [items]="units"
+  title="Units"
+  placeholder="e.g., cup, tablespoon, gram"
+  emptyMessage="No units available. Add measurement units for recipe ingredients."
+  (itemAdded)="onUnitAdded($event)"
+  (itemDeleted)="onUnitDeleted($event)">
+</app-configuration-tab>

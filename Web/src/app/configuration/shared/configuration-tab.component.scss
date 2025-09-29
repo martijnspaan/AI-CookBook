@@ -1,0 +1,216 @@
+.configuration-tab {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+
+.add-form-container {
+  margin-bottom: 2rem;
+  
+  .add-form {
+    .add-form-row {
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: stretch;
+      width: 100%;
+      
+      .add-input {
+        flex: 1 !important;
+        border-radius: 0.375rem 0 0 0.375rem !important;
+        border-right: none !important;
+        width: auto !important;
+        display: inline-block !important;
+        
+        &:focus {
+          border-color: #ced4da !important;
+          box-shadow: none !important;
+          z-index: 3;
+        }
+        
+        &.is-invalid {
+          border-color: #dc3545 !important;
+          
+          &:focus {
+            border-color: #dc3545 !important;
+            box-shadow: none !important;
+          }
+        }
+      }
+      
+      .add-button {
+        flex-shrink: 0 !important;
+        border-radius: 0 0.375rem 0.375rem 0 !important;
+        padding: 0.375rem 0.75rem;
+        display: inline-block !important;
+        width: auto !important;
+        
+        &.btn-primary {
+          background-color: #0d6efd;
+          border-color: #0d6efd;
+          
+          &:hover:not(:disabled) {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+          }
+          
+          &:disabled {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            opacity: 0.65;
+          }
+        }
+      }
+    }
+    
+    .invalid-feedback {
+      display: block;
+      color: #dc3545;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+    }
+  }
+}
+
+.items-container {
+  flex: 1;
+  min-height: 200px;
+  
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+    
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+    
+    h4 {
+      color: #495057;
+      margin-bottom: 0.5rem;
+    }
+    
+    p {
+      margin-bottom: 0;
+      max-width: 400px;
+    }
+  }
+  
+  .items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.05rem;
+    
+    .item-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.25rem 0.5rem;
+      background-color: transparent;
+      border: 1px solid transparent;
+      border-radius: 0.25rem;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        background-color: transparent;
+        border-color: transparent;
+      }
+      
+      .item-value {
+        font-weight: 500;
+        color: #495057;
+        font-size: 0.9rem;
+        flex: 1;
+      }
+      
+      .btn {
+        min-width: 1.5rem;
+        height: 1.5rem;
+        padding: 0.125rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        
+        &.btn-outline-danger {
+          border-color: #dc3545;
+          color: #dc3545;
+          
+          &:hover {
+            background-color: transparent;
+            border-color: #dc3545;
+            color: #dc3545;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Mobile responsive design
+@media (max-width: 768px) {
+  .add-form-container {
+    .add-form {
+      .add-form-row {
+        flex-direction: column;
+        gap: 0.75rem;
+        
+        .add-input {
+          border-radius: 0.375rem;
+          border-right: 1px solid #ced4da;
+          
+          &:focus {
+            border-right-color: #86b7fe;
+          }
+          
+          &.is-invalid {
+            border-right-color: #dc3545;
+          }
+        }
+        
+        .add-button {
+          border-radius: 0.375rem;
+          align-self: flex-end;
+        }
+      }
+    }
+  }
+  
+  .items-container {
+    .items-list {
+    .item-row {
+      padding: 0.2rem 0.375rem;
+        
+        .item-value {
+          font-size: 0.85rem;
+        }
+        
+        .btn {
+          min-width: 1.25rem;
+          height: 1.25rem;
+          font-size: 0.7rem;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .add-form-container {
+    margin-bottom: 1.5rem;
+  }
+  
+  .items-container {
+    .items-list {
+      .item-row {
+        padding: 0.25rem 0.5rem;
+      }
+    }
+  }
+}

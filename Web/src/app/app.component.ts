@@ -119,30 +119,39 @@ export class AppComponent implements OnInit, OnDestroy {
   private updateFooterForCurrentRoute(): void {
     const currentUrl = this.router.url;
     
-    // Only update footer for non-recipe-detail and non-grocery-list-detail pages
-    if (!currentUrl.startsWith('/recipes/') && !currentUrl.startsWith('/grocery-list/')) {
-      // Reset all button configurations
-      this.resetFooterButtons();
-      
-      if (currentUrl === '/recipes') {
-        this.showRightButton = true;
-        this.rightButtonText = 'Create New Recipe';
-        this.rightButtonIcon = 'fas fa-plus';
-        this.rightButtonClass = 'btn-primary';
-        this.rightButtonClickHandler = () => this.openCreateRecipeModal();
-      } else if (currentUrl === '/week-menu') {
-        this.showRightButton = true;
-        this.rightButtonText = 'Create Grocery List';
-        this.rightButtonIcon = 'fas fa-shopping-cart';
-        this.rightButtonClass = 'btn-success';
-        this.rightButtonClickHandler = () => this.createGroceryList();
-      } else if (currentUrl === '/cookbooks') {
-        this.showRightButton = true;
-        this.rightButtonText = 'Create New Cookbook';
-        this.rightButtonIcon = 'fas fa-plus';
-        this.rightButtonClass = 'btn-primary';
-        this.rightButtonClickHandler = () => this.openCreateCookbookModal();
-      }
+    // Handle routes that should never show footer (detail pages)
+    if (currentUrl.startsWith('/recipes/') || currentUrl.startsWith('/grocery-list/')) {
+      this.ensureFooterHidden();
+      return;
+    }
+    
+    // Reset all button configurations first
+    this.resetFooterButtons();
+    
+    // Configure footer buttons based on current route
+    // Only these specific routes should show footer buttons:
+    if (currentUrl === '/recipes') {
+      this.showRightButton = true;
+      this.rightButtonText = 'Create New Recipe';
+      this.rightButtonIcon = 'fas fa-plus';
+      this.rightButtonClass = 'btn-primary';
+      this.rightButtonClickHandler = () => this.openCreateRecipeModal();
+    } else if (currentUrl === '/week-menu') {
+      this.showRightButton = true;
+      this.rightButtonText = 'Create Grocery List';
+      this.rightButtonIcon = 'fas fa-shopping-cart';
+      this.rightButtonClass = 'btn-success';
+      this.rightButtonClickHandler = () => this.createGroceryList();
+    } else if (currentUrl === '/cookbooks') {
+      this.showRightButton = true;
+      this.rightButtonText = 'Create New Cookbook';
+      this.rightButtonIcon = 'fas fa-plus';
+      this.rightButtonClass = 'btn-primary';
+      this.rightButtonClickHandler = () => this.openCreateCookbookModal();
+    } else {
+      // For all other routes (including /recipe-settings, /grocery-list), 
+      // ensure footer is completely hidden
+      this.ensureFooterHidden();
     }
   }
 
@@ -180,6 +189,15 @@ export class AppComponent implements OnInit, OnDestroy {
     this.rightButtonIcon = '';
     this.rightButtonClass = 'btn-primary';
     this.rightButtonClickHandler = null;
+  }
+
+  // Helper method to ensure footer is completely hidden
+  private ensureFooterHidden(): void {
+    // Force reset all footer states to ensure clean state
+    this.resetFooterButtons();
+    
+    // Also reset the footer service to prevent any lingering state
+    this.footerService.resetFooterConfig();
   }
   
   onFooterButtonClick(): void {
