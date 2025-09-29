@@ -33,18 +33,18 @@
 }
 
 // Button Sizes
-.btn-sm {
-  height: $button-height-sm;
-  padding: 0 var(--spacing-3);
-  font-size: $font-size-sm;
-  line-height: $line-height-tight;
-}
-
 .btn {
   height: $button-height-base;
   padding: 0 var(--spacing-4);
   font-size: $font-size-base;
   line-height: $line-height-normal;
+}
+
+.btn-sm {
+  height: $button-height-sm;
+  padding: 0 var(--spacing-2);
+  font-size: 0.75rem; // Even smaller than $font-size-sm
+  line-height: $line-height-tight;
 }
 
 .btn-lg {
@@ -194,10 +194,26 @@
   padding: var(--spacing-6);
   border-bottom: 1px solid var(--color-neutral-200);
   background-color: var(--color-bg-secondary);
+  
+  @media (max-width: 768px) {
+    padding: var(--spacing-4);
+  }
+  
+  @media (max-width: 576px) {
+    padding: var(--spacing-3);
+  }
 }
 
 .card-body {
   padding: var(--spacing-6);
+  
+  @media (max-width: 768px) {
+    padding: var(--spacing-4);
+  }
+  
+  @media (max-width: 576px) {
+    padding: var(--spacing-3);
+  }
 }
 
 .card-footer {
@@ -249,7 +265,11 @@
 // =============================================================================
 
 .form-group {
-  margin-bottom: var(--spacing-4);
+  margin-bottom: var(--spacing-3);
+  
+  @media (max-width: 768px) {
+    margin-bottom: var(--spacing-2);
+  }
 }
 
 .form-label {
@@ -257,7 +277,11 @@
   font-size: $font-size-sm;
   font-weight: $font-weight-medium;
   color: var(--color-text-primary);
-  margin-bottom: var(--spacing-2);
+  margin-bottom: var(--spacing-1);
+  
+  @media (max-width: 768px) {
+    margin-bottom: 0.125rem;
+  }
 }
 
 .form-control {

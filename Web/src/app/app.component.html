@@ -12,7 +12,7 @@
   </header>
   
   <!-- Scrollable Content Area -->
-  <main class="main-content">
+  <main class="main-content" [class.with-footer]="shouldShowFooter">
     <div class="content-wrapper">
       <router-outlet></router-outlet>
     </div>

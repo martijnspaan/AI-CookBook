@@ -12,6 +12,15 @@ The frontend is built as a modern Angular web application with a mobile-first re
 - **Icon Usage**: Use semantic icons that clearly communicate functionality and improve user experience
 - **Font Hierarchy**: Implement clear typography scales for headings, body text, and UI elements
 
+### FontAwesome Icon Configuration
+- **Custom Bundle**: The application uses a custom FontAwesome configuration to reduce bundle size
+- **Two-Step Process**: Adding new FontAwesome icons requires BOTH steps:
+  1. **Icon Registration**: Add to `src/app/icons/fontawesome-icons.ts` in the `fontAwesomeIcons` array
+  2. **CSS Definitions**: Add to `src/app/icons/fontawesome-custom.scss` with the format `.fa-icon-name:before { content: "\fXXX"; }`
+- **Critical Step**: If icons don't display, check BOTH the TypeScript array AND the SCSS definitions
+- **Bundle Optimization**: Only icons actually used in the application are included in the build
+- **Unicode Lookup**: Use FontAwesome's website to find the correct Unicode value (e.g., \f53f for palette)
+
 ### Visual Design Principles
 - **Accessibility**: Ensure WCAG 2.1 AA compliance for all UI components
 - **Design System Compliance**: All visual elements must conform to the established design system standards

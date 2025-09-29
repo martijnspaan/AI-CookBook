@@ -15,11 +15,10 @@
       (keydown.enter)="toggleSection(section.id)"
       (keydown.space)="toggleSection(section.id); $event.preventDefault()">
       
-      <div class="section-icon">
-        <i [class]="section.icon"></i>
-      </div>
-      
-      <h3 class="section-title">{{ section.title }}</h3>
+      <h3 class="section-title">
+        <i [class]="section.icon" class="title-icon"></i>
+        {{ section.title }}
+      </h3>
       
       <div class="section-toggle">
         <i class="fas fa-chevron-down" [class.rotated]="isExpanded(section.id)"></i>

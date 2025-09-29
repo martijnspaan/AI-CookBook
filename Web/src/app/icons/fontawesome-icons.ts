@@ -23,6 +23,12 @@ export const fontAwesomeIcons = [
   'fas fa-chevron-down',
   'fas fa-inbox',
   
+  // Design system icons
+  'fas fa-palette',
+  'fas fa-puzzle-piece',
+  'fas fa-universal-access',
+  'fas fa-code',
+  
   // Content and data
   'fas fa-book',
   'fas fa-book-open',
@@ -33,6 +39,7 @@ export const fontAwesomeIcons = [
   'fas fa-tags',
   'fas fa-tag',
   'fas fa-list',
+  'fas fa-leaf',
   
   // Shopping and actions
   'fas fa-shopping-cart',

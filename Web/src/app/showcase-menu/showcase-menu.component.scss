@@ -88,6 +88,36 @@
   gap: 1.5rem;
 }
 
+// Padding utilities
+.pt-16 {
+  padding-top: 4rem;
+}
+
+.pb-16 {
+  padding-bottom: 4rem;
+}
+
+// Responsive padding adjustments
+@media (max-width: 768px) {
+  .pt-16 {
+    padding-top: 2.5rem;
+  }
+  
+  .pb-16 {
+    padding-bottom: 2.5rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .pt-16 {
+    padding-top: 2rem;
+  }
+  
+  .pb-16 {
+    padding-bottom: 2rem;
+  }
+}
+
 .space-y-4 > * + * {
   margin-top: 1rem;
 }
@@ -198,4 +228,164 @@ form .form-group:last-child {
 // Alert spacing
 .alert-showcase .alert:last-child {
   margin-bottom: 0;
+}
+
+// Table and Card Showcase Styles
+.table-card-showcase {
+  .table-responsive {
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    border: 1px solid var(--color-neutral-200);
+    
+    .table {
+      margin-bottom: 0;
+      
+      thead {
+        background-color: var(--color-neutral-50);
+        
+        th {
+          border-bottom: 2px solid var(--color-neutral-200);
+          font-weight: var(--font-weight-semibold);
+          color: var(--color-text-primary);
+          padding: 1rem;
+          text-align: left;
+        }
+      }
+      
+      tbody {
+        tr {
+          border-bottom: 1px solid var(--color-neutral-200);
+          transition: background-color var(--transition-fast);
+          
+          &:hover {
+            background-color: var(--color-primary-50);
+          }
+          
+          &:last-child {
+            border-bottom: none;
+          }
+          
+          td {
+            padding: 1rem;
+            vertical-align: middle;
+          }
+        }
+      }
+    }
+  }
+  
+  .card-flat {
+    border: 1px solid var(--color-neutral-200);
+    box-shadow: none;
+    
+    &:hover {
+      box-shadow: var(--shadow-sm);
+      transform: translateY(-2px);
+    }
+  }
+  
+  // Simple text cards should have borders
+  .simple-card {
+    border: 1px solid var(--color-neutral-200) !important;
+    border-radius: var(--border-radius-lg) !important;
+  }
+}
+
+// Responsive table adjustments
+@media (max-width: 768px) {
+  .table-card-showcase {
+    .container {
+      padding: 0 0.5rem !important;
+    }
+    
+    .card {
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      padding: 1rem !important;
+    }
+    
+    .table-responsive {
+      border: none;
+      border-radius: 0;
+      
+      .table {
+        thead {
+          background-color: transparent;
+          
+          th {
+            border-bottom: none;
+            padding: 0.5rem 0.25rem;
+            font-size: 0.875rem;
+          }
+        }
+        
+        tbody {
+          tr {
+            border-bottom: none;
+            
+            &:hover {
+              background-color: transparent;
+            }
+            
+            td {
+              padding: 0.5rem 0.25rem;
+              font-size: 0.875rem;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  .accordion-showcase {
+    .container {
+      padding: 0 0.5rem !important;
+    }
+    
+    .card {
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      padding: 1rem !important;
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .table-card-showcase {
+    .container {
+      padding: 0 0.25rem !important;
+    }
+    
+    .card {
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      padding: 0.75rem !important;
+    }
+    
+    .table-responsive {
+      .table {
+        thead th,
+        tbody td {
+          padding: 0.375rem 0.125rem;
+          font-size: 0.8rem;
+        }
+      }
+    }
+  }
+  
+  .accordion-showcase {
+    .container {
+      padding: 0 0.25rem !important;
+    }
+    
+    .card {
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      padding: 0.75rem !important;
+    }
+  }
 }

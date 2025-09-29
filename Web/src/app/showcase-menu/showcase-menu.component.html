@@ -73,7 +73,7 @@
   </section>
 
   <!-- Enhanced Components Showcase -->
-  <section class="enhanced-components bg-neutral-50">
+  <section class="enhanced-components bg-neutral-50 pt-16 pb-16">
     <div class="container mx-auto">
       <h2 class="font-secondary text-3xl text-primary-800 mb-8 text-center">
         Enhanced Components Showcase
@@ -381,7 +381,7 @@
   </section>
 
   <!-- Accordion Showcase -->
-  <section class="accordion-showcase bg-neutral-50">
+  <section class="accordion-showcase bg-neutral-50 pt-16 pb-16">
     <div class="container mx-auto p-6">
       <h2 class="font-secondary text-3xl text-primary-800 mb-8 text-center">
         Interactive Components
@@ -392,13 +392,218 @@
           <h3 class="font-secondary text-2xl text-primary-700 mb-6">Accordion Component</h3>
           <p class="text-primary-600 mb-6">
             Collapsible content sections that help organize information in a space-efficient way. 
+            Only one section can be open at a time, automatically closing others when a new section is opened. 
             Perfect for FAQs, documentation, and feature explanations.
           </p>
           
           <app-accordion 
             [sections]="accordionSections"
-            [allowMultiple]="true">
+            [allowMultiple]="false">
           </app-accordion>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Table and Simple Card Showcase -->
+  <section class="table-card-showcase bg-white pt-16 pb-16">
+    <div class="container mx-auto p-6">
+      <h2 class="font-secondary text-3xl text-primary-800 mb-8 text-center">
+        Data Display Components
+      </h2>
+      
+      <div class="max-w-6xl mx-auto">
+        <!-- Table Component -->
+        <div class="card p-6 mb-8">
+          <h3 class="font-secondary text-2xl text-primary-700 mb-6">Table Component</h3>
+          <p class="text-primary-600 mb-6">
+            Clean, responsive tables for displaying structured data. Perfect for lists, comparisons, and data visualization.
+          </p>
+          
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Recipe Name</th>
+                  <th>Cuisine</th>
+                  <th>Difficulty</th>
+                  <th>Prep Time</th>
+                  <th>Rating</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="clickable-row">
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="me-3">
+                        <div class="bg-primary-100 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                          <i class="fas fa-utensils text-primary-600"></i>
+                        </div>
+                      </div>
+                      <div>
+                        <div class="fw-semibold">Mediterranean Quinoa Bowl</div>
+                        <div class="text-muted small">Healthy & Fresh</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="badge bg-primary">Mediterranean</span></td>
+                  <td><span class="badge bg-success">Easy</span></td>
+                  <td>25 min</td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="me-1">
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                      </div>
+                      <span class="text-muted small">4.8</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="d-flex gap-1">
+                      <button class="btn btn-outline btn-sm">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="clickable-row">
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="me-3">
+                        <div class="bg-accent-100 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                          <i class="fas fa-pepper-hot text-accent-600"></i>
+                        </div>
+                      </div>
+                      <div>
+                        <div class="fw-semibold">Spicy Thai Basil Chicken</div>
+                        <div class="text-muted small">Bold & Aromatic</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="badge bg-accent">Thai</span></td>
+                  <td><span class="badge bg-warning">Medium</span></td>
+                  <td>35 min</td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="me-1">
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="far fa-star text-muted"></i>
+                      </div>
+                      <span class="text-muted small">4.2</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="d-flex gap-1">
+                      <button class="btn btn-outline btn-sm">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr class="clickable-row">
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="me-3">
+                        <div class="bg-secondary-100 rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                          <i class="fas fa-fish text-secondary-600"></i>
+                        </div>
+                      </div>
+                      <div>
+                        <div class="fw-semibold">Pan-Seared Salmon</div>
+                        <div class="text-muted small">Elegant & Simple</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td><span class="badge bg-secondary">International</span></td>
+                  <td><span class="badge bg-info">Easy</span></td>
+                  <td>20 min</td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="me-1">
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                      </div>
+                      <span class="text-muted small">4.9</span>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="d-flex gap-1">
+                      <button class="btn btn-outline btn-sm">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Simple Card Component -->
+        <div class="card p-6">
+          <h3 class="font-secondary text-2xl text-primary-700 mb-6">Simple Text Card</h3>
+          <p class="text-primary-600 mb-6">
+            Clean, minimal cards with compact design and single badges. Perfect for quick summaries and simple information display.
+          </p>
+          
+          <div class="row g-4">
+            <div class="col-md-6">
+              <div class="card card-flat simple-card">
+                <div class="card-body">
+                  <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                      <div class="bg-primary-100 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                        <i class="fas fa-book text-primary-600"></i>
+                      </div>
+                      <div>
+                        <h5 class="card-title mb-0">Recipe Collection</h5>
+                        <p class="text-muted small mb-0">Family favorites</p>
+                      </div>
+                    </div>
+                    <span class="badge bg-primary">Traditional</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-6">
+              <div class="card card-flat simple-card">
+                <div class="card-body">
+                  <div class="d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center">
+                      <div class="bg-accent-100 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                        <i class="fas fa-leaf text-accent-600"></i>
+                      </div>
+                      <div>
+                        <h5 class="card-title mb-0">Healthy Living</h5>
+                        <p class="text-muted small mb-0">Nutritious recipes</p>
+                      </div>
+                    </div>
+                    <span class="badge bg-success">Healthy</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

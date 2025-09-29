@@ -119,8 +119,8 @@ export class AppComponent implements OnInit, OnDestroy {
   private updateFooterForCurrentRoute(): void {
     const currentUrl = this.router.url;
     
-    // Handle routes that should never show footer (only recipe detail pages)
-    if (currentUrl.startsWith('/recipes/')) {
+    // Handle routes that should never show footer (recipe detail pages and showcase)
+    if (currentUrl.startsWith('/recipes/') || currentUrl === '/showcase') {
       this.ensureFooterHidden();
       return;
     }
