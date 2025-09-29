@@ -2,7 +2,7 @@
 
 ## 🎨 Application Architecture
 
-The frontend is built as a modern Angular web application with a mobile-first responsive design approach, leveraging Bootstrap framework for styling and component consistency.
+The frontend is built as a modern Angular web application with a mobile-first responsive design approach, leveraging the established design system for styling and component consistency.
 
 ## 🎯 Design System & Visual Standards
 
@@ -13,10 +13,15 @@ The frontend is built as a modern Angular web application with a mobile-first re
 - **Font Hierarchy**: Implement clear typography scales for headings, body text, and UI elements
 
 ### Visual Design Principles
-- **Material Design**: Follow Material Design principles where appropriate
 - **Accessibility**: Ensure WCAG 2.1 AA compliance for all UI components
-- **Color Palette**: Maintain consistent color schemes with proper contrast ratios
-- **Spacing**: Use consistent spacing scales throughout the application
+- **Design System Compliance**: All visual elements must conform to the established design system standards
+
+### Design System Implementation
+- **Design System First**: The entire application must be built using the established design system
+- **Component Consistency**: All UI components should follow the design system patterns and guidelines
+- **Showcase Reference**: For design system examples and component implementations, refer to the showcase page
+- **Design Tokens**: Use design system tokens for colors, typography, spacing, and other visual properties
+- **Component Library**: Leverage the design system's component library for consistent user experience
 
 ## 💻 Angular Development Standards
 
@@ -58,24 +63,17 @@ The frontend is built as a modern Angular web application with a mobile-first re
   - Touch-friendly interface elements
 
 ### CSS Layout Standards
-- **Flexbox Primary**: Use CSS Flexbox as the primary layout method for all components
-- **Grid Support**: Utilize CSS Grid for complex two-dimensional layouts
-- **Responsive Units**: Use relative units (rem, em, %) over absolute units (px)
-- **Container Queries**: Implement container queries where supported for component-level responsiveness
+- **Design System Layout**: Follow the design system's layout patterns and grid system
+- **Responsive Units**: Use design system specified units and breakpoints
+- **Component Layout**: Implement layouts as defined in the design system showcase
 
 ## 🎨 Styling & Component Standards
 
-### Reusable Style System
+### Design System Implementation
+- **Design System Components**: Use only components from the established design system
+- **Custom Styling**: Avoid custom styling that conflicts with design system standards
 - **SCSS Modules**: Organize styles using SCSS modules for better maintainability
-- **CSS Custom Properties**: Use CSS custom properties for theming and consistency
-- **Component Styles**: Create reusable style mixins and utilities
-- **Design Tokens**: Implement design tokens for consistent spacing, colors, and typography
-
-### Bootstrap Integration
-- **Component Library**: Leverage Bootstrap components while maintaining custom styling
-- **Customization**: Customize Bootstrap variables to match design system
-- **Grid System**: Use Bootstrap's responsive grid system for layout consistency
-- **Utility Classes**: Utilize Bootstrap utility classes for common styling needs
+- **CSS Custom Properties**: Use design system CSS custom properties for theming and consistency
 
 ## 🧪 Testing & Quality Assurance
 

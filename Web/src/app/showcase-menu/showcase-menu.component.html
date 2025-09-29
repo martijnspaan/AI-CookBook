@@ -1,0 +1,372 @@
+<!-- AI Cookbook Design System Showcase -->
+<div class="showcase-container bg-primary-50">
+  <!-- Hero Section -->
+  <section class="hero-section bg-gradient-to-br from-primary-100 to-secondary-100 p-8 mb-8">
+    <div class="container mx-auto text-center">
+      <h1 class="font-secondary text-5xl text-primary-800 mb-4">
+        AI Cookbook Design System
+      </h1>
+      <p class="text-xl text-primary-700 mb-6 leading-relaxed">
+        A modern, nature-inspired design system featuring pastel green colors, 
+        clean typography, and reusable components for cooking and healthy living.
+      </p>
+      <div class="flex flex-wrap justify-center gap-4">
+        <span class="badge badge-primary">Cooking</span>
+        <span class="badge badge-secondary">Healthy</span>
+        <span class="badge badge-accent">Nature</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Design System Overview -->
+  <section class="design-overview mb-12">
+    <div class="container mx-auto p-6">
+      <h2 class="font-secondary text-3xl text-primary-800 mb-6 text-center">
+        Design System Components
+      </h2>
+      
+      <!-- Color Palette Showcase -->
+      <div class="mb-8">
+        <h3 class="font-secondary text-2xl text-primary-700 mb-4">Color Palette</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="card card-flat">
+            <div class="bg-primary-500 h-16 rounded-t-lg"></div>
+            <div class="p-4">
+              <h4 class="font-semibold text-primary-800">Primary</h4>
+              <p class="text-sm text-primary-600">#3ba85c</p>
+            </div>
+          </div>
+          <div class="card card-flat">
+            <div class="bg-secondary-500 h-16 rounded-t-lg"></div>
+            <div class="p-4">
+              <h4 class="font-semibold text-primary-800">Secondary</h4>
+              <p class="text-sm text-primary-600">#8b9a4a</p>
+            </div>
+          </div>
+          <div class="card card-flat">
+            <div class="bg-accent-500 h-16 rounded-t-lg"></div>
+            <div class="p-4">
+              <h4 class="font-semibold text-primary-800">Accent</h4>
+              <p class="text-sm text-primary-600">#f97316</p>
+            </div>
+          </div>
+          <div class="card card-flat">
+            <div class="bg-neutral-500 h-16 rounded-t-lg"></div>
+            <div class="p-4">
+              <h4 class="font-semibold text-primary-800">Neutral</h4>
+              <p class="text-sm text-primary-600">#78716c</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Enhanced Components Showcase -->
+  <section class="enhanced-components bg-neutral-50">
+    <div class="container mx-auto">
+      <h2 class="font-secondary text-3xl text-primary-800 mb-8 text-center">
+        Enhanced Components Showcase
+      </h2>
+      
+      <!-- Form with Controls - Full Width -->
+      <div class="mb-8">
+        <div class="card p-6 mx-0">
+          <h3 class="font-secondary text-2xl text-primary-700 mb-6">Contact Form</h3>
+          
+          <form class="form-full-width">
+            <div class="form-grid form-grid-2 space-y-3">
+              <div class="form-group">
+                <label class="form-label">Full Name *</label>
+                <input type="text" class="form-control" placeholder="Enter your full name" required>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Email Address *</label>
+                <input type="email" class="form-control" placeholder="Enter your email address" required>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <input type="tel" class="form-control" placeholder="(555) 123-4567">
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Subject *</label>
+                <select class="form-select" required>
+                  <option value="">Select a subject</option>
+                  <option value="general">General Inquiry</option>
+                  <option value="menu">Menu Question</option>
+                  <option value="reservation">Reservation</option>
+                  <option value="feedback">Feedback</option>
+                  <option value="complaint">Complaint</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="form-group mt-4">
+              <label class="form-label">Dietary Preferences</label>
+              <div class="form-grid form-grid-2 gap-2">
+                <label class="flex items-center">
+                  <input type="checkbox" class="mr-2">
+                  <span class="text-sm">Vegetarian</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="checkbox" class="mr-2">
+                  <span class="text-sm">Vegan</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="checkbox" class="mr-2">
+                  <span class="text-sm">Gluten-Free</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="checkbox" class="mr-2">
+                  <span class="text-sm">Dairy-Free</span>
+                </label>
+              </div>
+            </div>
+            
+            <div class="form-group mt-4">
+              <label class="form-label">Message *</label>
+              <textarea class="form-textarea" placeholder="Tell us about your inquiry..." rows="4" required></textarea>
+            </div>
+            
+            <div class="form-group mt-4">
+              <label class="flex items-center">
+                <input type="checkbox" class="mr-2" required>
+                <span class="text-sm">I agree to the <a href="#" class="text-primary-600 hover:underline">Terms of Service</a> and <a href="#" class="text-primary-600 hover:underline">Privacy Policy</a></span>
+              </label>
+            </div>
+            
+            <div class="flex flex-wrap gap-4 mt-4">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-paper-plane mr-2"></i>
+                Send Message
+              </button>
+              <button type="button" class="btn btn-outline">
+                <i class="fas fa-times mr-2"></i>
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Button Showcase -->
+      <div class="mb-8">
+        <div class="card p-6">
+          <h3 class="font-secondary text-2xl text-primary-700 mb-6">Button Variants</h3>
+          
+          <div class="space-y-6">
+            <!-- Primary Buttons -->
+            <div>
+              <h4 class="font-semibold text-primary-800 mb-3">Primary Buttons</h4>
+              <div class="flex flex-wrap gap-3">
+                <button class="btn btn-primary btn-sm">Small Primary</button>
+                <button class="btn btn-primary">Regular Primary</button>
+                <button class="btn btn-primary btn-lg">Large Primary</button>
+              </div>
+            </div>
+            
+            <!-- Secondary Buttons -->
+            <div>
+              <h4 class="font-semibold text-primary-800 mb-3">Secondary Buttons</h4>
+              <div class="flex flex-wrap gap-3">
+                <button class="btn btn-secondary btn-sm">Small Secondary</button>
+                <button class="btn btn-secondary">Regular Secondary</button>
+                <button class="btn btn-secondary btn-lg">Large Secondary</button>
+              </div>
+            </div>
+            
+            <!-- Accent Buttons -->
+            <div>
+              <h4 class="font-semibold text-primary-800 mb-3">Accent Buttons</h4>
+              <div class="flex flex-wrap gap-3">
+                <button class="btn btn-accent btn-sm">Small Accent</button>
+                <button class="btn btn-accent">Regular Accent</button>
+                <button class="btn btn-accent btn-lg">Large Accent</button>
+              </div>
+            </div>
+            
+            <!-- Outline Buttons -->
+            <div>
+              <h4 class="font-semibold text-primary-800 mb-3">Outline Buttons</h4>
+              <div class="flex flex-wrap gap-3">
+                <button class="btn btn-outline btn-sm">Small Outline</button>
+                <button class="btn btn-outline">Regular Outline</button>
+                <button class="btn btn-outline btn-lg">Large Outline</button>
+              </div>
+            </div>
+            
+            <!-- Ghost Buttons -->
+            <div>
+              <h4 class="font-semibold text-primary-800 mb-3">Ghost Buttons</h4>
+              <div class="flex flex-wrap gap-3">
+                <button class="btn btn-ghost btn-sm">Small Ghost</button>
+                <button class="btn btn-ghost">Regular Ghost</button>
+                <button class="btn btn-ghost btn-lg">Large Ghost</button>
+              </div>
+            </div>
+            
+            <!-- Disabled Buttons -->
+            <div>
+              <h4 class="font-semibold text-primary-800 mb-3">Disabled Buttons</h4>
+              <div class="flex flex-wrap gap-3">
+                <button class="btn btn-primary" disabled>Disabled Primary</button>
+                <button class="btn btn-secondary" disabled>Disabled Secondary</button>
+                <button class="btn btn-outline" disabled>Disabled Outline</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Card with Actions and Badges -->
+      <div class="mt-8">
+        <div class="card card-elevated max-w-4xl mx-auto">
+          <div class="card-header bg-gradient-to-r from-primary-100 to-secondary-100">
+            <div class="flex justify-between items-start">
+              <div>
+                <h3 class="card-title text-2xl text-primary-800 mb-2">
+                  <i class="fas fa-info-circle mr-2"></i>
+                  Recipe Information
+                </h3>
+                <p class="card-subtitle text-primary-600">
+                  Complete details about your selected recipe
+                </p>
+              </div>
+              <div class="flex gap-2">
+                <span class="badge badge-success">
+                  <i class="fas fa-check mr-1"></i>
+                  Verified
+                </span>
+                <span class="badge badge-info">
+                  <i class="fas fa-star mr-1"></i>
+                  Featured
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card-body">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Recipe Image -->
+              <div class="relative">
+                <img 
+                  src="https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=400&h=300&fit=crop" 
+                  alt="Herb-Crusted Salmon"
+                  class="w-full h-48 object-cover rounded-lg">
+                <div class="absolute top-4 left-4">
+                  <span class="badge badge-primary">
+                    <i class="fas fa-clock mr-1"></i>
+                    30 min
+                  </span>
+                </div>
+                <div class="absolute top-4 right-4">
+                  <span class="badge badge-accent">
+                    <i class="fas fa-users mr-1"></i>
+                    4 servings
+                  </span>
+                </div>
+              </div>
+              
+              <!-- Recipe Details -->
+              <div>
+                <h4 class="font-secondary text-xl text-primary-800 mb-3">Herb-Crusted Salmon</h4>
+                <p class="text-primary-600 mb-4">
+                  Fresh Atlantic salmon with a delicious herb crust, served with roasted vegetables. 
+                  A perfect balance of protein and nutrients for a healthy meal.
+                </p>
+                
+                <!-- Recipe Tags -->
+                <div class="flex flex-wrap gap-2 mb-4">
+                  <span class="badge badge-primary">High Protein</span>
+                  <span class="badge badge-secondary">Omega-3</span>
+                  <span class="badge badge-success">Gluten-Free</span>
+                  <span class="badge badge-info">Low Carb</span>
+                  <span class="badge badge-accent">Quick Prep</span>
+                </div>
+                
+                <!-- Nutritional Info -->
+                <div class="bg-neutral-50 p-4 rounded-lg mb-4">
+                  <h5 class="font-semibold text-primary-800 mb-2">Nutritional Information</h5>
+                  <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div class="flex justify-between">
+                      <span>Calories:</span>
+                      <span class="font-medium">320</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Protein:</span>
+                      <span class="font-medium">28g</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Carbs:</span>
+                      <span class="font-medium">8g</span>
+                    </div>
+                    <div class="flex justify-between">
+                      <span>Fat:</span>
+                      <span class="font-medium">18g</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Ingredients List -->
+            <div class="mt-6">
+              <h5 class="font-semibold text-primary-800 mb-3">Key Ingredients</h5>
+              <div class="flex flex-wrap gap-2">
+                <span class="badge badge-outline">Fresh Salmon</span>
+                <span class="badge badge-outline">Fresh Herbs</span>
+                <span class="badge badge-outline">Lemon</span>
+                <span class="badge badge-outline">Garlic</span>
+                <span class="badge badge-outline">Olive Oil</span>
+                <span class="badge badge-outline">Sea Salt</span>
+                <span class="badge badge-outline">Black Pepper</span>
+                <span class="badge badge-outline">Mixed Vegetables</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card-footer bg-neutral-50">
+            <div class="flex flex-wrap justify-between items-center gap-4">
+              <div class="flex items-center gap-4">
+                <div class="flex items-center gap-1">
+                  <i class="fas fa-star text-accent-500"></i>
+                  <i class="fas fa-star text-accent-500"></i>
+                  <i class="fas fa-star text-accent-500"></i>
+                  <i class="fas fa-star text-accent-500"></i>
+                  <i class="fas fa-star text-accent-500"></i>
+                  <span class="ml-2 text-sm text-primary-600">4.8 (127 reviews)</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <i class="fas fa-heart text-primary-500"></i>
+                  <span class="text-sm text-primary-600">1.2k favorites</span>
+                </div>
+              </div>
+              
+              <div class="flex gap-3">
+                <button class="btn btn-outline btn-sm">
+                  <i class="fas fa-heart mr-1"></i>
+                  Save
+                </button>
+                <button class="btn btn-outline btn-sm">
+                  <i class="fas fa-share mr-1"></i>
+                  Share
+                </button>
+                <button class="btn btn-primary">
+                  <i class="fas fa-plus mr-2"></i>
+                  Add to Menu
+                </button>
+                <button class="btn btn-secondary">
+                  <i class="fas fa-book-open mr-2"></i>
+                  View Recipe
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>

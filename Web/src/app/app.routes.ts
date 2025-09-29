@@ -29,5 +29,9 @@ export const routes: Routes = [
   { 
     path: 'recipe-settings', 
     loadComponent: () => import('./configuration/configuration.component').then(m => m.ConfigurationComponent)
+  },
+  { 
+    path: 'showcase', 
+    loadComponent: () => import('./showcase-menu/showcase-menu.component').then(m => m.ShowcaseMenuComponent)
   }
 ];

@@ -1,0 +1,438 @@
+// Additional utility classes for the showcase and general use
+
+// Grid utilities
+.grid {
+  display: grid;
+}
+
+.grid-cols-1 {
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.grid-cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.grid-cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (min-width: 768px) {
+  .md\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  
+  .md\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  
+  .md\:grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+// Flex utilities
+.flex {
+  display: flex;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.items-start {
+  align-items: flex-start;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.items-end {
+  align-items: flex-end;
+}
+
+.flex-1 {
+  flex: 1 1 0%;
+}
+
+// Gap utilities
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.gap-6 {
+  gap: 1.5rem;
+}
+
+// Spacing utilities
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+.space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+// Max width utilities
+.max-w-2xl {
+  max-width: 42rem;
+}
+
+.max-w-4xl {
+  max-width: 56rem;
+}
+
+// Margin utilities
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+// Text alignment
+.text-center {
+  text-align: center;
+}
+
+// Position utilities
+.relative {
+  position: relative;
+}
+
+.absolute {
+  position: absolute;
+}
+
+.top-4 {
+  top: 1rem;
+}
+
+.right-4 {
+  right: 1rem;
+}
+
+// Width and height utilities
+.w-full {
+  width: 100%;
+}
+
+.h-16 {
+  height: 4rem;
+}
+
+.h-48 {
+  height: 12rem;
+}
+
+// Object fit
+.object-cover {
+  object-fit: cover;
+}
+
+// Border radius utilities
+.rounded-t-lg {
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+}
+
+.rounded-t-xl {
+  border-top-left-radius: 0.75rem;
+  border-top-right-radius: 0.75rem;
+}
+
+// Responsive text sizes
+@media (max-width: 640px) {
+  .text-5xl {
+    font-size: 2.5rem;
+  }
+  
+  .text-3xl {
+    font-size: 1.875rem;
+  }
+  
+  .text-2xl {
+    font-size: 1.5rem;
+  }
+}
+
+// Custom gradient utility
+.bg-gradient-to-br {
+  background-image: linear-gradient(to bottom right, var(--color-primary-100), var(--color-secondary-100));
+}
+
+// Card hover effects
+.card:hover {
+  transform: translateY(-4px);
+  transition: transform var(--transition-base);
+}
+
+// Button group spacing
+.flex.gap-4 button {
+  margin-right: 0;
+}
+
+// Form spacing
+form .form-group:last-child {
+  margin-bottom: 0;
+}
+
+// Alert spacing
+.alert-showcase .alert:last-child {
+  margin-bottom: 0;
+}
+
+// Additional utility classes for enhanced showcase
+.mr-1 {
+  margin-right: 0.25rem;
+}
+
+.mr-2 {
+  margin-right: 0.5rem;
+}
+
+.ml-2 {
+  margin-left: 0.5rem;
+}
+
+.mt-6 {
+  margin-top: 1.5rem;
+}
+
+.mt-8 {
+  margin-top: 2rem;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.mb-3 {
+  margin-bottom: 0.75rem;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
+// Grid responsive utilities
+@media (min-width: 1024px) {
+  .lg\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+// Badge outline variant
+.badge-outline {
+  background-color: transparent;
+  border: 1px solid var(--color-primary-300);
+  color: var(--color-primary-700);
+}
+
+// Gradient utilities
+.bg-gradient-to-r {
+  background-image: linear-gradient(to right, var(--color-primary-100), var(--color-secondary-100));
+}
+
+// Text color utilities
+.text-accent-500 {
+  color: var(--color-accent-500);
+}
+
+.text-primary-500 {
+  color: var(--color-primary-500);
+}
+
+.text-primary-600 {
+  color: var(--color-primary-600);
+}
+
+.text-primary-700 {
+  color: var(--color-primary-700);
+}
+
+.text-primary-800 {
+  color: var(--color-primary-800);
+}
+
+// Background color utilities
+.bg-neutral-50 {
+  background-color: var(--color-neutral-50);
+}
+
+.bg-neutral-100 {
+  background-color: var(--color-neutral-100);
+}
+
+// Hover utilities
+.hover\:underline:hover {
+  text-decoration: underline;
+}
+
+// Form checkbox styling
+input[type="checkbox"] {
+  accent-color: var(--color-primary-500);
+}
+
+// Font weight utilities
+.font-medium {
+  font-weight: 500;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+// Text size utilities
+.text-sm {
+  font-size: 0.875rem;
+}
+
+// Rounded utilities
+.rounded-lg {
+  border-radius: var(--border-radius-lg);
+}
+
+// Height utilities
+.h-48 {
+  height: 12rem;
+}
+
+// Max width utilities
+.max-w-4xl {
+  max-width: 56rem;
+}
+
+// Gap utilities
+.gap-1 {
+  gap: 0.25rem;
+}
+
+.gap-3 {
+  gap: 0.75rem;
+}
+
+// Justify content utilities
+.justify-between {
+  justify-content: space-between;
+}
+
+// Items alignment utilities
+.items-center {
+  align-items: center;
+}
+
+// Space utilities
+.space-y-2 > * + * {
+  margin-top: 0.5rem;
+}
+
+.space-y-3 > * + * {
+  margin-top: 0.75rem;
+}
+
+.space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+// Compact form spacing
+.enhanced-components .form-group {
+  margin-bottom: 1rem;
+}
+
+.enhanced-components .form-group:last-child {
+  margin-bottom: 0;
+}
+
+// Form layout utilities
+.form-full-width {
+  width: 100%;
+  max-width: none;
+}
+
+.form-grid {
+  display: grid;
+}
+
+.form-grid-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.form-grid-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 768px) {
+  .form-grid-2,
+  .form-grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Enhanced form styling
+.enhanced-components {
+  padding: 0 !important;
+}
+
+.enhanced-components .container {
+  max-width: none;
+  width: 100%;
+  padding: 2rem 1rem;
+}
+
+.enhanced-components .card {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+.enhanced-components .form-group {
+  width: 100%;
+}
+
+.enhanced-components .form-control,
+.enhanced-components .form-select,
+.enhanced-components .form-textarea {
+  width: 100%;
+  max-width: none;
+}
+
+// Full width form styling
+.form-full-width {
+  width: 100%;
+  max-width: none;
+}
+
+.mx-0 {
+  margin-left: 0;
+  margin-right: 0;
+}
