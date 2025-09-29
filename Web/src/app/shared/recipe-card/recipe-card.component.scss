@@ -12,7 +12,7 @@
     &:hover {
       transform: translateY(-2px);
       box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-      border-color: #007bff;
+      border-color: var(--color-primary-300);
     }
     
     &:active {
@@ -23,7 +23,7 @@
   &.compact-mode {
     padding: 0.75rem;
     margin-bottom: 0.5rem;
-    border: 2px solid transparent;
+    border: 1px solid var(--color-neutral-200);
     
     .recipe-card-content {
       .recipe-title {

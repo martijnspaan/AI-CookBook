@@ -70,7 +70,7 @@
               type="button" 
               class="btn btn-outline-danger btn-sm"
               (click)="removeRecipe()">
-              <i class="fas fa-trash"></i> Remove
+              <i class="fas fa-trash"></i>
             </button>
           </div>
         </div>
@@ -96,8 +96,7 @@
         <app-recipe-card
           *ngFor="let recipe of recipes"
           [recipe]="recipe"
-          [showDescription]="false"
-          [compactMode]="true"
+          [showDescription]="true"
           [clickable]="true"
           (recipeClicked)="selectRecipe($event)">
         </app-recipe-card>
