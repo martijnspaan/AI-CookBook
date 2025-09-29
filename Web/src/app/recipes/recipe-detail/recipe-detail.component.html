@@ -139,11 +139,13 @@
                     <tbody>
                       <tr *ngFor="let ingredient of editedRecipe!.ingredients; let i = index; trackBy: trackByIndex">
                         <td colspan="5">
-                          <input 
-                            type="text" 
-                            class="form-control form-control-sm mb-1" 
-                            [(ngModel)]="editedRecipe!.ingredients[i].name"
-                            placeholder="Ingredient name">
+                          <app-ingredient-autocomplete
+                            [inputValue]="editedRecipe!.ingredients[i].name"
+                            placeholder="Enter ingredient name"
+                            [required]="true"
+                            (valueChange)="onIngredientNameChange(i, $event)"
+                            (addNewIngredient)="onAddNewIngredient($event)">
+                          </app-ingredient-autocomplete>
                           <div class="row g-1">
                             <div class="col-3">
                               <input 
@@ -157,7 +159,6 @@
                               <select 
                                 class="form-select form-select-sm" 
                                 [(ngModel)]="editedRecipe!.ingredients[i].amount.unit">
-                                <option value="">Select unit</option>
                                 <option *ngFor="let unit of availableUnits" [value]="unit">{{ unit }}</option>
                               </select>
                             </div>
@@ -165,7 +166,6 @@
                               <select 
                                 class="form-select form-select-sm" 
                                 [(ngModel)]="editedRecipe!.ingredients[i].type">
-                                <option value="">Select type</option>
                                 <option *ngFor="let type of availableIngredientTypes" [value]="type">{{ type }}</option>
                               </select>
                             </div>

@@ -14,11 +14,12 @@ import { RecipeSettings } from '../models/recipe-settings.model';
 import { PageTitleService } from '../services/page-title.service';
 import { RecipeCardComponent } from '../shared/recipe-card/recipe-card.component';
 import { ReusablePopupComponent, PopupConfig } from '../shared/reusable-popup';
+import { IngredientAutocompleteComponent } from '../shared/ingredient-autocomplete/ingredient-autocomplete.component';
 
 @Component({
   selector: 'app-recipes',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RecipeCardComponent, ReusablePopupComponent],
+  imports: [CommonModule, ReactiveFormsModule, RecipeCardComponent, ReusablePopupComponent, IngredientAutocompleteComponent],
   templateUrl: './recipes.component.html',
   styleUrl: './recipes.component.scss'
 })
@@ -155,7 +156,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
           if (settings) {
             // Meal types are always fixed: Breakfast, Lunch, Dinner
             this.availableMealTypes = ['Breakfast', 'Lunch', 'Dinner'];
-            this.availableIngredientTypes = settings.ingredients || ['groente', 'fruit', 'olie', 'zuivel', 'kruid', 'anders'];
+            this.availableIngredientTypes = settings.categories || ['groente', 'fruit', 'olie', 'zuivel', 'kruid', 'anders'];
             this.availableUnits = settings.units || ['mg', 'g', 'kg', 'ml', 'dl', 'l', 'tbsp', 'tsp', 'cup', 'piece', 'pinch'];
           } else {
             // Fallback to default values if no settings found
@@ -418,5 +419,31 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     const titleControl = this.createRecipeForm.get('title');
     const isValid = titleControl?.valid || false;
     return isValid;
+  }
+
+  onAddNewIngredient(ingredientName: string): void {
+    // Add the new ingredient to the recipe settings
+    if (this.recipeSettings) {
+      this.recipeSettings.ingredients.push(ingredientName);
+      
+      // Update the recipe settings in the backend
+      this.recipeSettingsService.updateRecipeSettings({
+        tags: this.recipeSettings.tags,
+        ingredients: this.recipeSettings.ingredients,
+        units: this.recipeSettings.units,
+        categories: this.recipeSettings.categories
+      }).pipe(takeUntil(this.destroySubject))
+        .subscribe({
+          next: (updatedSettings) => {
+            this.recipeSettings = updatedSettings;
+            console.log('New ingredient added to recipe settings:', ingredientName);
+          },
+          error: (error) => {
+            console.error('Error adding new ingredient to recipe settings:', error);
+            // Revert the local changes
+            this.recipeSettings!.ingredients = this.recipeSettings!.ingredients.filter(ing => ing !== ingredientName);
+          }
+        });
+    }
   }
 }

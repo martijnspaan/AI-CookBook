@@ -181,11 +181,12 @@
                     <tbody>
                       <tr *ngFor="let ingredient of ingredientsFormArray.controls; let i = index" [formGroupName]="i">
                         <td colspan="5">
-                          <input 
-                            type="text" 
-                            class="form-control form-control-sm mb-1" 
+                          <app-ingredient-autocomplete
                             formControlName="name"
-                            placeholder="Ingredient name">
+                            placeholder="Enter ingredient name"
+                            [required]="true"
+                            (addNewIngredient)="onAddNewIngredient($event)">
+                          </app-ingredient-autocomplete>
                           <div class="row g-1">
                             <div class="col-3">
                               <input 

@@ -1,0 +1,39 @@
+<div class="ingredient-autocomplete-container" [class.disabled]="disabled">
+  <div class="input-group">
+    <input
+      type="text"
+      class="form-control"
+      [class.is-invalid]="required && !value"
+      [placeholder]="placeholder"
+      [value]="value"
+      [disabled]="disabled"
+      (input)="onInput($event)"
+      (blur)="onBlur()"
+      (focus)="onFocus()"
+      autocomplete="off">
+    
+    <button 
+      *ngIf="showAddButton && !disabled"
+      type="button"
+      class="btn btn-outline-success btn-sm add-ingredient-btn"
+      (click)="addNewIngredientToList()"
+      title="Add '{{ value }}' to ingredient list">
+      <i class="fas fa-plus"></i>
+    </button>
+    
+    <div class="suggestions-dropdown" *ngIf="showSuggestions && filteredIngredients.length > 0">
+      <ul class="suggestions-list">
+        <li 
+          *ngFor="let ingredient of filteredIngredients" 
+          class="suggestion-item"
+          (click)="selectIngredient(ingredient)">
+          {{ ingredient }}
+        </li>
+      </ul>
+    </div>
+  </div>
+  
+  <div *ngIf="isLoading" class="loading-indicator">
+    <small class="text-muted">Loading ingredients...</small>
+  </div>
+</div>
