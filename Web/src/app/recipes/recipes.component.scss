@@ -28,6 +28,35 @@
   }
 }
 
+.ingredients-table-container {
+  .ingredients-table {
+    margin-bottom: 0;
+    
+    tbody tr {
+      border-bottom: 1px solid #dee2e6;
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      td {
+        padding: 0.5rem;
+        vertical-align: middle;
+        border: none;
+      }
+    }
+  }
+  
+  .row.g-1 {
+    margin-top: 0.5rem;
+    
+    .col-3, .col-4, .col-2 {
+      padding-left: 0.25rem;
+      padding-right: 0.25rem;
+    }
+  }
+}
+
 // Mobile-specific styles (≤400px)
 @media (max-width: 400px) {
   .recipe-card {
@@ -190,6 +219,19 @@
 .form-label {
   color: #495057;
   margin-bottom: 0.25rem;
+  
+  // Add margin-top to all labels except the title label
+  &:not(:first-child) {
+    margin-top: 1rem;
+  }
+}
+
+.form-control, .form-select, .form-control-sm {
+  &:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: #ced4da;
+  }
 }
 
 .input-group {

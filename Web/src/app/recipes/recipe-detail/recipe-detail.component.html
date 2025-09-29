@@ -143,6 +143,7 @@
                             [inputValue]="editedRecipe!.ingredients[i].name"
                             placeholder="Enter ingredient name"
                             [required]="true"
+                            size="sm"
                             (valueChange)="onIngredientNameChange(i, $event)"
                             (addNewIngredient)="onAddNewIngredient($event)">
                           </app-ingredient-autocomplete>

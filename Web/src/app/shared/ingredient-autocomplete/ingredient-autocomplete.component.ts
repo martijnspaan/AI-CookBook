@@ -25,6 +25,7 @@ export class IngredientAutocompleteComponent implements OnInit, OnDestroy, OnCha
   @Input() disabled: boolean = false;
   @Input() required: boolean = false;
   @Input() inputValue: string = '';
+  @Input() size: 'sm' | 'md' | 'lg' = 'md';
   @Output() valueChange = new EventEmitter<string>();
   @Output() addNewIngredient = new EventEmitter<string>();
 

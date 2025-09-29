@@ -28,7 +28,7 @@
     flex: 1;
     padding: 0.5rem;
   }
-  
+
   .recipe-field {
     padding: 0.5rem;
     background-color: #f8f9fa;
@@ -49,6 +49,19 @@
   .form-label {
     color: #495057;
     margin-bottom: 0.25rem;
+    
+    // Add margin-top to all labels except the title label
+    &:not(:first-child) {
+      margin-top: 1rem;
+    }
+  }
+
+  .form-control, .form-select {
+    &:focus {
+      outline: none;
+      box-shadow: none;
+      border-color: #ced4da;
+    }
   }
 
   .input-group {
@@ -200,59 +213,43 @@
     border-radius: 0.5rem;
     overflow: hidden;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-
-  .ingredients-table {
-    margin-bottom: 0;
     
-    tbody {
-      tr {
-        &:hover {
-          background-color: #f8f9fa;
+    .ingredients-table {
+      margin-bottom: 0;
+      
+      tbody tr {
+        border-bottom: 1px solid #dee2e6;
+        
+        &:last-child {
+          border-bottom: none;
         }
         
-        &:not(:last-child) {
-          border-bottom: 1px solid #dee2e6;
+        td {
+          padding: 0.5rem;
+          vertical-align: middle;
+          border: none;
         }
       }
+    }
+    
+    .row.g-1 {
+      margin-top: 0.5rem;
       
-      td {
-        padding: 0.5rem;
-        vertical-align: top;
-        border: none;
-        
-        .form-control {
-          border: 1px solid #ced4da;
-          
-          &:focus {
-            border-color: #86b7fe;
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-          }
-          
-          &.mb-1 {
-            margin-bottom: 0.25rem !important;
-          }
-        }
-        
-        .btn {
-          min-width: 1.75rem;
-          height: 1.75rem;
-          padding: 0.2rem;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 0.75rem;
-        }
-        
-        .row {
-          margin: 0;
-        }
+      .col-3, .col-4, .col-2 {
+        padding-left: 0.25rem;
+        padding-right: 0.25rem;
       }
     }
   }
 
   .form-control-sm {
     font-size: 0.875rem;
+    
+    &:focus {
+      outline: none;
+      box-shadow: none;
+      border-color: #ced4da;
+    }
   }
 
   .small {

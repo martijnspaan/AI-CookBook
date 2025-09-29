@@ -3,6 +3,8 @@
     <input
       type="text"
       class="form-control"
+      [class.form-control-sm]="size === 'sm'"
+      [class.form-control-lg]="size === 'lg'"
       [class.is-invalid]="required && !value"
       [placeholder]="placeholder"
       [value]="value"
@@ -15,7 +17,9 @@
     <button 
       *ngIf="showAddButton && !disabled"
       type="button"
-      class="btn btn-outline-success btn-sm add-ingredient-btn"
+      class="btn btn-outline-success add-ingredient-btn"
+      [class.btn-sm]="size === 'sm'"
+      [class.btn-lg]="size === 'lg'"
       (click)="addNewIngredientToList()"
       title="Add '{{ value }}' to ingredient list">
       <i class="fas fa-plus"></i>
