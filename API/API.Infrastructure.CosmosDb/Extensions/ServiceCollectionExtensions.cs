@@ -63,6 +63,12 @@ public static class ServiceCollectionExtensions
                 options.GroceryListContainerName = groceryListContainerName;
             }
             
+            string? recipeSettingsContainerName = Environment.GetEnvironmentVariable("COSMOSDB_RECIPESETTINGS_CONTAINER_NAME");
+            if (!string.IsNullOrEmpty(recipeSettingsContainerName))
+            {
+                options.RecipeSettingsContainerName = recipeSettingsContainerName;
+            }
+            
             string? partitionKeyPath = Environment.GetEnvironmentVariable("COSMOSDB_PARTITION_KEY_PATH");
             if (!string.IsNullOrEmpty(partitionKeyPath))
             {

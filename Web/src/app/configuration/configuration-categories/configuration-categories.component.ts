@@ -1,5 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ConfigurationTabComponent, ConfigurationItem } from '../shared/configuration-tab.component';
+import { RecipeSettingsService, RecipeSettings, UpdateRecipeSettingsRequest } from '../../services/recipe-settings.service';
 
 @Component({
   selector: 'app-configuration-categories',
@@ -8,36 +11,92 @@ import { ConfigurationTabComponent, ConfigurationItem } from '../shared/configur
   templateUrl: './configuration-categories.component.html',
   styleUrl: './configuration-categories.component.scss'
 })
-export class ConfigurationCategoriesComponent implements OnInit {
-  categories: ConfigurationItem[] = [
-    { id: '1', value: 'Vegetables' },
-    { id: '2', value: 'Meat' },
-    { id: '3', value: 'Dairy' },
-    { id: '4', value: 'Seasoning' },
-    { id: '5', value: 'Grains' },
-    { id: '6', value: 'Fruits' },
-    { id: '7', value: 'Seafood' },
-    { id: '8', value: 'Nuts' }
-  ];
+export class ConfigurationCategoriesComponent implements OnInit, OnDestroy {
+  categories: ConfigurationItem[] = [];
+  isLoading = false;
+  errorMessage: string | null = null;
+  private readonly destroySubject = new Subject<void>();
 
-  private nextId = 9;
+  constructor(private readonly recipeSettingsService: RecipeSettingsService) {}
 
   ngOnInit(): void {
-    // Initialize with sample data or load from service later
+    this.loadRecipeSettings();
+  }
+
+  ngOnDestroy(): void {
+    this.destroySubject.next();
+    this.destroySubject.complete();
+  }
+
+  private loadRecipeSettings(): void {
+    this.isLoading = true;
+    this.errorMessage = null;
+
+    this.recipeSettingsService.getRecipeSettings()
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe({
+        next: (settings) => {
+          if (settings) {
+            this.categories = settings.categories.map((category, index) => ({
+              id: (index + 1).toString(),
+              value: category
+            }));
+          }
+          this.isLoading = false;
+        },
+        error: (error) => {
+          this.errorMessage = 'Failed to load recipe settings';
+          this.isLoading = false;
+          console.error('Error loading recipe settings:', error);
+        }
+      });
   }
 
   onCategoryAdded(value: string): void {
     const newCategory: ConfigurationItem = {
-      id: this.nextId.toString(),
+      id: (this.categories.length + 1).toString(),
       value: value.trim()
     };
     this.categories.push(newCategory);
-    this.nextId++;
-    console.log('Category added:', newCategory);
+    this.updateRecipeSettings();
   }
 
   onCategoryDeleted(id: string): void {
     this.categories = this.categories.filter(category => category.id !== id);
-    console.log('Category deleted:', id);
+    this.updateRecipeSettings();
+  }
+
+  private updateRecipeSettings(): void {
+    const categories = this.categories.map(category => category.value);
+    
+    // Get current settings and update only categories
+    this.recipeSettingsService.getRecipeSettings()
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe({
+        next: (currentSettings) => {
+          const updateRequest: UpdateRecipeSettingsRequest = {
+            tags: currentSettings?.tags || [],
+            ingredients: currentSettings?.ingredients || [],
+            units: currentSettings?.units || [],
+            categories: categories
+          };
+
+          this.recipeSettingsService.updateRecipeSettings(updateRequest)
+            .pipe(takeUntil(this.destroySubject))
+            .subscribe({
+              next: () => {
+                console.log('Recipe settings updated successfully');
+              },
+              error: (error) => {
+                console.error('Error updating recipe settings:', error);
+                // Revert the local changes
+                this.loadRecipeSettings();
+              }
+            });
+        },
+        error: (error) => {
+          console.error('Error getting current recipe settings:', error);
+        }
+      });
   }
 }

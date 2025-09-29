@@ -20,13 +20,15 @@ import { ConfigurationCategoriesComponent } from './configuration-categories/con
   styleUrl: './configuration.component.scss'
 })
 export class ConfigurationComponent implements OnInit {
-  expandedSection: 'tags' | 'ingredients' | 'units' | 'categories' | null = 'tags';
+  expandedSection: 'tags' | 'ingredients' | 'units' | 'categories' | null = null;
   sections: ('tags' | 'ingredients' | 'units' | 'categories')[] = ['tags', 'ingredients', 'units', 'categories'];
 
   constructor(private readonly pageTitleService: PageTitleService) {}
 
   ngOnInit(): void {
     this.pageTitleService.setPageTitle('Recipe Settings');
+    // Ensure all sections are collapsed when component initializes
+    this.expandedSection = null;
   }
 
   toggleSection(section: 'tags' | 'ingredients' | 'units' | 'categories'): void {

@@ -75,6 +75,20 @@ public class Startup(IConfiguration configuration)
             return new CosmosDbRepository<GroceryListEntity>(cosmosDbClientService, logger, containerName);
         });
 
+        // Register RecipeSettings repository
+        services.AddScoped<ICosmosDbRepository<RecipeSettingsEntity>>(provider =>
+        {
+            ICosmosDbClientService cosmosDbClientService = provider.GetRequiredService<ICosmosDbClientService>();
+            ILogger<CosmosDbRepository<RecipeSettingsEntity>> logger = provider.GetRequiredService<ILogger<CosmosDbRepository<RecipeSettingsEntity>>>();
+            IConfiguration configuration = provider.GetRequiredService<IConfiguration>();
+            
+            string containerName = configuration.GetSection("CosmosDb:RecipeSettingsContainerName").Value ?? 
+                               Environment.GetEnvironmentVariable("COSMOSDB_RECIPESETTINGS_CONTAINER_NAME") ?? 
+                               "RecipeSettings";
+            
+            return new CosmosDbRepository<RecipeSettingsEntity>(cosmosDbClientService, logger, containerName);
+        });
+
         // Register use cases
         services.AddScoped<GetAllRecipesUseCase>();
         services.AddScoped<CreateRecipeUseCase>();
@@ -90,6 +104,8 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<UpdateGroceryListUseCase>();
         services.AddScoped<GetAllGroceryListsUseCase>();
         services.AddScoped<DeleteGroceryListUseCase>();
+        services.AddScoped<GetRecipeSettingsUseCase>();
+        services.AddScoped<UpdateRecipeSettingsUseCase>();
 
         // Configure Swagger
         services.AddSwaggerGen(c =>
@@ -197,6 +213,9 @@ public class Startup(IConfiguration configuration)
             
             // Map grocery list endpoints
             endpoints.MapGroceryListEndpoints();
+            
+            // Map recipe settings endpoints
+            endpoints.MapRecipeSettingsEndpoints();
         });
     }
 }

@@ -36,6 +36,11 @@ public class CosmosDbConfiguration
     public string GroceryListContainerName { get; set; } = "GroceryLists";
 
     /// <summary>
+    /// The name of the RecipeSettings container
+    /// </summary>
+    public string RecipeSettingsContainerName { get; set; } = "RecipeSettings";
+
+    /// <summary>
     /// The partition key path for the container
     /// </summary>
     public string PartitionKeyPath { get; set; } = "/id";
