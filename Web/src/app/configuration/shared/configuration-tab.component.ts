@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 
 export interface ConfigurationItem {
   id: string;
@@ -10,7 +11,7 @@ export interface ConfigurationItem {
 @Component({
   selector: 'app-configuration-tab',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, DragDropModule],
   templateUrl: './configuration-tab.component.html',
   styleUrl: './configuration-tab.component.scss'
 })
@@ -19,9 +20,11 @@ export class ConfigurationTabComponent {
   @Input() title: string = '';
   @Input() placeholder: string = 'Enter new item';
   @Input() emptyMessage: string = 'No items available. Add your first item below.';
+  @Input() enableDragDrop: boolean = false;
   
   @Output() itemAdded = new EventEmitter<string>();
   @Output() itemDeleted = new EventEmitter<string>();
+  @Output() itemsReordered = new EventEmitter<ConfigurationItem[]>();
 
   itemForm: FormGroup;
 
@@ -31,8 +34,8 @@ export class ConfigurationTabComponent {
     });
   }
 
-  get sortedItems(): ConfigurationItem[] {
-    return [...this.items].sort((a, b) => a.value.localeCompare(b.value));
+  get displayItems(): ConfigurationItem[] {
+    return this.enableDragDrop ? this.items : [...this.items].sort((a, b) => a.value.localeCompare(b.value));
   }
 
   onSubmit(): void {
@@ -55,5 +58,12 @@ export class ConfigurationTabComponent {
 
   getButtonIcon(): string {
     return 'fas fa-plus';
+  }
+
+  onDragDropped(event: CdkDragDrop<ConfigurationItem[]>): void {
+    if (event.previousIndex !== event.currentIndex) {
+      moveItemInArray(this.items, event.previousIndex, event.currentIndex);
+      this.itemsReordered.emit([...this.items]);
+    }
   }
 }

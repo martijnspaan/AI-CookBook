@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { TranslateModule } from '@ngx-translate/core';
 import { ConfigurationTabComponent, ConfigurationItem } from '../shared/configuration-tab.component';
 import { RecipeSettingsService } from '../../services/recipe-settings.service';
 import { RecipeSettings, UpdateRecipeSettingsRequest } from '../../models/recipe-settings.model';
@@ -8,7 +9,7 @@ import { RecipeSettings, UpdateRecipeSettingsRequest } from '../../models/recipe
 @Component({
   selector: 'app-configuration-categories',
   standalone: true,
-  imports: [ConfigurationTabComponent],
+  imports: [ConfigurationTabComponent, TranslateModule],
   templateUrl: './configuration-categories.component.html',
   styleUrl: './configuration-categories.component.scss'
 })
@@ -64,6 +65,11 @@ export class ConfigurationCategoriesComponent implements OnInit, OnDestroy {
 
   onCategoryDeleted(id: string): void {
     this.categories = this.categories.filter(category => category.id !== id);
+    this.updateRecipeSettings();
+  }
+
+  onCategoriesReordered(reorderedCategories: ConfigurationItem[]): void {
+    this.categories = reorderedCategories;
     this.updateRecipeSettings();
   }
 

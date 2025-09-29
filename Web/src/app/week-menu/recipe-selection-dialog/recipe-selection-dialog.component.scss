@@ -324,7 +324,7 @@
 // Recipe cards now use the standard shared component styling
 
 // Mobile responsive design
-@media (max-width: 400px) {
+@media (max-width: 450px) {
   .dialog-backdrop {
     padding: 0.5rem;
   }
@@ -426,7 +426,7 @@
 }
 
 // Tablet responsive design
-@media (min-width: 401px) and (max-width: 768px) {
+@media (min-width: 451px) and (max-width: 768px) {
   .dialog-content {
     max-width: 85vw;
     height: 95vh;

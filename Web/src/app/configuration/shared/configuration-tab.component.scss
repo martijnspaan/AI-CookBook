@@ -106,7 +106,7 @@
     
     p {
       margin-bottom: 0;
-      max-width: 400px;
+      max-width: 450px;
     }
   }
   
@@ -154,6 +154,155 @@
             background-color: transparent;
             border-color: #dc3545;
             color: #dc3545;
+          }
+        }
+      }
+    }
+    
+    .drag-drop-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.05rem;
+      
+      .draggable-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.25rem 0.5rem;
+        background-color: transparent;
+        border: 1px solid transparent;
+        border-radius: 0.25rem;
+        transition: all 0.2s ease;
+        cursor: move;
+        
+        &:hover {
+          background-color: #e9ecef;
+          border-color: #dee2e6;
+        }
+        
+        &.cdk-drag-preview {
+          box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
+                      0 8px 10px 1px rgba(0, 0, 0, 0.14),
+                      0 3px 14px 2px rgba(0, 0, 0, 0.12);
+          background-color: #ffffff;
+          border: 1px solid #007bff;
+          padding: 0.25rem 0.5rem;
+          min-width: 250px;
+          max-width: 450px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          
+          .drag-handle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.25rem;
+            height: 1.25rem;
+            color: #6c757d;
+            margin-right: 0.5rem;
+            flex-shrink: 0;
+            
+            i {
+              font-size: 0.75rem;
+            }
+          }
+          
+          .item-content {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            margin-right: 0.5rem;
+          }
+          
+          .item-value {
+            font-weight: 500;
+            color: #495057;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+          }
+          
+          .btn {
+            min-width: 1.5rem;
+            height: 1.5rem;
+            padding: 0.125rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+            
+            &.btn-outline-danger {
+              border-color: #dc3545;
+              color: #dc3545;
+            }
+          }
+        }
+        
+        &.cdk-drag-placeholder {
+          opacity: 0.4;
+          background-color: #e3f2fd;
+          border: 2px dashed #2196f3;
+        }
+        
+        &.cdk-drag-animating {
+          transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+        }
+        
+        .drag-handle {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 1.25rem;
+          height: 1.25rem;
+          color: #6c757d;
+          cursor: grab;
+          margin-right: 0.5rem;
+          flex-shrink: 0;
+          
+          &:active {
+            cursor: grabbing;
+          }
+          
+          i {
+            font-size: 0.75rem;
+          }
+        }
+        
+        .item-content {
+          flex: 1;
+          display: flex;
+          align-items: center;
+        }
+        
+        .item-value {
+          font-weight: 500;
+          color: #495057;
+          font-size: 0.9rem;
+        }
+        
+        .btn {
+          min-width: 1.5rem;
+          height: 1.5rem;
+          padding: 0.125rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.75rem;
+          
+          &.btn-outline-danger {
+            border-color: #dc3545;
+            color: #dc3545;
+            
+            &:hover {
+              background-color: transparent;
+              border-color: #dc3545;
+              color: #dc3545;
+            }
           }
         }
       }

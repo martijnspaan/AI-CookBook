@@ -19,7 +19,7 @@
 
       <!-- Recipes Display -->
       <div *ngIf="!isLoadingRecipes && !errorMessage && recipes.length > 0">
-        <!-- Mobile Card Layout (≤400px) -->
+        <!-- Mobile Card Layout (≤450px) -->
         <div class="d-block d-md-none">
           <app-recipe-card
             *ngFor="let recipe of recipes"
@@ -30,7 +30,7 @@
           </app-recipe-card>
         </div>
 
-        <!-- Tablet and Desktop Table Layout (>400px) -->
+        <!-- Tablet and Desktop Table Layout (>450px) -->
         <div class="d-none d-md-block table-responsive">
           <table class="table table-striped table-hover">
             <thead class="table-dark">

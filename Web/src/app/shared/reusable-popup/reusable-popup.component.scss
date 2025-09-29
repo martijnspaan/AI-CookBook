@@ -42,7 +42,7 @@
 
 // Size variants
 .popup-sm {
-  max-width: 400px;
+  max-width: 450px;
 }
 
 .popup-md {
@@ -153,7 +153,7 @@
 }
 
 // Mobile responsive design
-@media (max-width: 400px) {
+@media (max-width: 450px) {
   .popup-backdrop {
     padding: 0.5rem;
   }
@@ -193,7 +193,7 @@
 }
 
 // Tablet responsive design
-@media (min-width: 401px) and (max-width: 768px) {
+@media (min-width: 451px) and (max-width: 768px) {
   .popup-content {
     max-width: 85vw;
   }

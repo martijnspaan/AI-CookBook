@@ -178,11 +178,63 @@
         overflow: hidden;
 
         &.flag-en {
-          background: linear-gradient(to bottom, #012169 0%, #012169 33%, #ffffff 33%, #ffffff 66%, #C8102E 66%, #C8102E 100%);
+          // USA flag - blue canton with white stars and red/white stripes
+          background: #B22234;
+          position: relative;
+          
+          &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 40%;
+            height: 54%;
+            background: #3C3B6E;
+            // Simplified stars as white dots
+            background-image: 
+              radial-gradient(circle at 20% 20%, #ffffff 1px, transparent 1px),
+              radial-gradient(circle at 40% 20%, #ffffff 1px, transparent 1px),
+              radial-gradient(circle at 60% 20%, #ffffff 1px, transparent 1px),
+              radial-gradient(circle at 80% 20%, #ffffff 1px, transparent 1px),
+              radial-gradient(circle at 30% 40%, #ffffff 1px, transparent 1px),
+              radial-gradient(circle at 50% 40%, #ffffff 1px, transparent 1px),
+              radial-gradient(circle at 70% 40%, #ffffff 1px, transparent 1px),
+              radial-gradient(circle at 20% 60%, #ffffff 1px, transparent 1px),
+              radial-gradient(circle at 40% 60%, #ffffff 1px, transparent 1px),
+              radial-gradient(circle at 60% 60%, #ffffff 1px, transparent 1px),
+              radial-gradient(circle at 80% 60%, #ffffff 1px, transparent 1px);
+            background-size: 20% 20%;
+          }
+          
+          &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+              // Red and white stripes
+              linear-gradient(to bottom, 
+                #B22234 0%, #B22234 7.7%,
+                #ffffff 7.7%, #ffffff 15.4%,
+                #B22234 15.4%, #B22234 23.1%,
+                #ffffff 23.1%, #ffffff 30.8%,
+                #B22234 30.8%, #B22234 38.5%,
+                #ffffff 38.5%, #ffffff 46.2%,
+                #B22234 46.2%, #B22234 53.9%,
+                #ffffff 53.9%, #ffffff 61.6%,
+                #B22234 61.6%, #B22234 69.3%,
+                #ffffff 69.3%, #ffffff 77%,
+                #B22234 77%, #B22234 84.7%,
+                #ffffff 84.7%, #ffffff 92.4%,
+                #B22234 92.4%, #B22234 100%);
+          }
         }
 
         &.flag-nl {
-          background: linear-gradient(to right, #AE1C28 0%, #AE1C28 33%, #ffffff 33%, #ffffff 66%, #21468B 66%, #21468B 100%);
+          // Netherlands flag - horizontal tricolor (red, white, blue)
+          background: linear-gradient(to bottom, #AE1C28 0%, #AE1C28 33.33%, #ffffff 33.33%, #ffffff 66.66%, #21468B 66.66%, #21468B 100%);
         }
       }
 
@@ -241,7 +293,7 @@
 }
 
 // Mobile responsive adjustments
-@media (max-width: 400px) {
+@media (max-width: 450px) {
   .menu-items {
     width: 100%;
     left: -100%;
@@ -251,7 +303,7 @@
 }
 
 // Tablet adjustments
-@media (min-width: 401px) and (max-width: 768px) {
+@media (min-width: 451px) and (max-width: 768px) {
   .menu-items {
     width: 280px;
   }

@@ -106,7 +106,6 @@
     "NO_TAGS": "Geen tags",
     "NO_INGREDIENTS": "Geen ingrediënten",
     "NO_RECIPE_STEPS": "Geen receptstappen",
-    "DELETE_RECIPE": "Recept Verwijderen",
     "OTHER": "Overig"
   },
   "WEEK_MENU": {
@@ -150,7 +149,10 @@
     "RECIPE_TAGS": "Recept Tags",
     "INGREDIENTS": "Ingrediënten",
     "MEASUREMENT_UNITS": "Meetbare Eenheden",
-    "INGREDIENT_CATEGORIES": "Ingrediënt Categorieën"
+    "INGREDIENT_CATEGORIES": "Ingrediënt Categorieën",
+    "CATEGORIES": "Categorieën",
+    "CATEGORIES_PLACEHOLDER": "bijv. Groenten, Vlees, Zuivel, Kruiden",
+    "CATEGORIES_EMPTY_MESSAGE": "Geen ingrediëntcategorieën beschikbaar. Voeg categorieën toe om je ingrediënten te organiseren."
   },
   "SHOWCASE": {
     "DESIGN_TOKENS": "Design Tokens",

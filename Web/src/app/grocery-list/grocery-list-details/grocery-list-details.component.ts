@@ -5,9 +5,11 @@ import { TranslateService } from '@ngx-translate/core';
 import { PageTitleService } from '../../services/page-title.service';
 import { GroceryListService } from '../../services/grocery-list.service';
 import { RecipeService } from '../../services/recipe.service';
+import { RecipeSettingsService } from '../../services/recipe-settings.service';
 import { FooterService } from '../../services/footer.service';
 import { GroceryList, Meal, IngredientState } from '../../models/grocery-list.model';
 import { Recipe, Ingredient } from '../../models/recipe.model';
+import { RecipeSettings } from '../../models/recipe-settings.model';
 import { forkJoin, of, Subject } from 'rxjs';
 import { catchError, map, takeUntil } from 'rxjs/operators';
 
@@ -54,6 +56,7 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
   ingredientTypeGroups: IngredientTypeGroup[] = [];
   isLoading: boolean = true;
   errorMessage: string | null = null;
+  recipeSettings: RecipeSettings | null = null;
   
   // Ingredient state management
   private ingredientStates = new Map<string, IngredientStateType>();
@@ -65,6 +68,7 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
     private pageTitleService: PageTitleService,
     private groceryListService: GroceryListService,
     private recipeService: RecipeService,
+    private recipeSettingsService: RecipeSettingsService,
     private footerService: FooterService,
     private translateService: TranslateService
   ) {}
@@ -74,7 +78,7 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
     
     const groceryListId = this.route.snapshot.paramMap.get('id');
     if (groceryListId) {
-      this.loadGroceryListDetails(groceryListId);
+      this.loadRecipeSettingsAndGroceryList(groceryListId);
     } else {
       this.errorMessage = 'Grocery list ID not provided';
       this.isLoading = false;
@@ -127,10 +131,27 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  private loadGroceryListDetails(groceryListId: string): void {
+  private loadRecipeSettingsAndGroceryList(groceryListId: string): void {
     this.isLoading = true;
     this.errorMessage = null;
 
+    // Load recipe settings first, then grocery list
+    this.recipeSettingsService.getRecipeSettings()
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe({
+        next: (settings) => {
+          this.recipeSettings = settings;
+          this.loadGroceryListDetails(groceryListId);
+        },
+        error: (error) => {
+          console.error('Error loading recipe settings:', error);
+          // Continue without custom ordering if settings fail to load
+          this.loadGroceryListDetails(groceryListId);
+        }
+      });
+  }
+
+  private loadGroceryListDetails(groceryListId: string): void {
     this.groceryListService.getGroceryListById(groceryListId).subscribe({
       next: (groceryList) => {
         this.loadGroceryListWithRecipes(groceryList);
@@ -429,13 +450,37 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
       typeGroups.get(type)!.push(ingredient);
     });
     
-    // Convert to array and sort by type name
-    this.ingredientTypeGroups = Array.from(typeGroups.entries())
+    // Convert to array and sort ingredients within each type
+    const typeGroupArray = Array.from(typeGroups.entries())
       .map(([type, ingredients]) => ({
         type: this.capitalizeFirstLetter(type),
         ingredients: ingredients.sort((a, b) => a.name.localeCompare(b.name))
-      }))
-      .sort((a, b) => a.type.localeCompare(b.type));
+      }));
+    
+    // Sort by custom category order if available, otherwise alphabetically
+    if (this.recipeSettings?.categories && this.recipeSettings.categories.length > 0) {
+      this.ingredientTypeGroups = typeGroupArray.sort((a, b) => {
+        const aIndex = this.recipeSettings!.categories.findIndex(cat => 
+          cat.toLowerCase() === a.type.toLowerCase()
+        );
+        const bIndex = this.recipeSettings!.categories.findIndex(cat => 
+          cat.toLowerCase() === b.type.toLowerCase()
+        );
+        
+        // If both types are in the custom order, sort by their position
+        if (aIndex !== -1 && bIndex !== -1) {
+          return aIndex - bIndex;
+        }
+        // If only one is in the custom order, prioritize it
+        if (aIndex !== -1) return -1;
+        if (bIndex !== -1) return 1;
+        // If neither is in the custom order, sort alphabetically
+        return a.type.localeCompare(b.type);
+      });
+    } else {
+      // Fallback to alphabetical sorting
+      this.ingredientTypeGroups = typeGroupArray.sort((a, b) => a.type.localeCompare(b.type));
+    }
   }
 
   private capitalizeFirstLetter(string: string): string {
@@ -489,12 +534,36 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
       typeGroups.get(type)!.push(ingredient);
     });
     
-    // Convert to array and sort by type name
-    return Array.from(typeGroups.entries())
+    // Convert to array and sort ingredients within each type
+    const typeGroupArray = Array.from(typeGroups.entries())
       .map(([type, ingredients]) => ({
         type: this.capitalizeFirstLetter(type),
         ingredients: ingredients.sort((a, b) => a.name.localeCompare(b.name))
-      }))
-      .sort((a, b) => a.type.localeCompare(b.type));
+      }));
+    
+    // Sort by custom category order if available, otherwise alphabetically
+    if (this.recipeSettings?.categories && this.recipeSettings.categories.length > 0) {
+      return typeGroupArray.sort((a, b) => {
+        const aIndex = this.recipeSettings!.categories.findIndex(cat => 
+          cat.toLowerCase() === a.type.toLowerCase()
+        );
+        const bIndex = this.recipeSettings!.categories.findIndex(cat => 
+          cat.toLowerCase() === b.type.toLowerCase()
+        );
+        
+        // If both types are in the custom order, sort by their position
+        if (aIndex !== -1 && bIndex !== -1) {
+          return aIndex - bIndex;
+        }
+        // If only one is in the custom order, prioritize it
+        if (aIndex !== -1) return -1;
+        if (bIndex !== -1) return 1;
+        // If neither is in the custom order, sort alphabetically
+        return a.type.localeCompare(b.type);
+      });
+    } else {
+      // Fallback to alphabetical sorting
+      return typeGroupArray.sort((a, b) => a.type.localeCompare(b.type));
+    }
   }
 }

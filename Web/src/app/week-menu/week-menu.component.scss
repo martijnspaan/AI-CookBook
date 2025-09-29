@@ -16,7 +16,7 @@
   position: relative;
   padding: 0;
   
-  @media (max-width: 400px) {
+  @media (max-width: 450px) {
     padding: 0;
   }
 }
@@ -29,7 +29,7 @@ h1 {
   color: #2c3e50;
   text-align: center;
   
-  @media (max-width: 400px) {
+  @media (max-width: 450px) {
     margin-bottom: 0.75rem !important;
     font-size: 1.75rem;
   }
@@ -59,7 +59,7 @@ h1 {
     animation: spin 1s linear infinite;
   }
   
-  @media (max-width: 400px) {
+  @media (max-width: 450px) {
     top: 1rem;
     right: 1rem;
     padding: 10px 16px;
@@ -87,7 +87,7 @@ h1 {
     animation: spin 1s linear infinite;
   }
   
-  @media (max-width: 400px) {
+  @media (max-width: 450px) {
     .spinner {
       width: 32px;
       height: 32px;

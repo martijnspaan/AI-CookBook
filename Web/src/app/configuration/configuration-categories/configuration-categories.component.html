@@ -1,8 +1,10 @@
 <app-configuration-tab
   [items]="categories"
-  title="Categories"
-  placeholder="e.g., Vegetables, Meat, Dairy, Seasoning"
-  emptyMessage="No ingredient categories available. Add categories to organize your ingredients."
+  [enableDragDrop]="true"
+  [title]="'CONFIGURATION.CATEGORIES' | translate"
+  [placeholder]="'CONFIGURATION.CATEGORIES_PLACEHOLDER' | translate"
+  [emptyMessage]="'CONFIGURATION.CATEGORIES_EMPTY_MESSAGE' | translate"
   (itemAdded)="onCategoryAdded($event)"
-  (itemDeleted)="onCategoryDeleted($event)">
+  (itemDeleted)="onCategoryDeleted($event)"
+  (itemsReordered)="onCategoriesReordered($event)">
 </app-configuration-tab>

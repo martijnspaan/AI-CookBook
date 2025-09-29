@@ -21,7 +21,7 @@
 
       <!-- Cookbooks Display -->
       <div *ngIf="!isLoadingCookbooks && !errorMessage && cookbooks.length > 0">
-        <!-- Mobile Card Layout (≤400px) -->
+        <!-- Mobile Card Layout (≤450px) -->
         <div class="mobile-layout">
           <div *ngFor="let cookbook of cookbooks" class="cookbook-card mb-3">
             <div class="card">
@@ -60,7 +60,7 @@
           </div>
         </div>
 
-        <!-- Tablet and Desktop Table Layout (>400px) -->
+        <!-- Tablet and Desktop Table Layout (>450px) -->
         <div class="tablet-desktop-layout table-responsive">
           <table class="table table-striped">
             <thead class="table-dark">

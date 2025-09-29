@@ -45,5 +45,8 @@ export const fontAwesomeIcons = [
   'fas fa-shopping-cart',
   'fas fa-laptop',
   'fas fa-home',
-  'fas fa-user'
+  'fas fa-user',
+  
+  // Drag and drop
+  'fas fa-grip-vertical'
 ];

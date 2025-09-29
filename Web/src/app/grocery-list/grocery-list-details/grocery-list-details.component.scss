@@ -3,7 +3,7 @@
   background-color: white;
   padding: 0.5rem 0.25rem;
 
-  @media (max-width: 400px) {
+  @media (max-width: 450px) {
     padding: 0.25rem 0.125rem;
   }
 }
@@ -443,7 +443,7 @@
   }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 450px) {
   .grocery-list-details-content {
     padding: 0;
   }

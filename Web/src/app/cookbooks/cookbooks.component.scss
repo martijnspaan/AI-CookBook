@@ -87,11 +87,11 @@
   }
 }
 
-// Mobile Card Layout (≤400px)
+// Mobile Card Layout (≤450px)
 .mobile-layout {
   display: block;
   
-  @media (min-width: 401px) {
+  @media (min-width: 451px) {
     display: none;
   }
 }
@@ -100,12 +100,12 @@
 .tablet-desktop-layout {
   display: none;
   
-  @media (min-width: 401px) {
+  @media (min-width: 451px) {
     display: block;
   }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 450px) {
   .cookbook-card {
     margin-bottom: var(--spacing-4);
     
@@ -264,7 +264,7 @@
       box-shadow: none !important;
     }
     
-    @media (max-width: 400px) {
+    @media (max-width: 450px) {
       min-width: 28px;
       height: 28px;
       font-size: 0.75rem;

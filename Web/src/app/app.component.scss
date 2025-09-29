@@ -23,7 +23,7 @@
   padding-top: 0.25rem !important;
   padding-bottom: 0.25rem !important;
   
-  @media (max-width: 400px) {
+  @media (max-width: 450px) {
     font-size: 1rem;
     margin-top: 0.125rem !important;
     margin-bottom: 0.125rem !important;
@@ -36,7 +36,7 @@
 .navbar h1.navbar-brand.mb-0 {
   margin-bottom: 0.25rem !important;
   
-  @media (max-width: 400px) {
+  @media (max-width: 450px) {
     margin-bottom: 0.125rem !important;
   }
 }
@@ -47,7 +47,7 @@
   border-bottom: 2px solid var(--color-primary-600);
   box-shadow: var(--shadow-md);
   
-  @media (max-width: 400px) {
+  @media (max-width: 450px) {
     min-height: 48px;
     padding: 0.5rem 1rem;
   }
@@ -60,7 +60,7 @@
   overflow-x: hidden;
   height: calc(100vh - 56px); // Full height minus header
   
-  @media (max-width: 400px) {
+  @media (max-width: 450px) {
     margin-top: 48px; // Height of fixed header on mobile
     height: calc(100vh - 48px); // Full height minus header on mobile
   }
@@ -71,7 +71,7 @@
   margin-bottom: 80px; // Height of fixed footer
   height: calc(100vh - 56px - 80px); // Full height minus header and footer
   
-  @media (max-width: 400px) {
+  @media (max-width: 450px) {
     margin-bottom: 70px; // Height of fixed footer on mobile
     height: calc(100vh - 48px - 70px); // Full height minus header and footer on mobile
   }
@@ -84,7 +84,7 @@
   display: flex;
   flex-direction: column;
   
-  @media (max-width: 400px) {
+  @media (max-width: 450px) {
     padding: 1rem;
   }
   

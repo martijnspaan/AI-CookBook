@@ -57,14 +57,14 @@ The frontend is built as a modern Angular web application with a mobile-first re
 ### Breakpoint Strategy
 - **Mobile First**: Design mobile-first with progressive enhancement for larger screens
 - **Breakpoint Definitions**:
-  - **Mobile**: Maximum width of 400px
-  - **Tablet**: 401px and above
+  - **Mobile**: Maximum width of 450px
+  - **Tablet**: 451px and above
   - **Desktop**: 1024px and above
 
 ### Layout Constraints
 - **Mobile Restrictions**: 
   - No horizontal scrollbars allowed
-  - All functionality must be accessible within 400px width
+  - All functionality must be accessible within 450px width
   - Vertical scrolling preferred over horizontal scrolling
 - **Tablet Flexibility**:
   - Horizontal scrollbars permitted when necessary
