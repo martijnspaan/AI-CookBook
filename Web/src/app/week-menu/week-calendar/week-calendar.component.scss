@@ -58,10 +58,9 @@
 
 .day-card {
   background: white;
-  border: 1px solid #e9ecef;
+  border: 2px solid #a8a29e;
   border-radius: 8px;
   padding: 1rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   min-height: 140px;
   width: 100%;
   display: flex;
@@ -70,36 +69,28 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   position: relative;
   overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
+  outline: none;
   
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-    border-color: rgba(102, 126, 234, 0.3);
-    
-    &::before {
-      opacity: 1;
-    }
+    transform: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-color: #a8a29e;
+  }
+  
+  &:focus {
+    outline: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transform: none;
+  }
+  
+  &:active {
+    transform: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
   
   &.weekend {
-    background: #d4edda;
-    border-color: #c3e6cb;
-    
-    &::before {
-      background: #28a745;
-    }
+    background: #f1f8e9;
+    border-color: #4caf50;
   }
   
   &.today {
@@ -107,23 +98,13 @@
     border-color: #ffc107;
     font-weight: 600;
     box-shadow: 0 4px 15px rgba(255, 193, 7, 0.15);
-    
-    &::before {
-      background: #ffc107;
-      opacity: 1;
-    }
   }
   
   &.weekend.today {
-    background: #d4edda;
-    border-color: #28a745;
+    background: #f1f8e9;
+    border-color: #4caf50;
     font-weight: 600;
-    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.15);
-    
-    &::before {
-      background: #28a745;
-      opacity: 1;
-    }
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
   }
   
   @media (max-width: 400px) {
@@ -143,6 +124,7 @@
   padding-bottom: 0.5rem;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   margin-bottom: 0.5rem;
+  padding-left: 0.5rem;
   
   .day-name {
     font-size: 0.75rem;
@@ -205,28 +187,11 @@
     border-radius: 8px;
     border: 1px solid #e9ecef;
     min-height: 70px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
     
-    &::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-    
     &.weekend-meal {
-      background: #e8f5e8;
-      
-      &::before {
-        background: #28a745;
-      }
+      background: #f8f9fa;
     }
     
     &.selected {
@@ -235,37 +200,35 @@
       border-width: 1px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
       transform: none;
-      
-      &::before {
-        opacity: 0;
-      }
     }
     
     &.selected.weekend-meal {
-      background: #e8f5e8;
-      border-color: #c3e6cb;
+      background: #ffffff;
+      border-color: #e9ecef;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-      
-      &::before {
-        background: #28a745;
-        opacity: 0;
-      }
     }
     
     &:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-      border-color: #dee2e6;
-      
-      &::before {
-        opacity: 0.5;
-      }
+      transform: none;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      border-color: #e9ecef;
+    }
+    
+    &:focus {
+      outline: none;
+      transform: none;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    &:active {
+      transform: none;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
     
     .meal-label {
       font-size: 0.65rem;
       font-weight: 600;
-      color: #6c757d;
+      color: var(--color-primary-500);
       text-transform: uppercase;
       letter-spacing: 0.5px;
       margin-bottom: 0.25rem;

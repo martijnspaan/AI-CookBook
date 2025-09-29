@@ -57,7 +57,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.pageTitleService.setPageTitle('Create Week Menu');
+    this.pageTitleService.setPageTitle('Week Menu');
   }
 
   onWeekChanged(week: Date) {
