@@ -1,42 +1,40 @@
 <div class="configuration-container">
   <div class="configuration-content">
     
-
-    <!-- Accordion Sections -->
+    <!-- Custom Accordion with Design System Styling -->
     <div class="accordion-container">
       <div 
-        *ngFor="let section of sections" 
+        *ngFor="let section of accordionSections" 
         class="accordion-section"
-        [class.expanded]="isExpanded(section)">
+        [class.expanded]="isExpanded(section.id)">
         
         <!-- Section Header -->
         <div 
           class="section-header"
-          (click)="toggleSection(section)"
-          [attr.aria-expanded]="isExpanded(section)"
+          (click)="toggleSection(section.id)"
+          [attr.aria-expanded]="isExpanded(section.id)"
           role="button"
           tabindex="0"
-          (keydown.enter)="toggleSection(section)"
-          (keydown.space)="toggleSection(section); $event.preventDefault()">
+          (keydown.enter)="toggleSection(section.id)"
+          (keydown.space)="toggleSection(section.id); $event.preventDefault()">
           
-          <div class="section-icon">
-            <i [class]="getSectionIcon(section)"></i>
-          </div>
-          
-          <h3 class="section-title">{{ getSectionTitle(section) }}</h3>
+          <h3 class="section-title">
+            <i [class]="section.icon" class="title-icon"></i>
+            {{ section.title }}
+          </h3>
           
           <div class="section-toggle">
-            <i class="fas fa-chevron-down" [class.rotated]="isExpanded(section)"></i>
+            <i class="fas fa-chevron-down" [class.rotated]="isExpanded(section.id)"></i>
           </div>
         </div>
 
-        <!-- Section Content -->
-        <div class="section-content" [class.show]="isExpanded(section)">
+        <!-- Section Content with Angular Components -->
+        <div class="section-content" [class.show]="isExpanded(section.id)">
           <div class="section-content-inner">
-            <app-configuration-tags *ngIf="section === 'tags'"></app-configuration-tags>
-            <app-configuration-ingredients *ngIf="section === 'ingredients'"></app-configuration-ingredients>
-            <app-configuration-units *ngIf="section === 'units'"></app-configuration-units>
-            <app-configuration-categories *ngIf="section === 'categories'"></app-configuration-categories>
+            <app-configuration-tags *ngIf="section.id === 'tags'"></app-configuration-tags>
+            <app-configuration-ingredients *ngIf="section.id === 'ingredients'"></app-configuration-ingredients>
+            <app-configuration-units *ngIf="section.id === 'units'"></app-configuration-units>
+            <app-configuration-categories *ngIf="section.id === 'categories'"></app-configuration-categories>
           </div>
         </div>
       </div>

@@ -1,4 +1,28 @@
 <div class="configuration-tab">
+  <!-- Items List -->
+  <div class="items-container">
+    <div *ngIf="sortedItems.length === 0" class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-inbox"></i>
+      </div>
+      <h4>No {{ title.toLowerCase() }} yet</h4>
+      <p>{{ emptyMessage }}</p>
+    </div>
+
+    <div *ngIf="sortedItems.length > 0" class="items-list">
+      <div *ngFor="let item of sortedItems" class="item-row">
+        <span class="item-value">{{ item.value }}</span>
+        <button 
+          type="button" 
+          class="btn btn-outline-danger btn-sm"
+          (click)="deleteItem(item)"
+          title="Delete {{ title.toLowerCase().slice(0, -1) }}">
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Add Form -->
   <div class="add-form-container">
     <form [formGroup]="itemForm" (ngSubmit)="onSubmit()" class="add-form">
@@ -26,29 +50,5 @@
         <div *ngIf="itemForm.get('value')?.errors?.['maxlength']">Must be no more than 100 characters</div>
       </div>
     </form>
-  </div>
-
-  <!-- Items List -->
-  <div class="items-container">
-    <div *ngIf="sortedItems.length === 0" class="empty-state">
-      <div class="empty-icon">
-        <i class="fas fa-inbox"></i>
-      </div>
-      <h4>No {{ title.toLowerCase() }} yet</h4>
-      <p>{{ emptyMessage }}</p>
-    </div>
-
-    <div *ngIf="sortedItems.length > 0" class="items-list">
-      <div *ngFor="let item of sortedItems" class="item-row">
-        <span class="item-value">{{ item.value }}</span>
-        <button 
-          type="button" 
-          class="btn btn-outline-danger btn-sm"
-          (click)="deleteItem(item)"
-          title="Delete {{ title.toLowerCase().slice(0, -1) }}">
-          <i class="fas fa-trash"></i>
-        </button>
-      </div>
-    </div>
   </div>
 </div>

@@ -6,6 +6,14 @@ import { ConfigurationIngredientsComponent } from './configuration-ingredients/c
 import { ConfigurationUnitsComponent } from './configuration-units/configuration-units.component';
 import { ConfigurationCategoriesComponent } from './configuration-categories/configuration-categories.component';
 
+export interface AccordionSection {
+  id: string;
+  title: string;
+  icon: string;
+  content: string;
+  expanded?: boolean;
+}
+
 @Component({
   selector: 'app-configuration',
   standalone: true,
@@ -21,51 +29,53 @@ import { ConfigurationCategoriesComponent } from './configuration-categories/con
 })
 export class ConfigurationComponent implements OnInit {
   expandedSection: 'tags' | 'ingredients' | 'units' | 'categories' | null = null;
-  sections: ('tags' | 'ingredients' | 'units' | 'categories')[] = ['tags', 'ingredients', 'units', 'categories'];
+  
+  accordionSections: AccordionSection[] = [
+    {
+      id: 'tags',
+      title: 'Recipe Tags',
+      icon: 'fas fa-tags',
+      content: '',
+      expanded: false
+    },
+    {
+      id: 'ingredients',
+      title: 'Ingredients',
+      icon: 'fas fa-carrot',
+      content: '',
+      expanded: false
+    },
+    {
+      id: 'units',
+      title: 'Measurement Units',
+      icon: 'fas fa-weight',
+      content: '',
+      expanded: false
+    },
+    {
+      id: 'categories',
+      title: 'Ingredient Categories',
+      icon: 'fas fa-utensils',
+      content: '',
+      expanded: false
+    }
+  ];
 
   constructor(private readonly pageTitleService: PageTitleService) {}
 
   ngOnInit(): void {
     this.pageTitleService.setPageTitle('Recipe Settings');
-    // Ensure all sections are collapsed when component initializes
-    this.expandedSection = null;
   }
 
-  toggleSection(section: 'tags' | 'ingredients' | 'units' | 'categories'): void {
-    this.expandedSection = this.expandedSection === section ? null : section;
-  }
-
-  isExpanded(section: 'tags' | 'ingredients' | 'units' | 'categories'): boolean {
-    return this.expandedSection === section;
-  }
-
-  getSectionIcon(section: string): string {
-    switch (section) {
-      case 'tags': return 'fas fa-tags';
-      case 'ingredients': return 'fas fa-carrot';
-      case 'units': return 'fas fa-weight';
-      case 'categories': return 'fas fa-utensils';
-      default: return 'fas fa-cog';
+  toggleSection(sectionId: string): void {
+    if (this.expandedSection === sectionId) {
+      this.expandedSection = null;
+    } else {
+      this.expandedSection = sectionId as 'tags' | 'ingredients' | 'units' | 'categories';
     }
   }
 
-  getSectionTitle(section: string): string {
-    switch (section) {
-      case 'tags': return 'Recipe Tags';
-      case 'ingredients': return 'Ingredients';
-      case 'units': return 'Measurement Units';
-      case 'categories': return 'Ingredient Categories';
-      default: return 'Configuration';
-    }
-  }
-
-  getSectionDescription(section: string): string {
-    switch (section) {
-      case 'tags': return 'Manage tags for categorizing and filtering recipes';
-      case 'ingredients': return 'Manage common ingredients for recipe creation';
-      case 'units': return 'Manage measurement units for recipe ingredients';
-      case 'categories': return 'Manage recipe categories for organization';
-      default: return 'Configuration section';
-    }
+  isExpanded(sectionId: string): boolean {
+    return this.expandedSection === sectionId;
   }
 }
