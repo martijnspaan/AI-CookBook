@@ -102,7 +102,9 @@
     position: absolute;
     top: 100%;
     left: 0;
-    right: 0;
+    min-width: 100%;
+    width: max-content;
+    max-width: 300px;
     z-index: 1060;
     background-color: #ffffff;
     border: 1px solid #ced4da;
@@ -281,6 +283,10 @@
     }
 
     .multi-select-dropdown-menu {
+      max-width: calc(100vw - 2rem);
+      right: 0;
+      left: auto;
+
       .search-container {
         padding: 0.375rem;
 

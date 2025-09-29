@@ -144,7 +144,7 @@
             <div class="mb-3">
               <label for="cookbookId" class="form-label fw-bold">Cookbook</label>
               <select class="form-select" id="cookbookId" formControlName="cookbookId">
-                <option value="">No cookbook selected</option>
+                <option value="">No cookbook</option>
                 <option *ngFor="let cookbook of cookbooks" [value]="cookbook.id">{{ cookbook.title }}</option>
               </select>
             </div>

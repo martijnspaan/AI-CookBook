@@ -52,7 +52,7 @@
                   <label class="form-label fw-bold">Cookbook</label>
                   <div *ngIf="isEditingMode">
                     <select class="form-select" [(ngModel)]="editedRecipe!.cookbookId">
-                      <option value="">No cookbook selected</option>
+                      <option value="">No cookbook</option>
                       <option *ngFor="let cookbook of cookbooks" [value]="cookbook.id">{{ cookbook.title }}</option>
                     </select>
                   </div>
