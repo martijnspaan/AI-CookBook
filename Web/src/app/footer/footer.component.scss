@@ -1,6 +1,6 @@
 .app-footer {
-  background-color: #f8f9fa;
-  border-top: 1px solid #dee2e6;
+  background-color: var(--color-neutral-100);
+  border-top: 2px solid var(--color-neutral-300);
   padding: 1rem 0;
   margin-top: auto;
   position: fixed;
@@ -8,6 +8,7 @@
   left: 0;
   right: 0;
   z-index: 1000;
+  box-shadow: var(--shadow-lg);
   
   .footer-container {
     display: flex;
@@ -31,13 +32,23 @@
   
   .btn {
     min-width: 120px;
-    font-weight: 500;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: all 0.2s ease-in-out;
+    font-weight: var(--font-weight-medium);
+    font-family: var(--font-family-primary);
+    font-size: var(--font-size-base);
+    box-shadow: var(--shadow-md);
+    transition: var(--transition-base);
+    border-radius: var(--border-radius-md);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    
+    i {
+      margin-right: var(--spacing-2);
+    }
     
     &:hover {
       transform: translateY(-1px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      box-shadow: var(--shadow-lg);
     }
     
     &:active {
@@ -53,7 +64,7 @@
     
     .btn {
       min-width: 100px;
-      font-size: 0.875rem;
+      font-size: var(--font-size-sm);
       padding: 0.5rem 1rem;
     }
   }
@@ -64,7 +75,7 @@
   .app-footer {
     .btn {
       min-width: 140px;
-      font-size: 1rem;
+      font-size: var(--font-size-base);
       padding: 0.75rem 1.5rem;
     }
   }

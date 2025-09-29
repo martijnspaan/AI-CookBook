@@ -22,7 +22,7 @@
       <!-- Cookbooks Display -->
       <div *ngIf="!isLoadingCookbooks && !errorMessage && cookbooks.length > 0">
         <!-- Mobile Card Layout (≤400px) -->
-        <div class="d-block d-md-none">
+        <div class="mobile-layout">
           <div *ngFor="let cookbook of cookbooks" class="cookbook-card mb-3">
             <div class="card">
               <div class="card-body">
@@ -38,15 +38,15 @@
                           <i class="fas fa-user me-1"></i>by {{ cookbook.author }}
                         </small>
                       </div>
-                      <div class="btn-group" role="group">
+                      <div class="d-flex gap-2">
                         <button 
-                          class="btn btn-outline-primary btn-sm" 
+                          class="btn btn-outline-primary btn-sm edit-button" 
                           (click)="editCookbook(cookbook)"
                           title="Edit cookbook">
                           <i class="fas fa-pen"></i>
                         </button>
                         <button 
-                          class="btn btn-outline-danger btn-sm" 
+                          class="btn btn-outline-danger btn-sm delete-button" 
                           (click)="deleteCookbookWithConfirmation(cookbook)"
                           title="Delete cookbook">
                           <i class="fas fa-trash-alt"></i>
@@ -61,7 +61,7 @@
         </div>
 
         <!-- Tablet and Desktop Table Layout (>400px) -->
-        <div class="d-none d-md-block table-responsive">
+        <div class="tablet-desktop-layout table-responsive">
           <table class="table table-striped">
             <thead class="table-dark">
               <tr>
@@ -93,15 +93,15 @@
                   </div>
                 </td>
                 <td>
-                  <div class="btn-group" role="group">
+                  <div class="d-flex gap-2">
                     <button 
-                      class="btn btn-outline-primary btn-sm" 
+                      class="btn btn-outline-primary btn-sm edit-button" 
                       (click)="editCookbook(cookbook)"
                       title="Edit cookbook">
                       <i class="fas fa-pen"></i>
                     </button>
                     <button 
-                      class="btn btn-outline-danger btn-sm" 
+                      class="btn btn-outline-danger btn-sm delete-button" 
                       (click)="deleteCookbookWithConfirmation(cookbook)"
                       title="Delete cookbook">
                       <i class="fas fa-trash-alt"></i>
@@ -152,13 +152,13 @@
     </ng-template>
 
     <ng-template #popupFooter>
-      <button type="button" class="btn btn-secondary" (click)="cancelCookbookModal()">
+      <button type="button" class="btn btn-outline-secondary" (click)="cancelCookbookModal()">
         <i class="fas fa-times me-2"></i>Cancel
       </button>
       <button type="button" class="btn btn-primary" (click)="submitCookbookForm()" [disabled]="cookbookForm.invalid || isSubmittingCookbook">
         <span *ngIf="isSubmittingCookbook" class="spinner-border spinner-border-sm me-2" role="status"></span>
         <i *ngIf="!isSubmittingCookbook" class="fas fa-save me-2"></i>
-        {{ isSubmittingCookbook ? 'Saving...' : (isEditingCookbook ? 'Update Cookbook' : 'Create Cookbook') }}
+        {{ isSubmittingCookbook ? 'Saving...' : (isEditingCookbook ? 'Update' : 'Create') }}
       </button>
     </ng-template>
   </app-reusable-popup>

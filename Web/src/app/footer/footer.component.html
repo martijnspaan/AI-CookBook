@@ -7,7 +7,7 @@
         class="btn"
         [class]="leftButtonClass"
         (click)="onLeftButtonClick()">
-        <i *ngIf="leftButtonIcon" [class]="leftButtonIcon"></i>
+        <i *ngIf="leftButtonIcon" [class]="leftButtonIcon + ' me-2'"></i>
         {{ leftButtonText }}
       </button>
     </div>
@@ -19,7 +19,7 @@
         class="btn"
         [class]="rightButtonClass"
         (click)="onRightButtonClick()">
-        <i *ngIf="rightButtonIcon" [class]="rightButtonIcon"></i>
+        <i *ngIf="rightButtonIcon" [class]="rightButtonIcon + ' me-2'"></i>
         {{ rightButtonText }}
       </button>
     </div>

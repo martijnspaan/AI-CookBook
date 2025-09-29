@@ -1,3 +1,5 @@
+// Design system variables are already available globally
+
 .cookbooks-container {
   height: 100%;
   width: 100%;
@@ -12,71 +14,287 @@
   overflow-y: auto;
 }
 
-// Mobile-specific styles (≤400px)
+// Loading State
+.text-center {
+  .spinner-border {
+    color: var(--color-primary-500);
+    width: 3rem;
+    height: 3rem;
+  }
+  
+  p {
+    color: var(--color-text-secondary);
+    font-family: var(--font-family-primary);
+    font-size: var(--font-size-lg);
+    margin-top: var(--spacing-4);
+  }
+}
+
+// Error State
+.alert {
+  background-color: var(--color-error);
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-6);
+  margin-bottom: var(--spacing-6);
+  
+  .alert-heading {
+    color: #991b1b;
+    font-family: var(--font-family-primary);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-2);
+  }
+  
+  p {
+    color: #991b1b;
+    font-family: var(--font-family-primary);
+    margin-bottom: var(--spacing-4);
+  }
+  
+  hr {
+    border-color: #fecaca;
+    margin: var(--spacing-4) 0;
+  }
+}
+
+// Empty State
+.text-center {
+  .text-muted {
+    color: var(--color-text-secondary);
+    
+    i {
+      color: var(--color-primary-500);
+      margin-bottom: var(--spacing-4);
+    }
+    
+    h4 {
+      color: var(--color-text-primary);
+      font-family: var(--font-family-primary);
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-xl);
+      margin-bottom: var(--spacing-2);
+    }
+    
+    p {
+      color: var(--color-text-secondary);
+      font-family: var(--font-family-primary);
+      font-size: var(--font-size-base);
+      margin-bottom: var(--spacing-6);
+    }
+  }
+}
+
+// Mobile Card Layout (≤400px)
+.mobile-layout {
+  display: block;
+  
+  @media (min-width: 401px) {
+    display: none;
+  }
+}
+
+// Tablet and Desktop Table Layout (>400px)
+.tablet-desktop-layout {
+  display: none;
+  
+  @media (min-width: 401px) {
+    display: block;
+  }
+}
+
 @media (max-width: 400px) {
   .cookbook-card {
+    margin-bottom: var(--spacing-4);
+    
     .card {
-      background: #f8f9fa;
-      border: 2px solid #dee2e6;
-      border-radius: 0.5rem;
+      background: var(--color-bg-primary);
+      border: 1px solid var(--color-neutral-200);
+      border-radius: var(--border-radius-xl);
+      box-shadow: var(--shadow-sm);
+      transition: all var(--transition-base);
+      
+      &:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+        border-color: var(--color-primary-300);
+      }
+    }
+    
+    .card-body {
+      padding: var(--spacing-4);
     }
     
     .cookbook-icon {
       font-size: 1.5rem;
-      color: #007bff;
+      color: var(--color-primary-500);
       margin-top: 0.25rem;
     }
     
     .card-title {
-      font-size: 1rem;
-      line-height: 1.2;
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+      font-family: var(--font-family-primary);
+      line-height: var(--line-height-snug);
       word-wrap: break-word;
+      margin-bottom: var(--spacing-1);
+    }
+    
+    .text-muted {
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
+      font-family: var(--font-family-primary);
+      
+      i {
+        color: var(--color-primary-400);
+      }
     }
     
     .btn-group {
       .btn {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
+        padding: var(--spacing-2) var(--spacing-3);
+        font-size: var(--font-size-sm);
+        border-radius: var(--border-radius-md);
+        
+        i {
+          font-size: var(--font-size-sm);
+        }
       }
     }
   }
 }
 
-// Tablet and Desktop styles (>400px)
+// Tablet and Desktop Table Layout (>400px)
 @media (min-width: 401px) {
-  .table {
+  .tablet-desktop-layout .table-responsive {
+    background: var(--color-bg-primary);
+    border-radius: var(--border-radius-xl);
+    border: 1px solid var(--color-neutral-200);
+    overflow-x: auto;
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .tablet-desktop-layout .table {
+    margin-bottom: 0;
+    
     th {
       position: sticky;
       top: 0;
       z-index: 10;
+      background-color: var(--color-primary-500);
+      color: var(--color-text-inverse);
+      font-family: var(--font-family-primary);
+      font-weight: var(--font-weight-semibold);
+      font-size: var(--font-size-sm);
+      padding: var(--spacing-4);
+      border: none;
       
       i {
-        color: #fff;
+        color: var(--color-text-inverse);
+        margin-right: var(--spacing-2);
+      }
+    }
+    
+    td {
+      padding: var(--spacing-4);
+      vertical-align: middle;
+      border-color: var(--color-neutral-200);
+      font-family: var(--font-family-primary);
+      
+      strong {
+        color: var(--color-text-primary);
+        font-weight: var(--font-weight-medium);
+      }
+    }
+    
+    tbody tr {
+      transition: background-color var(--transition-fast);
+      
+      &:hover {
+        background-color: var(--color-primary-50);
+      }
+      
+      &:nth-child(even) {
+        background-color: var(--color-neutral-50);
       }
     }
   }
   
-  .cookbook-icon-small {
+  .tablet-desktop-layout .cookbook-icon-small {
     font-size: 1rem;
-    color: #007bff;
+    color: var(--color-primary-500);
     width: 20px;
     text-align: center;
   }
   
-  .table-responsive {
-    background: #f8f9fa;
-    border-radius: 0.5rem;
-    border: 2px solid #dee2e6;
-    overflow-x: auto;
+  .tablet-desktop-layout .text-muted {
+    color: var(--color-text-secondary);
+    
+    i {
+      color: var(--color-primary-400);
+    }
   }
 }
 
-.btn-group {
+// Button Groups
+.d-flex.gap-2 {
   .btn {
-    font-size: 0.75rem;
+    font-size: var(--font-size-sm);
+    font-family: var(--font-family-primary);
+    border-radius: var(--border-radius-md);
     
     i {
-      font-size: 0.875rem; // Make icons slightly larger than button text
+      font-size: var(--font-size-sm);
     }
   }
+}
+
+// Button specific styling to match grocery list cards
+.btn {
+  &.edit-button,
+  &.delete-button {
+    min-width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    @media (max-width: 400px) {
+      min-width: 28px;
+      height: 28px;
+      font-size: 0.75rem;
+    }
+  }
+}
+
+// Form Styling in Modal
+.form-label {
+  color: var(--color-text-primary);
+  font-family: var(--font-family-primary);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-2);
+}
+
+.form-control {
+  font-family: var(--font-family-primary);
+  border-color: var(--color-neutral-300);
+  border-radius: var(--border-radius-lg);
+  
+  &:focus {
+    border-color: var(--color-primary-500);
+    box-shadow: 0 0 0 3px var(--color-primary-200);
+  }
+}
+
+// Modal Styling
+.popup-title {
+  color: var(--color-text-primary);
+  font-family: var(--font-family-primary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-lg);
 }

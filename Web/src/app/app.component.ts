@@ -139,19 +139,19 @@ export class AppComponent implements OnInit, OnDestroy {
     // Only these specific routes should show footer buttons:
     if (currentUrl === '/recipes') {
       this.showRightButton = true;
-      this.rightButtonText = 'Create New Recipe';
+      this.rightButtonText = 'New Recipe';
       this.rightButtonIcon = 'fas fa-plus';
       this.rightButtonClass = 'btn-primary';
       this.rightButtonClickHandler = () => this.openCreateRecipeModal();
     } else if (currentUrl === '/week-menu') {
       this.showRightButton = true;
-      this.rightButtonText = 'Create Grocery List';
+      this.rightButtonText = 'New Grocery List';
       this.rightButtonIcon = 'fas fa-shopping-cart';
       this.rightButtonClass = 'btn-success';
       this.rightButtonClickHandler = () => this.createGroceryList();
     } else if (currentUrl === '/cookbooks') {
       this.showRightButton = true;
-      this.rightButtonText = 'Create New Cookbook';
+      this.rightButtonText = 'New Cookbook';
       this.rightButtonIcon = 'fas fa-plus';
       this.rightButtonClass = 'btn-primary';
       this.rightButtonClickHandler = () => this.openCreateCookbookModal();

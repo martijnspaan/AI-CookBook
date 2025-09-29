@@ -258,7 +258,7 @@
     </ng-template>
 
     <ng-template #popupFooter>
-      <button type="button" class="btn btn-secondary" (click)="cancelCreateRecipe()">Cancel</button>
+      <button type="button" class="btn btn-outline-secondary" (click)="cancelCreateRecipe()">Cancel</button>
       <button type="button" class="btn btn-primary" (click)="submitCreateRecipeForm()" [disabled]="!isCreateButtonEnabled() || isCreatingRecipe">
         <span *ngIf="isCreatingRecipe" class="spinner-border spinner-border-sm me-2" role="status"></span>
         {{ isCreatingRecipe ? 'Creating...' : 'Create Recipe' }}
