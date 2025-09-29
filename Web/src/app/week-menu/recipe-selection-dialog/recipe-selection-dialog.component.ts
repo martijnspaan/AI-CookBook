@@ -46,6 +46,12 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy, OnChan
   mealTypeOptions: MultiSelectOption[] = [];
   cookbookOptions: MultiSelectOption[] = [];
   
+  // Search functionality
+  searchQuery: string = '';
+  searchSuggestions: string[] = [];
+  showSearchSuggestions: boolean = false;
+  allSearchableTerms: string[] = [];
+  
   private readonly destroySubject = new Subject<void>();
 
   constructor(
@@ -73,6 +79,7 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy, OnChan
       this.loadCookbooks();
       this.loadRecipeSettings();
       this.preselectMealTypeFilter();
+      this.clearSearch();
     }
   }
 
@@ -182,14 +189,48 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy, OnChan
       );
     }
 
+    // Apply search filter
+    if (this.searchQuery.trim().length > 0) {
+      filtered = this.filterBySearchQuery(filtered);
+    }
+
     this.filteredRecipes = filtered;
     this.recipes = this.filteredRecipes;
+  }
+
+  filterBySearchQuery(recipes: Recipe[]): Recipe[] {
+    const query = this.searchQuery.toLowerCase().trim();
+    
+    return recipes.filter(recipe => {
+      // Search in title
+      if (recipe.title.toLowerCase().includes(query)) {
+        return true;
+      }
+      
+      // Search in tags
+      if (recipe.tags.some(tag => tag.toLowerCase().includes(query))) {
+        return true;
+      }
+      
+      // Search in ingredients
+      if (recipe.ingredients.some(ingredient => 
+        ingredient.name.toLowerCase().includes(query) ||
+        ingredient.type.toLowerCase().includes(query)
+      )) {
+        return true;
+      }
+      
+      return false;
+    });
   }
 
 
   clearFilters(): void {
     this.selectedMealTypeFilters = [];
     this.selectedCookbookFilters = [];
+    this.searchQuery = '';
+    this.searchSuggestions = [];
+    this.showSearchSuggestions = false;
     this.applyFilters();
   }
 
@@ -201,6 +242,81 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy, OnChan
   onCookbookSelectionChanged(selectedValues: string[]): void {
     this.selectedCookbookFilters = selectedValues;
     this.applyFilters();
+  }
+
+  // Search functionality methods
+  onSearchInput(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.searchQuery = target.value;
+    this.generateSearchSuggestions();
+    this.applyFilters();
+  }
+
+  onSearchFocus(): void {
+    if (this.searchQuery.length > 0) {
+      this.generateSearchSuggestions();
+      this.showSearchSuggestions = true;
+    }
+  }
+
+  onSearchBlur(): void {
+    // Delay hiding suggestions to allow for clicks on suggestions
+    setTimeout(() => {
+      this.showSearchSuggestions = false;
+    }, 200);
+  }
+
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.searchSuggestions = [];
+    this.showSearchSuggestions = false;
+    this.applyFilters();
+  }
+
+  selectSearchSuggestion(suggestion: string): void {
+    this.searchQuery = suggestion;
+    this.showSearchSuggestions = false;
+    this.applyFilters();
+  }
+
+  generateSearchSuggestions(): void {
+    if (this.searchQuery.length < 2) {
+      this.searchSuggestions = [];
+      return;
+    }
+
+    const query = this.searchQuery.toLowerCase();
+    const suggestions = new Set<string>();
+
+    // Add matching titles
+    this.allRecipes.forEach(recipe => {
+      if (recipe.title.toLowerCase().includes(query)) {
+        suggestions.add(recipe.title);
+      }
+    });
+
+    // Add matching tags
+    this.allRecipes.forEach(recipe => {
+      recipe.tags.forEach(tag => {
+        if (tag.toLowerCase().includes(query)) {
+          suggestions.add(tag);
+        }
+      });
+    });
+
+    // Add matching ingredient names and types
+    this.allRecipes.forEach(recipe => {
+      recipe.ingredients.forEach(ingredient => {
+        if (ingredient.name.toLowerCase().includes(query)) {
+          suggestions.add(ingredient.name);
+        }
+        if (ingredient.type.toLowerCase().includes(query)) {
+          suggestions.add(ingredient.type);
+        }
+      });
+    });
+
+    this.searchSuggestions = Array.from(suggestions).slice(0, 8); // Limit to 8 suggestions
   }
 
 
@@ -226,6 +342,7 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy, OnChan
   }
 
   closeDialog(): void {
+    this.clearSearch();
     this.dialogClosed.emit();
   }
 
