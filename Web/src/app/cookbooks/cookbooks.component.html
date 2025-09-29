@@ -4,18 +4,18 @@
       <!-- Loading State -->
       <div *ngIf="isLoadingCookbooks" class="text-center py-5">
         <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Loading...</span>
+          <span class="visually-hidden">{{ 'COMMON.LOADING' | translate }}</span>
         </div>
-        <p class="mt-2">Loading cookbooks...</p>
+        <p class="mt-2">{{ 'COOKBOOKS.LOADING_COOKBOOKS' | translate }}</p>
       </div>
 
       <!-- Error State -->
       <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
-        <h4 class="alert-heading">Error!</h4>
+        <h4 class="alert-heading">{{ 'COMMON.ERROR' | translate }}</h4>
         <p>{{ errorMessage }}</p>
         <hr>
         <button class="btn btn-outline-danger" (click)="loadAllCookbooks()">
-          <i class="fas fa-redo me-2"></i>Try Again
+          <i class="fas fa-redo me-2"></i>{{ 'COMMON.TRY_AGAIN' | translate }}
         </button>
       </div>
 
@@ -35,20 +35,20 @@
                       <div>
                         <h5 class="card-title mb-1">{{ cookbook.title }}</h5>
                         <small class="text-muted">
-                          <i class="fas fa-user me-1"></i>by {{ cookbook.author }}
+                          <i class="fas fa-user me-1"></i>{{ 'COMMON.BY' | translate }} {{ cookbook.author }}
                         </small>
                       </div>
                       <div class="d-flex gap-2">
                         <button 
                           class="btn btn-outline-primary btn-sm edit-button" 
                           (click)="editCookbook(cookbook)"
-                          title="Edit cookbook">
+                          [title]="'COOKBOOKS.EDIT_COOKBOOK_TITLE' | translate">
                           <i class="fas fa-pen"></i>
                         </button>
                         <button 
                           class="btn btn-outline-danger btn-sm delete-button" 
                           (click)="deleteCookbookWithConfirmation(cookbook)"
-                          title="Delete cookbook">
+                          [title]="'COOKBOOKS.DELETE_COOKBOOK_TITLE' | translate">
                           <i class="fas fa-trash-alt"></i>
                         </button>
                       </div>
@@ -66,13 +66,13 @@
             <thead class="table-dark">
               <tr>
                 <th scope="col">
-                  <i class="fas fa-book-open me-2"></i>Title
+                  <i class="fas fa-book-open me-2"></i>{{ 'COMMON.TITLE' | translate }}
                 </th>
                 <th scope="col">
-                  <i class="fas fa-user me-2"></i>Author
+                  <i class="fas fa-user me-2"></i>{{ 'COMMON.AUTHOR' | translate }}
                 </th>
                 <th scope="col">
-                  <i class="fas fa-cogs me-2"></i>Actions
+                  <i class="fas fa-cogs me-2"></i>{{ 'COMMON.ACTIONS' | translate }}
                 </th>
               </tr>
             </thead>
@@ -97,13 +97,13 @@
                     <button 
                       class="btn btn-outline-primary btn-sm edit-button" 
                       (click)="editCookbook(cookbook)"
-                      title="Edit cookbook">
+                      [title]="'COOKBOOKS.EDIT_COOKBOOK_TITLE' | translate">
                       <i class="fas fa-pen"></i>
                     </button>
                     <button 
                       class="btn btn-outline-danger btn-sm delete-button" 
                       (click)="deleteCookbookWithConfirmation(cookbook)"
-                      title="Delete cookbook">
+                      [title]="'COOKBOOKS.DELETE_COOKBOOK_TITLE' | translate">
                       <i class="fas fa-trash-alt"></i>
                     </button>
                   </div>
@@ -118,10 +118,10 @@
       <div *ngIf="!isLoadingCookbooks && !errorMessage && cookbooks.length === 0" class="text-center py-5">
         <div class="text-muted">
           <i class="fas fa-book-open fa-3x mb-3 text-primary"></i>
-          <h4>No cookbooks found</h4>
-          <p>There are no cookbooks available at the moment.</p>
+          <h4>{{ 'COOKBOOKS.NO_COOKBOOKS_FOUND' | translate }}</h4>
+          <p>{{ 'COOKBOOKS.NO_COOKBOOKS_AVAILABLE' | translate }}</p>
           <button class="btn btn-primary mt-3" (click)="openCreateCookbookModal()">
-            <i class="fas fa-plus me-2"></i>Create First Cookbook
+            <i class="fas fa-plus me-2"></i>{{ 'COOKBOOKS.CREATE_FIRST_COOKBOOK' | translate }}
           </button>
         </div>
       </div>
@@ -135,17 +135,17 @@
     (popupClosed)="cancelCookbookModal()">
     
     <ng-template #popupHeader>
-      <h5 class="popup-title">{{ isEditingCookbook ? 'Edit Cookbook' : 'Create New Cookbook' }}</h5>
+      <h5 class="popup-title">{{ isEditingCookbook ? ('COOKBOOKS.EDIT_COOKBOOK' | translate) : ('COOKBOOKS.CREATE_NEW_COOKBOOK' | translate) }}</h5>
     </ng-template>
 
     <ng-template #popupBody>
       <form [formGroup]="cookbookForm" (ngSubmit)="submitCookbookForm()">
         <div class="mb-3">
-          <label for="title" class="form-label">Title *</label>
+          <label for="title" class="form-label">{{ 'COOKBOOKS.TITLE_REQUIRED' | translate }}</label>
           <input type="text" class="form-control" id="title" formControlName="title" required>
         </div>
         <div class="mb-3">
-          <label for="author" class="form-label">Author *</label>
+          <label for="author" class="form-label">{{ 'COOKBOOKS.AUTHOR_REQUIRED' | translate }}</label>
           <input type="text" class="form-control" id="author" formControlName="author" required>
         </div>
       </form>
@@ -153,12 +153,12 @@
 
     <ng-template #popupFooter>
       <button type="button" class="btn btn-outline-secondary" (click)="cancelCookbookModal()">
-        <i class="fas fa-times me-2"></i>Cancel
+        <i class="fas fa-times me-2"></i>{{ 'COMMON.CANCEL' | translate }}
       </button>
       <button type="button" class="btn btn-primary" (click)="submitCookbookForm()" [disabled]="cookbookForm.invalid || isSubmittingCookbook">
         <span *ngIf="isSubmittingCookbook" class="spinner-border spinner-border-sm me-2" role="status"></span>
         <i *ngIf="!isSubmittingCookbook" class="fas fa-save me-2"></i>
-        {{ isSubmittingCookbook ? 'Saving...' : (isEditingCookbook ? 'Update' : 'Create') }}
+        {{ isSubmittingCookbook ? ('COMMON.SAVING' | translate) : (isEditingCookbook ? ('COMMON.UPDATE' | translate) : ('COMMON.CREATE' | translate)) }}
       </button>
     </ng-template>
   </app-reusable-popup>

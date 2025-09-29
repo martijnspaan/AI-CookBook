@@ -1,0 +1,85 @@
+{
+  "APP": {
+    "TITLE": "AI Cookbook",
+    "MEAL_PLANNER": "AI Meal Planner"
+  },
+  "NAVIGATION": {
+    "COOKBOOKS": "Cookbooks",
+    "ALL_RECIPES": "All Recipes",
+    "WEEK_MENU": "Week Menu",
+    "GROCERY_LISTS": "Grocery Lists",
+    "RECIPE_SETTINGS": "Recipe Settings",
+    "TOGGLE_MENU": "Toggle navigation menu"
+  },
+  "COMMON": {
+    "LOADING": "Loading...",
+    "SAVING": "Saving...",
+    "ERROR": "Error!",
+    "TRY_AGAIN": "Try Again",
+    "CANCEL": "Cancel",
+    "SAVE": "Save",
+    "CREATE": "Create",
+    "UPDATE": "Update",
+    "EDIT": "Edit",
+    "DELETE": "Delete",
+    "CLOSE": "Close",
+    "CLEAR": "Clear",
+    "SEARCH": "Search",
+    "TITLE": "Title",
+    "AUTHOR": "Author",
+    "ACTIONS": "Actions",
+    "BY": "by",
+    "NO_ITEMS_FOUND": "No items found",
+    "NO_ITEMS_AVAILABLE": "No items available at the moment",
+    "CREATE_FIRST": "Create First",
+    "GO_TO": "Go to"
+  },
+  "COOKBOOKS": {
+    "LOADING_COOKBOOKS": "Loading cookbooks...",
+    "NO_COOKBOOKS_FOUND": "No cookbooks found",
+    "NO_COOKBOOKS_AVAILABLE": "There are no cookbooks available at the moment.",
+    "CREATE_FIRST_COOKBOOK": "Create First Cookbook",
+    "EDIT_COOKBOOK": "Edit Cookbook",
+    "CREATE_NEW_COOKBOOK": "Create New Cookbook",
+    "TITLE_REQUIRED": "Title *",
+    "AUTHOR_REQUIRED": "Author *",
+    "EDIT_COOKBOOK_TITLE": "Edit cookbook",
+    "DELETE_COOKBOOK_TITLE": "Delete cookbook"
+  },
+  "RECIPES": {
+    "LOADING_RECIPES": "Loading recipes...",
+    "NO_RECIPES_AVAILABLE": "No recipes available",
+    "NO_RECIPES_TO_CHOOSE": "There are no recipes to choose from.",
+    "SELECT_RECIPE": "Select Recipe",
+    "CURRENT_RECIPE": "Current Recipe",
+    "SEARCH_PLACEHOLDER": "Search recipes by title, tags, or ingredients...",
+    "ALL_MEAL_CATEGORIES": "All Meal Categories",
+    "ALL_COOKBOOKS": "All Cookbooks",
+    "CLEAR_FILTERS": "Clear filters",
+    "CLEAR_SEARCH": "Clear search",
+    "CHOOSE_RECIPE_FOR": "Choose a recipe for {{mealType}} on {{date}}"
+  },
+  "WEEK_MENU": {
+    "SAVING_WEEK_MENU": "Saving week menu...",
+    "NEW_GROCERY_LIST": "New Grocery List"
+  },
+  "GROCERY_LISTS": {
+    "LOADING_GROCERY_LISTS": "Loading grocery lists...",
+    "NO_GROCERY_LISTS_YET": "No Grocery Lists Yet",
+    "CREATE_FIRST_GROCERY_LIST": "Create your first grocery list by planning meals in the Week Menu.",
+    "GO_TO_WEEK_MENU": "Go to Week Menu",
+    "EDIT_GROCERY_LIST": "Edit grocery list",
+    "DELETE_GROCERY_LIST": "Delete grocery list"
+  },
+  "MEAL_TYPES": {
+    "BREAKFAST": "Breakfast",
+    "LUNCH": "Lunch",
+    "DINNER": "Dinner",
+    "SNACK": "Snack"
+  },
+  "BUTTONS": {
+    "NEW_RECIPE": "New Recipe",
+    "NEW_COOKBOOK": "New Cookbook",
+    "NEW_GROCERY_LIST": "New Grocery List"
+  }
+}

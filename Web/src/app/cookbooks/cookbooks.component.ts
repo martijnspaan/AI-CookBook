@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { CookbookService } from '../services/cookbook.service';
@@ -12,7 +13,7 @@ import { ReusablePopupComponent, PopupConfig } from '../shared/reusable-popup';
 @Component({
   selector: 'app-cookbooks',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ReusablePopupComponent],
+  imports: [CommonModule, ReactiveFormsModule, ReusablePopupComponent, TranslateModule],
   templateUrl: './cookbooks.component.html',
   styleUrl: './cookbooks.component.scss'
 })
@@ -29,7 +30,7 @@ export class CookbooksComponent implements OnInit, OnDestroy, AfterViewInit {
 
   get cookbookPopupConfig(): PopupConfig {
     return {
-      title: this.isEditingCookbook ? 'Edit Cookbook' : 'Create New Cookbook',
+      title: this.isEditingCookbook ? this.translate.instant('COOKBOOKS.EDIT_COOKBOOK') : this.translate.instant('COOKBOOKS.CREATE_NEW_COOKBOOK'),
       icon: 'fas fa-book',
       showCloseButton: true,
       size: 'md',
@@ -44,7 +45,8 @@ export class CookbooksComponent implements OnInit, OnDestroy, AfterViewInit {
     private readonly cookbookService: CookbookService,
     private readonly formBuilder: FormBuilder,
     private readonly pageTitleService: PageTitleService,
-    private readonly cookbookModalService: CookbookModalService
+    private readonly cookbookModalService: CookbookModalService,
+    private readonly translate: TranslateService
   ) {
     this.cookbookForm = this.formBuilder.group({
       title: ['', [Validators.required, Validators.minLength(3)]],

@@ -23,15 +23,38 @@
     <div class="menu-content">
       <div class="menu-title">
         <i class="fas fa-utensils menu-title-icon"></i>
-        <span class="menu-title-text">AI Meal Planner</span>
+        <span class="menu-title-text">{{ 'APP.MEAL_PLANNER' | translate }}</span>
       </div>
+      
+      <!-- Language Switcher -->
+      <div class="language-switcher">
+        <button 
+          type="button" 
+          class="language-btn" 
+          [class.active]="currentLanguage === 'en'"
+          (click)="switchLanguage('en')"
+          title="English">
+          <div class="flag-icon flag-en"></div>
+          <span>EN</span>
+        </button>
+        <button 
+          type="button" 
+          class="language-btn" 
+          [class.active]="currentLanguage === 'nl'"
+          (click)="switchLanguage('nl')"
+          title="Nederlands">
+          <div class="flag-icon flag-nl"></div>
+          <span>NL</span>
+        </button>
+      </div>
+      
       <a 
         class="menu-item" 
         routerLink="/cookbooks" 
         (click)="closeMenu()"
         routerLinkActive="active">
         <i class="fas fa-book me-2"></i>
-        Cookbooks
+        {{ 'NAVIGATION.COOKBOOKS' | translate }}
       </a>
       <a 
         class="menu-item" 
@@ -39,7 +62,7 @@
         (click)="closeMenu()"
         routerLinkActive="active">
         <i class="fas fa-utensils me-2"></i>
-        All Recipes
+        {{ 'NAVIGATION.ALL_RECIPES' | translate }}
       </a>
       <a 
         class="menu-item" 
@@ -47,7 +70,7 @@
         (click)="closeMenu()"
         routerLinkActive="active">
         <i class="fas fa-calendar-week me-2"></i>
-        Week Menu
+        {{ 'NAVIGATION.WEEK_MENU' | translate }}
       </a>
       <a 
         class="menu-item" 
@@ -55,7 +78,7 @@
         (click)="closeMenu()"
         routerLinkActive="active">
         <i class="fas fa-shopping-cart me-2"></i>
-        Grocery Lists
+        {{ 'NAVIGATION.GROCERY_LISTS' | translate }}
       </a>
       <a 
         class="menu-item" 
@@ -63,7 +86,7 @@
         (click)="closeMenu()"
         routerLinkActive="active">
         <i class="fas fa-cog me-2"></i>
-        Recipe Settings
+        {{ 'NAVIGATION.RECIPE_SETTINGS' | translate }}
       </a>
     </div>
   </div>

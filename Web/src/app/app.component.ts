@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { HamburgerMenuComponent } from './hamburger-menu/hamburger-menu.component';
 import { FooterComponent } from './footer/footer.component';
 import { RecipeSelectionDialogComponent } from './week-menu/recipe-selection-dialog/recipe-selection-dialog.component';
@@ -17,7 +18,7 @@ import { Recipe } from './models/recipe.model';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HamburgerMenuComponent, FooterComponent, RecipeSelectionDialogComponent, CommonModule],
+  imports: [RouterOutlet, HamburgerMenuComponent, FooterComponent, RecipeSelectionDialogComponent, CommonModule, TranslateModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
@@ -66,7 +67,8 @@ export class AppComponent implements OnInit, OnDestroy {
     private recipeModalService: RecipeModalService,
     private groceryListDialogService: GroceryListDialogService,
     private recipeSelectionDialogService: RecipeSelectionDialogService,
-    private footerService: FooterService
+    private footerService: FooterService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -139,19 +141,19 @@ export class AppComponent implements OnInit, OnDestroy {
     // Only these specific routes should show footer buttons:
     if (currentUrl === '/recipes') {
       this.showRightButton = true;
-      this.rightButtonText = 'New Recipe';
+      this.rightButtonText = this.translate.instant('BUTTONS.NEW_RECIPE');
       this.rightButtonIcon = 'fas fa-plus';
       this.rightButtonClass = 'btn-primary';
       this.rightButtonClickHandler = () => this.openCreateRecipeModal();
     } else if (currentUrl === '/week-menu') {
       this.showRightButton = true;
-      this.rightButtonText = 'New Grocery List';
+      this.rightButtonText = this.translate.instant('BUTTONS.NEW_GROCERY_LIST');
       this.rightButtonIcon = 'fas fa-shopping-cart';
       this.rightButtonClass = 'btn-success';
       this.rightButtonClickHandler = () => this.createGroceryList();
     } else if (currentUrl === '/cookbooks') {
       this.showRightButton = true;
-      this.rightButtonText = 'New Cookbook';
+      this.rightButtonText = this.translate.instant('BUTTONS.NEW_COOKBOOK');
       this.rightButtonIcon = 'fas fa-plus';
       this.rightButtonClass = 'btn-primary';
       this.rightButtonClickHandler = () => this.openCreateCookbookModal();

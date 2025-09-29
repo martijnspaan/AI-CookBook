@@ -1,0 +1,85 @@
+{
+  "APP": {
+    "TITLE": "AI Kookboek",
+    "MEAL_PLANNER": "AI Maaltijdplanner"
+  },
+  "NAVIGATION": {
+    "COOKBOOKS": "Kookboeken",
+    "ALL_RECIPES": "Alle Recepten",
+    "WEEK_MENU": "Weekmenu",
+    "GROCERY_LISTS": "Boodschappenlijsten",
+    "RECIPE_SETTINGS": "Receptinstellingen",
+    "TOGGLE_MENU": "Navigatiemenu wisselen"
+  },
+  "COMMON": {
+    "LOADING": "Laden...",
+    "SAVING": "Opslaan...",
+    "ERROR": "Fout!",
+    "TRY_AGAIN": "Opnieuw proberen",
+    "CANCEL": "Annuleren",
+    "SAVE": "Opslaan",
+    "CREATE": "Aanmaken",
+    "UPDATE": "Bijwerken",
+    "EDIT": "Bewerken",
+    "DELETE": "Verwijderen",
+    "CLOSE": "Sluiten",
+    "CLEAR": "Wissen",
+    "SEARCH": "Zoeken",
+    "TITLE": "Titel",
+    "AUTHOR": "Auteur",
+    "ACTIONS": "Acties",
+    "BY": "door",
+    "NO_ITEMS_FOUND": "Geen items gevonden",
+    "NO_ITEMS_AVAILABLE": "Er zijn momenteel geen items beschikbaar",
+    "CREATE_FIRST": "Eerste aanmaken",
+    "GO_TO": "Ga naar"
+  },
+  "COOKBOOKS": {
+    "LOADING_COOKBOOKS": "Kookboeken laden...",
+    "NO_COOKBOOKS_FOUND": "Geen kookboeken gevonden",
+    "NO_COOKBOOKS_AVAILABLE": "Er zijn momenteel geen kookboeken beschikbaar.",
+    "CREATE_FIRST_COOKBOOK": "Eerste Kookboek Aanmaken",
+    "EDIT_COOKBOOK": "Kookboek Bewerken",
+    "CREATE_NEW_COOKBOOK": "Nieuw Kookboek Aanmaken",
+    "TITLE_REQUIRED": "Titel *",
+    "AUTHOR_REQUIRED": "Auteur *",
+    "EDIT_COOKBOOK_TITLE": "Kookboek bewerken",
+    "DELETE_COOKBOOK_TITLE": "Kookboek verwijderen"
+  },
+  "RECIPES": {
+    "LOADING_RECIPES": "Recepten laden...",
+    "NO_RECIPES_AVAILABLE": "Geen recepten beschikbaar",
+    "NO_RECIPES_TO_CHOOSE": "Er zijn geen recepten om uit te kiezen.",
+    "SELECT_RECIPE": "Recept Selecteren",
+    "CURRENT_RECIPE": "Huidig Recept",
+    "SEARCH_PLACEHOLDER": "Zoek recepten op titel, tags of ingrediënten...",
+    "ALL_MEAL_CATEGORIES": "Alle Maaltijdcategorieën",
+    "ALL_COOKBOOKS": "Alle Kookboeken",
+    "CLEAR_FILTERS": "Filters wissen",
+    "CLEAR_SEARCH": "Zoekopdracht wissen",
+    "CHOOSE_RECIPE_FOR": "Kies een recept voor {{mealType}} op {{date}}"
+  },
+  "WEEK_MENU": {
+    "SAVING_WEEK_MENU": "Weekmenu opslaan...",
+    "NEW_GROCERY_LIST": "Nieuwe Boodschappenlijst"
+  },
+  "GROCERY_LISTS": {
+    "LOADING_GROCERY_LISTS": "Boodschappenlijsten laden...",
+    "NO_GROCERY_LISTS_YET": "Nog Geen Boodschappenlijsten",
+    "CREATE_FIRST_GROCERY_LIST": "Maak je eerste boodschappenlijst door maaltijden te plannen in het Weekmenu.",
+    "GO_TO_WEEK_MENU": "Ga naar Weekmenu",
+    "EDIT_GROCERY_LIST": "Boodschappenlijst bewerken",
+    "DELETE_GROCERY_LIST": "Boodschappenlijst verwijderen"
+  },
+  "MEAL_TYPES": {
+    "BREAKFAST": "Ontbijt",
+    "LUNCH": "Lunch",
+    "DINNER": "Diner",
+    "SNACK": "Snack"
+  },
+  "BUTTONS": {
+    "NEW_RECIPE": "Nieuw Recept",
+    "NEW_COOKBOOK": "Nieuw Kookboek",
+    "NEW_GROCERY_LIST": "Nieuwe Boodschappenlijst"
+  }
+}

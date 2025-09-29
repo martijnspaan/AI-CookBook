@@ -134,6 +134,65 @@
       background-clip: text;
     }
   }
+
+  .language-switcher {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--color-neutral-300);
+    background-color: var(--color-neutral-50);
+
+    .language-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border: 2px solid var(--color-neutral-300);
+      background-color: var(--color-bg-primary);
+      border-radius: var(--border-radius-md);
+      cursor: pointer;
+      transition: var(--transition-base);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-primary);
+
+      &:hover {
+        border-color: var(--color-primary-400);
+        background-color: var(--color-primary-50);
+        color: var(--color-primary-700);
+      }
+
+      &.active {
+        border-color: var(--color-primary-500);
+        background-color: var(--color-primary-500);
+        color: var(--color-text-inverse);
+      }
+
+      .flag-icon {
+        width: 20px;
+        height: 15px;
+        border-radius: 2px;
+        border: 1px solid var(--color-neutral-300);
+        position: relative;
+        overflow: hidden;
+
+        &.flag-en {
+          background: linear-gradient(to bottom, #012169 0%, #012169 33%, #ffffff 33%, #ffffff 66%, #C8102E 66%, #C8102E 100%);
+        }
+
+        &.flag-nl {
+          background: linear-gradient(to right, #AE1C28 0%, #AE1C28 33%, #ffffff 33%, #ffffff 66%, #21468B 66%, #21468B 100%);
+        }
+      }
+
+      span {
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-semibold);
+        letter-spacing: 0.5px;
+      }
+    }
+  }
   
   @keyframes pulse {
     0%, 100% {
