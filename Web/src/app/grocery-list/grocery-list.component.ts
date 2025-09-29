@@ -64,10 +64,10 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.pageTitleService.setPageTitle('Grocery List');
+    this.pageTitleService.setPageTitle('Grocery Lists');
   }
 
-  private loadGroceryLists(): void {
+  public loadGroceryLists(): void {
     this.isLoading = true;
     this.errorMessage = null;
 
@@ -226,7 +226,6 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
     
     return date.toLocaleDateString('en-US', {
       weekday: 'long',
-      year: 'numeric',
       month: 'long',
       day: 'numeric'
     });
@@ -473,6 +472,32 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
     weekStart.setHours(0, 0, 0, 0);
     
     return weekStart;
+  }
+
+
+  navigateToWeekMenu(): void {
+    this.router.navigate(['/week-menu']);
+  }
+
+  getRelativeTime(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMs = now.getTime() - date.getTime();
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+    
+    if (diffInDays === 0) {
+      return 'today';
+    } else if (diffInDays === 1) {
+      return 'yesterday';
+    } else if (diffInDays < 7) {
+      return `${diffInDays} days ago`;
+    } else if (diffInDays < 30) {
+      const weeks = Math.floor(diffInDays / 7);
+      return `${weeks} week${weeks !== 1 ? 's' : ''} ago`;
+    } else {
+      const months = Math.floor(diffInDays / 30);
+      return `${months} month${months !== 1 ? 's' : ''} ago`;
+    }
   }
 
 }

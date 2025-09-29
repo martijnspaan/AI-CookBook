@@ -1,66 +1,88 @@
-<div class="grocery-list-container">
-  <div class="grocery-list-content">
+<div class="page-container">
+  <div class="page-content">
 
     <!-- Loading State -->
-    <div *ngIf="isLoading" class="loading-state">
-      <div class="spinner"></div>
-      <p>Loading grocery lists...</p>
+    <div *ngIf="isLoading" class="d-flex flex-column align-items-center justify-content-center p-5 text-center">
+      <div class="spinner-border text-primary mb-3" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="text-muted">Loading grocery lists...</p>
     </div>
 
     <!-- Error State -->
-    <div *ngIf="errorMessage && !isLoading" class="error-state">
-      <div class="error-icon">⚠️</div>
-      <p>{{ errorMessage }}</p>
+    <div *ngIf="errorMessage && !isLoading" class="alert alert-danger d-flex flex-column align-items-center text-center p-5">
+      <div class="mb-3">
+        <i class="fas fa-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+      </div>
+      <p class="mb-3">{{ errorMessage }}</p>
+      <button class="btn btn-outline" (click)="loadGroceryLists()">
+        <i class="fas fa-refresh me-2"></i>
+        Try Again
+      </button>
     </div>
 
     <!-- Empty State -->
-    <div *ngIf="!isLoading && !errorMessage && groceryLists.length === 0" class="empty-state">
-      <div class="empty-icon">🛒</div>
-      <h3>No Grocery Lists Yet</h3>
-      <p>Create your first grocery list by planning meals in the Week Menu.</p>
+    <div *ngIf="!isLoading && !errorMessage && groceryLists.length === 0" class="d-flex flex-column align-items-center justify-content-center text-center p-5">
+      <div class="mb-3">
+        <i class="fas fa-shopping-cart text-primary" style="font-size: 4rem;"></i>
+      </div>
+      <h3 class="text-primary-800 mb-2">No Grocery Lists Yet</h3>
+      <p class="text-muted mb-4">Create your first grocery list by planning meals in the Week Menu.</p>
+      <button class="btn btn-primary" (click)="navigateToWeekMenu()">
+        <i class="fas fa-calendar-week me-2"></i>
+        Go to Week Menu
+      </button>
     </div>
 
     <!-- Grocery Lists -->
-    <div *ngIf="!isLoading && !errorMessage && groceryLists.length > 0" class="grocery-lists">
-      <div *ngFor="let groceryList of groceryLists" class="grocery-list-card" (click)="viewGroceryListDetails(groceryList.id)">
-        <div class="grocery-list-card-content">
-          <!-- Header with date and action buttons -->
-          <div class="d-flex justify-content-between align-items-center mb-1">
-            <h5 class="grocery-list-title mb-0">{{ getFormattedDate(groceryList.dayOfGrocery) }}</h5>
-            <div class="d-flex gap-2">
-              <button 
-                type="button" 
-                class="btn btn-outline-primary btn-sm edit-button"
-                (click)="editGroceryList(groceryList, $event)"
-                title="Edit grocery list">
-                <i class="fas fa-edit"></i>
-              </button>
-              <button 
-                type="button" 
-                class="btn btn-outline-danger btn-sm delete-button"
-                (click)="deleteGroceryList(groceryList.id); $event.stopPropagation()"
-                [disabled]="isDeleting"
-                title="Delete grocery list">
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Meals section grouped by day -->
-          <div class="meals-section">
-            <div *ngFor="let dayGroup of getMealsGroupedByDay(groceryList.meals)" class="day-group">
-              <div class="day-header">
-                <span class="day-label">{{ getFormattedDayDate(dayGroup.day) }}</span>
-              </div>
-              <div class="meals-list-compact">
-                <div *ngFor="let meal of dayGroup.meals" class="meal-item-row">
-                  <span class="meal-name">{{ meal.recipeTitle || 'Loading...' }}</span>
-                  <span class="badge bg-primary meal-type-badge">{{ getMealTypeLabel(meal.mealType) }}</span>
+    <div *ngIf="!isLoading && !errorMessage && groceryLists.length > 0" class="container-fluid px-2 py-1">
+      <div class="row g-2">
+        <div *ngFor="let groceryList of groceryLists" class="col-12 col-md-6 col-lg-4">
+          <div class="card card-elevated grocery-list-card" (click)="viewGroceryListDetails(groceryList.id)">
+            <div class="card-header bg-gradient-to-r from-primary-100 to-secondary-100 py-2">
+              <div class="d-flex justify-content-between align-items-center">
+                <h6 class="card-title text-primary-800 mb-0" style="font-size: 1rem;">
+                  <i class="fas fa-calendar-day me-1"></i>
+                  {{ getFormattedDate(groceryList.dayOfGrocery) }}
+                </h6>
+                <div class="d-flex gap-1">
+                  <button 
+                    type="button" 
+                    class="btn btn-outline btn-sm"
+                    (click)="editGroceryList(groceryList, $event)"
+                    title="Edit grocery list">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button 
+                    type="button" 
+                    class="btn btn-outline-danger btn-sm"
+                    (click)="deleteGroceryList(groceryList.id); $event.stopPropagation()"
+                    [disabled]="isDeleting"
+                    title="Delete grocery list">
+                    <i class="fas fa-trash"></i>
+                  </button>
                 </div>
               </div>
             </div>
-          </div>
 
+            <div class="card-body">
+              <!-- Meals section grouped by day -->
+              <div class="meals-section">
+                <div *ngFor="let dayGroup of getMealsGroupedByDay(groceryList.meals)" class="day-group mb-3">
+                  <div class="day-header mb-2">
+                    <span class="badge badge-primary small">{{ getFormattedDayDate(dayGroup.day) }}</span>
+                  </div>
+                  <div class="meals-list">
+                    <div *ngFor="let meal of dayGroup.meals" class="meal-item d-flex justify-content-between align-items-center py-1">
+                      <span class="meal-name text-primary-700 fw-medium">{{ meal.recipeTitle || 'Loading...' }}</span>
+                      <span class="badge badge-secondary small">{{ getMealTypeLabel(meal.mealType) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
       </div>
     </div>
