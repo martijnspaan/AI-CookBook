@@ -57,6 +57,29 @@
   }
 }
 
+// Primary color for Planned Meals and Shopping List sections
+.meals-overview-section .section-title,
+.shopping-list-section .section-title {
+  color: var(--color-primary-500) !important;
+  border-bottom-color: var(--color-primary-200) !important;
+}
+
+// State icon colors for other sections
+.basket-section .section-title {
+  color: #ffc107 !important;
+  border-bottom-color: #ffeaa7 !important;
+}
+
+.online-section .section-title {
+  color: #17a2b8 !important;
+  border-bottom-color: #b3e5fc !important;
+}
+
+.stock-section .section-title {
+  color: #28a745 !important;
+  border-bottom-color: #c3e6cb !important;
+}
+
 // Meals Overview Section - Match grocery list styling
 .meals-overview-section {
   padding: 0.25rem;

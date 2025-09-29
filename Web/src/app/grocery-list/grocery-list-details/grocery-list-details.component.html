@@ -33,7 +33,7 @@
       </div>
 
       <!-- Shopping List Section -->
-      <div class="ingredients-section">
+      <div class="ingredients-section shopping-list-section">
         <h3 class="section-title">
           <i class="fas fa-shopping-cart me-2"></i>Shopping List
         </h3>
@@ -119,10 +119,9 @@
       </div>
 
       <!-- Basket Section -->
-      <div class="ingredients-section">
+      <div class="ingredients-section basket-section">
         <h3 class="section-title">
           <i class="fas fa-shopping-cart me-2"></i>Basket
-          <span class="ingredient-count">({{ getIngredientsByStatus('Basket').length }})</span>
         </h3>
         <div *ngIf="getIngredientsByStatus('Basket').length === 0" class="empty-status-section">
           <p class="text-muted">No ingredients added to cart yet</p>
@@ -194,10 +193,9 @@
       </div>
 
       <!-- Online Section -->
-      <div class="ingredients-section">
+      <div class="ingredients-section online-section">
         <h3 class="section-title">
           <i class="fas fa-laptop me-2"></i>Online
-          <span class="ingredient-count">({{ getIngredientsByStatus('Online').length }})</span>
         </h3>
         <div *ngIf="getIngredientsByStatus('Online').length === 0" class="empty-status-section">
           <p class="text-muted">No ingredients bought online yet</p>
@@ -268,11 +266,10 @@
         </div>
       </div>
 
-      <!-- Online Section -->
-      <div class="ingredients-section">
+      <!-- Stock Section -->
+      <div class="ingredients-section stock-section">
         <h3 class="section-title">
           <i class="fas fa-home me-2"></i>Stock
-          <span class="ingredient-count">({{ getIngredientsByStatus('Stock').length }})</span>
         </h3>
         <div *ngIf="getIngredientsByStatus('Stock').length === 0" class="empty-status-section">
           <p class="text-muted">No ingredients marked as in stock yet</p>
