@@ -2,7 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ConfigurationTabComponent, ConfigurationItem } from '../shared/configuration-tab.component';
-import { RecipeSettingsService, RecipeSettings, UpdateRecipeSettingsRequest } from '../../services/recipe-settings.service';
+import { RecipeSettingsService } from '../../services/recipe-settings.service';
+import { RecipeSettings, UpdateRecipeSettingsRequest } from '../../models/recipe-settings.model';
 
 @Component({
   selector: 'app-configuration-categories',

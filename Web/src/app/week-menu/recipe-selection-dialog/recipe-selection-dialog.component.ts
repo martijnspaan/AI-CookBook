@@ -5,8 +5,10 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { RecipeService } from '../../services/recipe.service';
 import { CookbookService } from '../../services/cookbook.service';
+import { RecipeSettingsService } from '../../services/recipe-settings.service';
 import { Recipe } from '../../models/recipe.model';
 import { Cookbook } from '../../models/cookbook.model';
+import { RecipeSettings } from '../../models/recipe-settings.model';
 import { RecipeCardComponent } from '../../shared/recipe-card/recipe-card.component';
 import { MultiSelectDropdownComponent, MultiSelectOption } from '../../shared/multi-select-dropdown/multi-select-dropdown.component';
 
@@ -33,8 +35,10 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy, OnChan
   allRecipes: Recipe[] = [];
   filteredRecipes: Recipe[] = [];
   cookbooks: Cookbook[] = [];
+  recipeSettings: RecipeSettings | null = null;
   isLoadingRecipes = false;
   isLoadingCookbooks = false;
+  isLoadingRecipeSettings = false;
   errorMessage: string | null = null;
   
   selectedMealTypeFilters: string[] = [];
@@ -46,13 +50,15 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy, OnChan
 
   constructor(
     private readonly recipeService: RecipeService,
-    private readonly cookbookService: CookbookService
+    private readonly cookbookService: CookbookService,
+    private readonly recipeSettingsService: RecipeSettingsService
   ) {}
 
   ngOnInit(): void {
     if (this.isVisible) {
       this.loadAllRecipes();
       this.loadCookbooks();
+      this.loadRecipeSettings();
     }
   }
 
@@ -65,6 +71,7 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy, OnChan
     if (changes['isVisible'] && this.isVisible) {
       this.loadAllRecipes();
       this.loadCookbooks();
+      this.loadRecipeSettings();
       this.preselectMealTypeFilter();
     }
   }
@@ -111,19 +118,37 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy, OnChan
       });
   }
 
-  extractAvailableMealTypes(recipes: Recipe[]): void {
-    const mealTypes = new Set<string>();
-    recipes.forEach(recipe => {
-      recipe.mealTypes.forEach(mealType => {
-        mealTypes.add(mealType);
+  loadRecipeSettings(): void {
+    this.isLoadingRecipeSettings = true;
+    
+    this.recipeSettingsService.getRecipeSettings()
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe({
+        next: (settings) => {
+          this.recipeSettings = settings;
+          // Meal types are always fixed: Breakfast, Lunch, Dinner
+          this.mealTypeOptions = [
+            { value: 'Breakfast', label: 'Breakfast' },
+            { value: 'Lunch', label: 'Lunch' },
+            { value: 'Dinner', label: 'Dinner' }
+          ];
+          this.isLoadingRecipeSettings = false;
+        },
+        error: (error) => {
+          console.error('Error loading recipe settings:', error);
+          this.isLoadingRecipeSettings = false;
+        }
       });
-    });
-    this.mealTypeOptions = Array.from(mealTypes)
-      .sort()
-      .map(mealType => ({
-        value: mealType,
-        label: mealType.charAt(0).toUpperCase() + mealType.slice(1)
-      }));
+  }
+
+  extractAvailableMealTypes(recipes: Recipe[]): void {
+    // Meal types are always fixed: Breakfast, Lunch, Dinner
+    // This method is kept for compatibility but doesn't change the fixed meal types
+    this.mealTypeOptions = [
+      { value: 'Breakfast', label: 'Breakfast' },
+      { value: 'Lunch', label: 'Lunch' },
+      { value: 'Dinner', label: 'Dinner' }
+    ];
   }
 
   preselectMealTypeFilter(): void {

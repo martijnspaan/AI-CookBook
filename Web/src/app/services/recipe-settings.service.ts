@@ -2,23 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-
-export interface RecipeSettings {
-  id: string;
-  tags: string[];
-  ingredients: string[];
-  units: string[];
-  categories: string[];
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface UpdateRecipeSettingsRequest {
-  tags: string[];
-  ingredients: string[];
-  units: string[];
-  categories: string[];
-}
+import { RecipeSettings, UpdateRecipeSettingsRequest } from '../models/recipe-settings.model';
 
 @Injectable({
   providedIn: 'root'
@@ -34,8 +18,8 @@ export class RecipeSettingsService {
     );
   }
 
-  updateRecipeSettings(settings: UpdateRecipeSettingsRequest): Observable<RecipeSettings> {
-    return this.httpClient.put<RecipeSettings>(this.apiBaseUrl, settings).pipe(
+  updateRecipeSettings(updateRequest: UpdateRecipeSettingsRequest): Observable<RecipeSettings> {
+    return this.httpClient.put<RecipeSettings>(this.apiBaseUrl, updateRequest).pipe(
       catchError(this.handleError)
     );
   }

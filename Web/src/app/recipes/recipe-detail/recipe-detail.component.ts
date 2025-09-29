@@ -6,8 +6,10 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { RecipeService } from '../../services/recipe.service';
 import { CookbookService } from '../../services/cookbook.service';
+import { RecipeSettingsService } from '../../services/recipe-settings.service';
 import { Recipe, UpdateRecipeRequest } from '../../models/recipe.model';
 import { Cookbook } from '../../models/cookbook.model';
+import { RecipeSettings } from '../../models/recipe-settings.model';
 import { PageTitleService } from '../../services/page-title.service';
 import { FooterService } from '../../services/footer.service';
 
@@ -21,13 +23,17 @@ import { FooterService } from '../../services/footer.service';
 export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
   recipe: Recipe | null = null;
   cookbooks: Cookbook[] = [];
+  recipeSettings: RecipeSettings | null = null;
   isLoadingRecipe = false;
   isLoadingCookbooks = false;
+  isLoadingRecipeSettings = false;
   isUpdatingRecipe = false;
   errorMessage: string | null = null;
   isEditingMode = false;
   editedRecipe: Recipe | null = null;
-  availableMealTypes = ['Breakfast', 'Lunch', 'Dinner'];
+  availableMealTypes: string[] = [];
+  availableIngredientTypes: string[] = [];
+  availableUnits: string[] = [];
   private readonly destroySubject = new Subject<void>();
 
 
@@ -36,12 +42,14 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     private readonly router: Router,
     private readonly recipeService: RecipeService,
     private readonly cookbookService: CookbookService,
+    private readonly recipeSettingsService: RecipeSettingsService,
     private readonly pageTitleService: PageTitleService,
     private readonly footerService: FooterService
   ) { }
 
   ngOnInit(): void {
     this.loadAllCookbooks();
+    this.loadRecipeSettings();
     
     const recipeId = this.activatedRoute.snapshot.paramMap.get('id');
     if (recipeId) {
@@ -114,6 +122,38 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         error: (error) => {
           this.isLoadingCookbooks = false;
           console.error('Error loading cookbooks:', error);
+        }
+      });
+  }
+
+  loadRecipeSettings(): void {
+    this.isLoadingRecipeSettings = true;
+    
+    this.recipeSettingsService.getRecipeSettings()
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe({
+        next: (settings) => {
+          this.recipeSettings = settings;
+          if (settings) {
+            // Meal types are always fixed: Breakfast, Lunch, Dinner
+            this.availableMealTypes = ['Breakfast', 'Lunch', 'Dinner'];
+            this.availableIngredientTypes = settings.ingredients || ['groente', 'fruit', 'olie', 'zuivel', 'kruid', 'anders'];
+            this.availableUnits = settings.units || ['mg', 'g', 'kg', 'ml', 'dl', 'l', 'tbsp', 'tsp', 'cup', 'piece', 'pinch'];
+          } else {
+            // Fallback to default values if no settings found
+            this.availableMealTypes = ['Breakfast', 'Lunch', 'Dinner'];
+            this.availableIngredientTypes = ['groente', 'fruit', 'olie', 'zuivel', 'kruid', 'anders'];
+            this.availableUnits = ['mg', 'g', 'kg', 'ml', 'dl', 'l', 'tbsp', 'tsp', 'cup', 'piece', 'pinch'];
+          }
+          this.isLoadingRecipeSettings = false;
+        },
+        error: (error) => {
+          console.error('Error loading recipe settings:', error);
+          // Fallback to default values on error
+          this.availableMealTypes = ['Breakfast', 'Lunch', 'Dinner'];
+          this.availableIngredientTypes = ['groente', 'fruit', 'olie', 'zuivel', 'kruid', 'anders'];
+          this.availableUnits = ['mg', 'g', 'kg', 'ml', 'dl', 'l', 'tbsp', 'tsp', 'cup', 'piece', 'pinch'];
+          this.isLoadingRecipeSettings = false;
         }
       });
   }

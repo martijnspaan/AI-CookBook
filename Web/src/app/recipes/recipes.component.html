@@ -38,7 +38,7 @@
                 <th scope="col">Title</th>
                 <th scope="col">Description</th>
                 <th scope="col">Cookbook</th>
-                <th scope="col">Meal Types</th>
+                <th scope="col">Meal Categories</th>
                 <th scope="col">Tags</th>
                 <th scope="col">Actions</th>
               </tr>
@@ -155,7 +155,7 @@
             </div>
             
             <div class="mb-3" *ngIf="mealTypesFormArray.controls.length > 0">
-              <label class="form-label fw-bold">Meal Types</label>
+              <label class="form-label fw-bold">Meal Categories</label>
               <div formArrayName="mealTypes">
                 <div class="meal-types-container">
                   <div *ngFor="let mealType of availableMealTypes; let i = index" class="form-check">
@@ -199,29 +199,14 @@
                               <select 
                                 class="form-select form-select-sm" 
                                 formControlName="amountUnit">
-                                <option value="mg">mg</option>
-                                <option value="g">g</option>
-                                <option value="kg">kg</option>
-                                <option value="ml">ml</option>
-                                <option value="dl">dl</option>
-                                <option value="l">l</option>
-                                <option value="tbsp">tbsp</option>
-                                <option value="tsp">tsp</option>
-                                <option value="cup">cup</option>
-                                <option value="piece">piece</option>
-                                <option value="pinch">pinch</option>
+                                <option *ngFor="let unit of availableUnits" [value]="unit">{{ unit }}</option>
                               </select>
                             </div>
                             <div class="col-4">
                               <select 
                                 class="form-select form-select-sm" 
                                 formControlName="type">
-                                <option value="groente">groente</option>
-                                <option value="fruit">fruit</option>
-                                <option value="olie">olie</option>
-                                <option value="zuivel">zuivel</option>
-                                <option value="kruid">kruid</option>
-                                <option value="anders">anders</option>
+                                <option *ngFor="let type of availableIngredientTypes" [value]="type">{{ type }}</option>
                               </select>
                             </div>
                             <div class="col-2 text-center">

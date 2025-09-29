@@ -7,8 +7,10 @@ import { takeUntil } from 'rxjs/operators';
 import { RecipeService } from '../services/recipe.service';
 import { CookbookService } from '../services/cookbook.service';
 import { RecipeModalService } from '../services/recipe-modal.service';
+import { RecipeSettingsService } from '../services/recipe-settings.service';
 import { Recipe, Ingredient, CreateRecipeRequest } from '../models/recipe.model';
 import { Cookbook } from '../models/cookbook.model';
+import { RecipeSettings } from '../models/recipe-settings.model';
 import { PageTitleService } from '../services/page-title.service';
 import { RecipeCardComponent } from '../shared/recipe-card/recipe-card.component';
 import { ReusablePopupComponent, PopupConfig } from '../shared/reusable-popup';
@@ -23,12 +25,16 @@ import { ReusablePopupComponent, PopupConfig } from '../shared/reusable-popup';
 export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   recipes: Recipe[] = [];
   cookbooks: Cookbook[] = [];
+  recipeSettings: RecipeSettings | null = null;
   isLoadingRecipes = false;
   isLoadingCookbooks = false;
+  isLoadingRecipeSettings = false;
   isCreatingRecipe = false;
   errorMessage: string | null = null;
   createRecipeForm: FormGroup;
-  availableMealTypes = ['Breakfast', 'Lunch', 'Dinner'];
+  availableMealTypes: string[] = [];
+  availableIngredientTypes: string[] = [];
+  availableUnits: string[] = [];
   showCreateRecipeModal = false;
   private readonly destroySubject = new Subject<void>();
 
@@ -47,6 +53,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     private readonly recipeService: RecipeService,
     private readonly cookbookService: CookbookService,
     private readonly recipeModalService: RecipeModalService,
+    private readonly recipeSettingsService: RecipeSettingsService,
     private readonly router: Router,
     private readonly formBuilder: FormBuilder,
     private readonly pageTitleService: PageTitleService
@@ -66,7 +73,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnInit(): void {
     this.loadAllRecipes();
     this.loadAllCookbooks();
-    this.initializeMealTypes();
+    this.loadRecipeSettings();
     
     // Subscribe to recipe modal service
     this.recipeModalService.openModal$
@@ -133,6 +140,38 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
         error: (error) => {
           this.isLoadingCookbooks = false;
           console.error('Error loading cookbooks:', error);
+        }
+      });
+  }
+
+  loadRecipeSettings(): void {
+    this.isLoadingRecipeSettings = true;
+    
+    this.recipeSettingsService.getRecipeSettings()
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe({
+        next: (settings) => {
+          this.recipeSettings = settings;
+          if (settings) {
+            // Meal types are always fixed: Breakfast, Lunch, Dinner
+            this.availableMealTypes = ['Breakfast', 'Lunch', 'Dinner'];
+            this.availableIngredientTypes = settings.ingredients || ['groente', 'fruit', 'olie', 'zuivel', 'kruid', 'anders'];
+            this.availableUnits = settings.units || ['mg', 'g', 'kg', 'ml', 'dl', 'l', 'tbsp', 'tsp', 'cup', 'piece', 'pinch'];
+          } else {
+            // Fallback to default values if no settings found
+            this.availableMealTypes = ['Breakfast', 'Lunch', 'Dinner'];
+            this.availableIngredientTypes = ['groente', 'fruit', 'olie', 'zuivel', 'kruid', 'anders'];
+            this.availableUnits = ['mg', 'g', 'kg', 'ml', 'dl', 'l', 'tbsp', 'tsp', 'cup', 'piece', 'pinch'];
+          }
+          this.isLoadingRecipeSettings = false;
+        },
+        error: (error) => {
+          console.error('Error loading recipe settings:', error);
+          // Fallback to default values on error
+          this.availableMealTypes = ['Breakfast', 'Lunch', 'Dinner'];
+          this.availableIngredientTypes = ['groente', 'fruit', 'olie', 'zuivel', 'kruid', 'anders'];
+          this.availableUnits = ['mg', 'g', 'kg', 'ml', 'dl', 'l', 'tbsp', 'tsp', 'cup', 'piece', 'pinch'];
+          this.isLoadingRecipeSettings = false;
         }
       });
   }
