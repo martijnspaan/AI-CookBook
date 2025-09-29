@@ -25,10 +25,12 @@
   .accordion-section {
     background: transparent;
     border-radius: 0;
-    overflow: hidden;
+    overflow: visible;
     transition: all 0.3s ease;
     border: none;
     box-shadow: none;
+    position: relative;
+    z-index: 1;
     
     &:hover {
       box-shadow: none;
@@ -37,6 +39,7 @@
     &.expanded {
       box-shadow: none;
       border: none;
+      z-index: 10;
     }
     
     .section-header {
@@ -123,7 +126,7 @@
       transition: max-height 0.3s ease;
       
       &.show {
-        max-height: 2000px; // Large enough to accommodate content
+        max-height: 5000px; // Large enough to accommodate all content including 127+ ingredients
       }
       
       .section-content-inner {

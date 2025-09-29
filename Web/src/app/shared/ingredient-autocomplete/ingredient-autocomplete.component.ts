@@ -117,8 +117,7 @@ export class IngredientAutocompleteComponent implements OnInit, OnDestroy, OnCha
     this.filteredIngredients = this.availableIngredients
       .filter(ingredient => 
         ingredient.toLowerCase().includes(this._value.toLowerCase())
-      )
-      .slice(0, 10); // Limit to 10 suggestions
+      );
   }
 
   selectIngredient(ingredient: string): void {

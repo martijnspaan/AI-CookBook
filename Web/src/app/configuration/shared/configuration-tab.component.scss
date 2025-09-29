@@ -83,6 +83,8 @@
 
 .items-container {
   flex: 1;
+  overflow-y: auto;
+  max-height: 300px;
   
   .empty-state {
     display: flex;
