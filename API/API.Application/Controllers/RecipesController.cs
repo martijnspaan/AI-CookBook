@@ -100,5 +100,21 @@ public static class RecipesController
         })
         .WithName("DeleteRecipe")
         .WithOpenApi();
+
+        // POST /api/recipes/upload - Upload a recipe directly as JSON
+        endpoints.MapPost("/api/recipes/upload", async (RecipeEntity recipe, ICosmosDbRepository<RecipeEntity> repository) =>
+        {
+            try
+            {
+                RecipeEntity createdRecipe = await repository.CreateAsync(recipe);
+                return Results.Json(createdRecipe, statusCode: 201);
+            }
+            catch (Exception ex)
+            {
+                return Results.Json(new { error = ex.Message }, statusCode: 400);
+            }
+        })
+        .WithName("UploadRecipe")
+        .WithOpenApi();
     }
 }
