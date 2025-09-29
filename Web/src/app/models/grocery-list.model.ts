@@ -4,10 +4,16 @@ export interface Meal {
   recipeId?: string;
 }
 
+export interface IngredientState {
+  ingredientName: string;
+  state: string;
+}
+
 export interface GroceryList {
   id: string;
   dayOfGrocery: string;
   meals: Meal[];
+  ingredientsState: IngredientState[];
   createdAt: string;
   updatedAt: string;
 }
@@ -15,4 +21,9 @@ export interface GroceryList {
 export interface CreateGroceryListRequest {
   dayOfGrocery: string;
   meals: Meal[];
+}
+
+export interface UpdateIngredientStateRequest {
+  ingredientName: string;
+  state: string;
 }

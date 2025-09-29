@@ -101,5 +101,23 @@ public static class GroceryListController
         })
         .WithName("DeleteGroceryList")
         .WithOpenApi();
+
+        // PATCH /api/grocerylists/{id}/ingredient-state - Update ingredient state
+        endpoints.MapPatch("/api/grocerylists/{id}/ingredient-state", async (string id, UpdateIngredientStateUseCaseInput input, UpdateIngredientStateUseCase updateIngredientStateUseCase) =>
+        {
+            UpdateIngredientStateUseCaseInput updateInput = input with { GroceryListId = id };
+            UpdateIngredientStateUseCaseOutput output = await updateIngredientStateUseCase.Execute(updateInput);
+
+            if (output.IsSuccess)
+            {
+                return Results.Json(output.GroceryList);
+            }
+            else
+            {
+                return Results.Json(new { error = output.ErrorMessage }, statusCode: 404);
+            }
+        })
+        .WithName("UpdateIngredientState")
+        .WithOpenApi();
     }
 }

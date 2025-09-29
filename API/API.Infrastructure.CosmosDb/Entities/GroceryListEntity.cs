@@ -11,6 +11,9 @@ public class GroceryListEntity : BaseCosmosDbEntity
     [JsonProperty("Meals")]
     public List<Meal> Meals { get; set; } = new();
 
+    [JsonProperty("IngredientsState")]
+    public List<IngredientState> IngredientsState { get; set; } = new();
+
     public GroceryListEntity()
     {
     }
@@ -64,5 +67,24 @@ public class Meal
 
         MealType = mealType;
         RecipeId = recipeId;
+    }
+}
+
+public class IngredientState
+{
+    [JsonProperty("IngredientName")]
+    public string IngredientName { get; set; } = string.Empty;
+
+    [JsonProperty("State")]
+    public string State { get; set; } = string.Empty;
+
+    public IngredientState()
+    {
+    }
+
+    public IngredientState(string ingredientName, string state)
+    {
+        IngredientName = ingredientName;
+        State = state;
     }
 }

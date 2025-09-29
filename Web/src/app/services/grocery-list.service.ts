@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { GroceryList, CreateGroceryListRequest } from '../models/grocery-list.model';
+import { GroceryList, CreateGroceryListRequest, UpdateIngredientStateRequest } from '../models/grocery-list.model';
 
 @Injectable({
   providedIn: 'root'
@@ -38,6 +38,12 @@ export class GroceryListService {
 
   deleteGroceryList(groceryListId: string): Observable<void> {
     return this.httpClient.delete<void>(`${this.apiBaseUrl}/${groceryListId}`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  updateIngredientState(groceryListId: string, ingredientStateRequest: UpdateIngredientStateRequest): Observable<GroceryList> {
+    return this.httpClient.patch<GroceryList>(`${this.apiBaseUrl}/${groceryListId}/ingredient-state`, ingredientStateRequest).pipe(
       catchError(this.handleError)
     );
   }

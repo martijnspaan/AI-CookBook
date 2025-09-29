@@ -5,7 +5,7 @@ import { PageTitleService } from '../../services/page-title.service';
 import { GroceryListService } from '../../services/grocery-list.service';
 import { RecipeService } from '../../services/recipe.service';
 import { FooterService } from '../../services/footer.service';
-import { GroceryList, Meal } from '../../models/grocery-list.model';
+import { GroceryList, Meal, IngredientState } from '../../models/grocery-list.model';
 import { Recipe, Ingredient } from '../../models/recipe.model';
 import { forkJoin, of, Subject } from 'rxjs';
 import { catchError, map, takeUntil } from 'rxjs/operators';
@@ -25,10 +25,10 @@ interface AggregatedIngredient {
   totalAmount: number;
   unit: string;
   recipes: string[];
-  state: IngredientState;
+  state: IngredientStateType;
 }
 
-type IngredientState = 'on-list' | 'add-to-cart' | 'bought-online' | 'in-stock';
+type IngredientStateType = 'List' | 'Basket' | 'Online' | 'Stock';
 
 interface DayGroup {
   day: string;
@@ -55,7 +55,7 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
   errorMessage: string | null = null;
   
   // Ingredient state management
-  private ingredientStates = new Map<string, IngredientState>();
+  private ingredientStates = new Map<string, IngredientStateType>();
   private readonly destroySubject = new Subject<void>();
 
   constructor(
@@ -142,6 +142,9 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
   }
 
   private loadGroceryListWithRecipes(groceryList: GroceryList): void {
+    // Load existing ingredient states from the database
+    this.loadIngredientStatesFromDatabase(groceryList.ingredientsState || []);
+    
     if (groceryList.meals.length === 0) {
       this.groceryList = groceryList as GroceryListWithRecipes;
       this.aggregatedIngredients = [];
@@ -223,7 +226,7 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
     this.groceryList.meals.forEach(meal => {
       if (meal.recipe && meal.recipe.ingredients) {
         meal.recipe.ingredients.forEach(ingredient => {
-          const key = `${ingredient.name.toLowerCase()}_${ingredient.type.toLowerCase()}_${ingredient.amount.unit.toLowerCase()}`;
+          const key = ingredient.name.toLowerCase();
           
           if (ingredientMap.has(key)) {
             const existing = ingredientMap.get(key)!;
@@ -238,7 +241,7 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
               totalAmount: ingredient.amount.value,
               unit: ingredient.amount.unit,
               recipes: [meal.recipe!.title],
-              state: this.ingredientStates.get(key) || 'on-list'
+              state: this.ingredientStates.get(key) || 'List'
             });
           }
         });
@@ -334,15 +337,15 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
 
   // Ingredient state management methods
   getIngredientKey(ingredient: AggregatedIngredient): string {
-    return `${ingredient.name.toLowerCase()}_${ingredient.type.toLowerCase()}_${ingredient.unit.toLowerCase()}`;
+    return ingredient.name.toLowerCase();
   }
 
   toggleIngredientState(ingredient: AggregatedIngredient): void {
     const key = this.getIngredientKey(ingredient);
     const currentState = ingredient.state;
     
-    // Cycle through states: on-list -> add-to-cart -> bought-online -> on-list
-    const stateOrder: IngredientState[] = ['on-list', 'add-to-cart', 'bought-online'];
+    // Cycle through states: List -> Basket -> Online -> Stock -> List
+    const stateOrder: IngredientStateType[] = ['List', 'Basket', 'Online', 'Stock'];
     const currentIndex = stateOrder.indexOf(currentState);
     const nextIndex = (currentIndex + 1) % stateOrder.length;
     const nextState = stateOrder[nextIndex];
@@ -350,6 +353,9 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
     ingredient.state = nextState;
     this.ingredientStates.set(key, nextState);
     
+    // Persist the state change to the database
+    this.persistIngredientState(ingredient, nextState);
+    
     // Prevent page scrolling when ingredient state changes
     // by maintaining the current scroll position
     const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -361,11 +367,14 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
     }, 0);
   }
 
-  setIngredientState(ingredient: AggregatedIngredient, state: IngredientState): void {
+  setIngredientState(ingredient: AggregatedIngredient, state: IngredientStateType): void {
     const key = this.getIngredientKey(ingredient);
     ingredient.state = state;
     this.ingredientStates.set(key, state);
     
+    // Persist the state change to the database
+    this.persistIngredientState(ingredient, state);
+    
     // Prevent page scrolling when ingredient state changes
     // by maintaining the current scroll position
     const currentScrollTop = window.pageYOffset || document.documentElement.scrollTop;
@@ -377,32 +386,32 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
     }, 0);
   }
 
-  getStateIcon(state: IngredientState): string {
-    const iconMap: { [key in IngredientState]: string } = {
-      'on-list': 'fas fa-list',
-      'add-to-cart': 'fas fa-shopping-cart',
-      'bought-online': 'fas fa-laptop',
-      'in-stock': 'fas fa-home'
+  getStateIcon(state: IngredientStateType): string {
+    const iconMap: { [key in IngredientStateType]: string } = {
+      'List': 'fas fa-list',
+      'Basket': 'fas fa-shopping-cart',
+      'Online': 'fas fa-laptop',
+      'Stock': 'fas fa-home'
     };
     return iconMap[state];
   }
 
-  getStateClass(state: IngredientState): string {
-    const classMap: { [key in IngredientState]: string } = {
-      'on-list': 'state-on-list',
-      'add-to-cart': 'state-add-to-cart',
-      'bought-online': 'state-bought-online',
-      'in-stock': 'state-in-stock'
+  getStateClass(state: IngredientStateType): string {
+    const classMap: { [key in IngredientStateType]: string } = {
+      'List': 'state-list',
+      'Basket': 'state-basket',
+      'Online': 'state-online',
+      'Stock': 'state-stock'
     };
     return classMap[state];
   }
 
-  getStateLabel(state: IngredientState): string {
-    const labelMap: { [key in IngredientState]: string } = {
-      'on-list': 'On List',
-      'add-to-cart': 'Add to Cart',
-      'bought-online': 'Bought Online',
-      'in-stock': 'In Stock'
+  getStateLabel(state: IngredientStateType): string {
+    const labelMap: { [key in IngredientStateType]: string } = {
+      'List': 'List',
+      'Basket': 'Basket',
+      'Online': 'Online',
+      'Stock': 'Stock'
     };
     return labelMap[state];
   }
@@ -431,12 +440,42 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
     return string.charAt(0).toUpperCase() + string.slice(1);
   }
 
+  private loadIngredientStatesFromDatabase(ingredientStates: IngredientState[]): void {
+    this.ingredientStates.clear();
+    ingredientStates.forEach(state => {
+      const key = state.ingredientName.toLowerCase();
+      this.ingredientStates.set(key, state.state as any);
+    });
+  }
+
+  private persistIngredientState(ingredient: AggregatedIngredient, state: IngredientStateType): void {
+    if (!this.groceryList) return;
+
+    const updateRequest = {
+      ingredientName: ingredient.name,
+      state: state
+    };
+
+    this.groceryListService.updateIngredientState(this.groceryList.id, updateRequest)
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe({
+        next: (updatedGroceryList) => {
+          // Update the local grocery list with the updated ingredient states
+          this.groceryList!.ingredientsState = updatedGroceryList.ingredientsState;
+        },
+        error: (error) => {
+          console.error('Error updating ingredient state:', error);
+          // Optionally show a user-friendly error message
+        }
+      });
+  }
+
   // New methods for status-based ingredient filtering and grouping
-  getIngredientsByStatus(status: IngredientState): AggregatedIngredient[] {
+  getIngredientsByStatus(status: IngredientStateType): AggregatedIngredient[] {
     return this.aggregatedIngredients.filter(ingredient => ingredient.state === status);
   }
 
-  getIngredientTypeGroupsByStatus(status: IngredientState): IngredientTypeGroup[] {
+  getIngredientTypeGroupsByStatus(status: IngredientStateType): IngredientTypeGroup[] {
     const ingredientsByStatus = this.getIngredientsByStatus(status);
     const typeGroups = new Map<string, AggregatedIngredient[]>();
     
