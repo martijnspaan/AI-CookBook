@@ -1,19 +1,33 @@
 import { Routes } from '@angular/router';
-import { RecipesComponent } from './recipes/recipes.component';
-import { RecipeDetailComponent } from './recipes/recipe-detail/recipe-detail.component';
-import { GroceryListComponent } from './grocery-list/grocery-list.component';
-import { GroceryListDetailsComponent } from './grocery-list/grocery-list-details/grocery-list-details.component';
-import { WeekMenuComponent } from './week-menu/week-menu.component';
-import { CookbooksComponent } from './cookbooks/cookbooks.component';
-import { ConfigurationComponent } from './configuration/configuration.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/recipes', pathMatch: 'full' },
-  { path: 'recipes', component: RecipesComponent },
-  { path: 'recipes/:id', component: RecipeDetailComponent },
-  { path: 'grocery-list', component: GroceryListComponent },
-  { path: 'grocery-list/:id', component: GroceryListDetailsComponent },
-  { path: 'week-menu', component: WeekMenuComponent },
-  { path: 'cookbooks', component: CookbooksComponent },
-  { path: 'recipe-settings', component: ConfigurationComponent }
+  { 
+    path: 'recipes', 
+    loadComponent: () => import('./recipes/recipes.component').then(m => m.RecipesComponent)
+  },
+  { 
+    path: 'recipes/:id', 
+    loadComponent: () => import('./recipes/recipe-detail/recipe-detail.component').then(m => m.RecipeDetailComponent)
+  },
+  { 
+    path: 'grocery-list', 
+    loadComponent: () => import('./grocery-list/grocery-list.component').then(m => m.GroceryListComponent)
+  },
+  { 
+    path: 'grocery-list/:id', 
+    loadComponent: () => import('./grocery-list/grocery-list-details/grocery-list-details.component').then(m => m.GroceryListDetailsComponent)
+  },
+  { 
+    path: 'week-menu', 
+    loadComponent: () => import('./week-menu/week-menu.component').then(m => m.WeekMenuComponent)
+  },
+  { 
+    path: 'cookbooks', 
+    loadComponent: () => import('./cookbooks/cookbooks.component').then(m => m.CookbooksComponent)
+  },
+  { 
+    path: 'recipe-settings', 
+    loadComponent: () => import('./configuration/configuration.component').then(m => m.ConfigurationComponent)
+  }
 ];

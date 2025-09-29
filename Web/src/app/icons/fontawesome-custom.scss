@@ -1,0 +1,115 @@
+// Custom FontAwesome CSS with only the icons we actually use
+// This significantly reduces the bundle size compared to the full FontAwesome library
+
+// Base FontAwesome styles (minimal)
+.fas, .far, .fab {
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  display: inline-block;
+  font-style: normal;
+  font-variant: normal;
+  text-rendering: auto;
+  line-height: 1;
+}
+
+@font-face {
+  font-family: "Font Awesome 6 Free";
+  font-style: normal;
+  font-weight: 900;
+  font-display: block;
+  src: url("/webfonts/fa-solid-900.woff2") format("woff2"),
+       url("/webfonts/fa-solid-900.woff") format("woff"),
+       url("/webfonts/fa-solid-900.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Font Awesome 6 Free";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/webfonts/fa-regular-400.woff2") format("woff2"),
+       url("/webfonts/fa-regular-400.woff") format("woff"),
+       url("/webfonts/fa-regular-400.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Font Awesome 6 Brands";
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+  src: url("/webfonts/fa-brands-400.woff2") format("woff2"),
+       url("/webfonts/fa-brands-400.woff") format("woff"),
+       url("/webfonts/fa-brands-400.ttf") format("truetype");
+}
+
+.fas {
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+}
+
+.far {
+  font-family: "Font Awesome 6 Free";
+  font-weight: 400;
+}
+
+.fab {
+  font-family: "Font Awesome 6 Brands";
+  font-weight: 400;
+}
+
+// Only include the icons we actually use
+.fa-arrow-left:before { content: "\f060"; }
+.fa-chevron-down:before { content: "\f078"; }
+.fa-times:before { content: "\f00d"; }
+.fa-plus:before { content: "\f067"; }
+.fa-edit:before { content: "\f044"; }
+.fa-save:before { content: "\f0c7"; }
+.fa-trash:before { content: "\f1f8"; }
+.fa-trash-alt:before { content: "\f2ed"; }
+.fa-search:before { content: "\f002"; }
+.fa-spinner:before { content: "\f110"; }
+.fa-info-circle:before { content: "\f05a"; }
+.fa-cog:before { content: "\f013"; }
+.fa-cogs:before { content: "\f085"; }
+.fa-redo:before { content: "\f01e"; }
+.fa-pen:before { content: "\f304"; }
+.fa-calendar-alt:before { content: "\f073"; }
+.fa-calendar-week:before { content: "\f784"; }
+.fa-inbox:before { content: "\f01c"; }
+.fa-book:before { content: "\f02d"; }
+.fa-book-open:before { content: "\f518"; }
+.fa-utensils:before { content: "\f2e7"; }
+.fa-egg:before { content: "\f7fb"; }
+.fa-carrot:before { content: "\f787"; }
+.fa-weight:before { content: "\f496"; }
+.fa-tags:before { content: "\f02c"; }
+.fa-tag:before { content: "\f02b"; }
+.fa-list:before { content: "\f03a"; }
+.fa-shopping-cart:before { content: "\f07a"; }
+.fa-laptop:before { content: "\f109"; }
+.fa-home:before { content: "\f015"; }
+.fa-user:before { content: "\f007"; }
+
+// Animation classes
+.fa-spin {
+  animation: fa-spin 2s infinite linear;
+}
+
+@keyframes fa-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Size classes
+.fa-3x { font-size: 3em; }
+
+// Margin classes
+.me-1 { margin-right: 0.25rem; }
+.me-2 { margin-right: 0.5rem; }
+.mb-3 { margin-bottom: 1rem; }
+
+// Rotation class
+.rotated {
+  transform: rotate(180deg);
+  transition: transform 0.3s ease;
+}
