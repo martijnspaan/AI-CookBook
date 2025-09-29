@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, FormArray, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { RecipeService } from '../services/recipe.service';
@@ -19,7 +20,7 @@ import { IngredientAutocompleteComponent } from '../shared/ingredient-autocomple
 @Component({
   selector: 'app-recipes',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RecipeCardComponent, ReusablePopupComponent, IngredientAutocompleteComponent],
+  imports: [CommonModule, ReactiveFormsModule, TranslateModule, RecipeCardComponent, ReusablePopupComponent, IngredientAutocompleteComponent],
   templateUrl: './recipes.component.html',
   styleUrl: './recipes.component.scss'
 })
@@ -34,13 +35,14 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   errorMessage: string | null = null;
   createRecipeForm: FormGroup;
   availableMealTypes: string[] = [];
+  mealTypeKeys: string[] = ['breakfast', 'lunch', 'dinner'];
   availableIngredientTypes: string[] = [];
   availableUnits: string[] = [];
   showCreateRecipeModal = false;
   private readonly destroySubject = new Subject<void>();
 
   createRecipePopupConfig: PopupConfig = {
-    title: 'Create New Recipe',
+    title: '',
     icon: 'fas fa-utensils',
     showCloseButton: true,
     size: 'xl',
@@ -57,7 +59,8 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     private readonly recipeSettingsService: RecipeSettingsService,
     private readonly router: Router,
     private readonly formBuilder: FormBuilder,
-    private readonly pageTitleService: PageTitleService
+    private readonly pageTitleService: PageTitleService,
+    private readonly translate: TranslateService
   ) {
     this.createRecipeForm = this.formBuilder.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
@@ -76,6 +79,9 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.loadAllCookbooks();
     this.loadRecipeSettings();
     
+    // Set translated popup title
+    this.createRecipePopupConfig.title = this.translate.instant('RECIPES.CREATE_NEW_RECIPE');
+    
     // Subscribe to recipe modal service
     this.recipeModalService.openModal$
       .pipe(takeUntil(this.destroySubject))
@@ -85,7 +91,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.pageTitleService.setPageTitle('Recipe Collection');
+    this.pageTitleService.setPageTitleFromTranslation('PAGE_TITLES.RECIPE_COLLECTION');
   }
 
   ngOnDestroy(): void {
@@ -155,12 +161,12 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
           this.recipeSettings = settings;
           if (settings) {
             // Meal types are always fixed: Breakfast, Lunch, Dinner
-            this.availableMealTypes = ['Breakfast', 'Lunch', 'Dinner'];
+            this.loadTranslatedMealTypes();
             this.availableIngredientTypes = settings.categories || ['groente', 'fruit', 'olie', 'zuivel', 'kruid', 'anders'];
             this.availableUnits = settings.units || ['mg', 'g', 'kg', 'ml', 'dl', 'l', 'tbsp', 'tsp', 'cup', 'piece', 'pinch'];
           } else {
             // Fallback to default values if no settings found
-            this.availableMealTypes = ['Breakfast', 'Lunch', 'Dinner'];
+            this.loadTranslatedMealTypes();
             this.availableIngredientTypes = ['groente', 'fruit', 'olie', 'zuivel', 'kruid', 'anders'];
             this.availableUnits = ['mg', 'g', 'kg', 'ml', 'dl', 'l', 'tbsp', 'tsp', 'cup', 'piece', 'pinch'];
           }
@@ -169,12 +175,24 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
         error: (error) => {
           console.error('Error loading recipe settings:', error);
           // Fallback to default values on error
-          this.availableMealTypes = ['Breakfast', 'Lunch', 'Dinner'];
+          this.loadTranslatedMealTypes();
           this.availableIngredientTypes = ['groente', 'fruit', 'olie', 'zuivel', 'kruid', 'anders'];
           this.availableUnits = ['mg', 'g', 'kg', 'ml', 'dl', 'l', 'tbsp', 'tsp', 'cup', 'piece', 'pinch'];
           this.isLoadingRecipeSettings = false;
         }
       });
+  }
+
+  private loadTranslatedMealTypes(): void {
+    this.availableMealTypes = this.mealTypeKeys.map(key => 
+      this.translate.instant(`MEAL_TYPES.${key.toUpperCase()}`)
+    );
+  }
+
+  getMealTypeTranslation(mealType: string): string {
+    // Convert meal type to lowercase for key lookup
+    const key = mealType.toLowerCase();
+    return this.translate.instant(`MEAL_TYPES.${key.toUpperCase()}`);
   }
 
   getTagsAsCommaSeparatedString(tags: string[]): string {

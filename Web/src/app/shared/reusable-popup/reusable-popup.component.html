@@ -17,7 +17,7 @@
           *ngIf="config.showCloseButton"
           type="button" 
           class="btn-close" 
-          aria-label="Close"
+          [attr.aria-label]="'GROCERY_LISTS.CLOSE' | translate"
           (click)="closePopup()">
           <span aria-hidden="true">&times;</span>
         </button>

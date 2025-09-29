@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { WeekCalendarComponent, RecipeAssignment } from './week-calendar/week-calendar.component';
 import { RecipeSelectionDialogService } from '../services/recipe-selection-dialog.service';
 import { RecipeSelectionDialogComponent } from './recipe-selection-dialog/recipe-selection-dialog.component';
@@ -46,7 +47,8 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     private groceryListDialogService: GroceryListDialogService,
     private recipeSelectionDialogService: RecipeSelectionDialogService,
     private groceryListService: GroceryListService,
-    private router: Router
+    private router: Router,
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -57,7 +59,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.pageTitleService.setPageTitle('Week Menu');
+    this.pageTitleService.setPageTitleFromTranslation('PAGE_TITLES.WEEK_MENU');
   }
 
   onWeekChanged(week: Date) {

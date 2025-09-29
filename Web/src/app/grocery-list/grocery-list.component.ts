@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { PageTitleService } from '../services/page-title.service';
 import { GroceryListService } from '../services/grocery-list.service';
 import { RecipeService } from '../services/recipe.service';
@@ -55,7 +56,8 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
     private groceryListService: GroceryListService,
     private recipeService: RecipeService,
     private weekMenuService: WeekMenuService,
-    private router: Router
+    private router: Router,
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -64,7 +66,7 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.pageTitleService.setPageTitle('Grocery Lists');
+    this.pageTitleService.setPageTitleFromTranslation('PAGE_TITLES.GROCERY_LISTS');
   }
 
   public loadGroceryLists(): void {

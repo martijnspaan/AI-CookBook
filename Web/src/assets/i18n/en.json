@@ -3,6 +3,13 @@
     "TITLE": "AI Cookbook",
     "MEAL_PLANNER": "AI Meal Planner"
   },
+  "PAGE_TITLES": {
+    "RECIPE_COLLECTION": "Recipe Collection",
+    "COOKBOOKS": "Cookbooks",
+    "GROCERY_LISTS": "Grocery Lists",
+    "WEEK_MENU": "Week Menu",
+    "AI_COOKBOOK": "AI Cookbook"
+  },
   "NAVIGATION": {
     "COOKBOOKS": "Cookbooks",
     "ALL_RECIPES": "All Recipes",
@@ -57,7 +64,50 @@
     "ALL_COOKBOOKS": "All Cookbooks",
     "CLEAR_FILTERS": "Clear filters",
     "CLEAR_SEARCH": "Clear search",
-    "CHOOSE_RECIPE_FOR": "Choose a recipe for {{mealType}} on {{date}}"
+    "CHOOSE_RECIPE_FOR": "Choose a recipe for {{mealType}} on {{date}}",
+    "LOADING_RECIPES_TEXT": "Loading recipes...",
+    "ERROR_LOADING_RECIPES": "Failed to load recipes. Please make sure the API is running.",
+    "CLOSE_DIALOG": "Close",
+    "REMOVE_RECIPE": "Remove recipe",
+    "NO_RECIPES_FOUND": "No recipes found",
+    "NO_RECIPES_AVAILABLE_MOMENT": "There are no recipes available at the moment.",
+    "TITLE": "Title",
+    "DESCRIPTION": "Description",
+    "COOKBOOK": "Cookbook",
+    "MEAL_CATEGORIES": "Meal Categories",
+    "TAGS": "Tags",
+    "ACTIONS": "Actions",
+    "DELETE_RECIPE": "Delete recipe",
+    "CREATE_NEW_RECIPE": "Create New Recipe",
+    "TITLE_REQUIRED": "Title *",
+    "DESCRIPTION_LABEL": "Description",
+    "TAGS_LABEL": "Tags",
+    "TAG_PLACEHOLDER": "Tag",
+    "ADD_TAG": "Add Tag",
+    "COOKBOOK_LABEL": "Cookbook",
+    "NO_COOKBOOK": "No cookbook",
+    "PAGE": "Page",
+    "PAGE_PLACEHOLDER": "Page number in cookbook",
+    "MEAL_CATEGORIES_LABEL": "Meal Categories",
+    "INGREDIENTS": "Ingredients",
+    "INGREDIENT_NAME_PLACEHOLDER": "Enter ingredient name",
+    "AMOUNT": "Amount",
+    "REMOVE_INGREDIENT": "Remove ingredient",
+    "ADD_INGREDIENT": "Add Ingredient",
+    "RECIPE_STEPS": "Recipe",
+    "RECIPE_STEP_PLACEHOLDER": "Recipe step",
+    "ADD_STEP": "Add Step",
+    "CANCEL": "Cancel",
+    "CREATING": "Creating...",
+    "CREATE_RECIPE": "Create Recipe",
+    "LOADING_RECIPE_DETAILS": "Loading recipe details...",
+    "GO_BACK": "Go Back",
+    "NO_MEAL_TYPES_SELECTED": "No meal types selected",
+    "NO_TAGS": "No tags",
+    "NO_INGREDIENTS": "No ingredients",
+    "NO_RECIPE_STEPS": "No recipe steps",
+    "DELETE_RECIPE": "Delete Recipe",
+    "OTHER": "Other"
   },
   "WEEK_MENU": {
     "SAVING_WEEK_MENU": "Saving week menu...",
@@ -69,7 +119,18 @@
     "CREATE_FIRST_GROCERY_LIST": "Create your first grocery list by planning meals in the Week Menu.",
     "GO_TO_WEEK_MENU": "Go to Week Menu",
     "EDIT_GROCERY_LIST": "Edit grocery list",
-    "DELETE_GROCERY_LIST": "Delete grocery list"
+    "DELETE_GROCERY_LIST": "Delete grocery list",
+    "CREATE_GROCERY_LIST": "Create Grocery List",
+    "CHOOSE_GROCERY_DAY": "Choose your grocery day:",
+    "SELECT_MEALS_TO_INCLUDE": "Select meals to include:",
+    "LOADING_EXISTING_LISTS": "Loading existing grocery lists...",
+    "NO_MEALS_SELECTED": "No meals selected for this week. Please add some recipes to your week menu first.",
+    "NO_MEALS_IN_LIST": "No meals in this grocery list.",
+    "UPDATING": "Updating...",
+    "UPDATE_GROCERY_LIST": "Update Grocery List",
+    "GROCERY_DAY": "Grocery day:",
+    "LOADING_RECIPES": "Loading recipes...",
+    "CLOSE": "Close"
   },
   "MEAL_TYPES": {
     "BREAKFAST": "Breakfast",
@@ -80,6 +141,22 @@
   "BUTTONS": {
     "NEW_RECIPE": "New Recipe",
     "NEW_COOKBOOK": "New Cookbook",
-    "NEW_GROCERY_LIST": "New Grocery List"
+    "NEW_GROCERY_LIST": "New Grocery List",
+    "BACK_TO_RECIPES": "Back to Recipes",
+    "EDIT_RECIPE": "Edit Recipe",
+    "BACK_TO_GROCERY_LISTS": "Back to Grocery Lists"
+  },
+  "CONFIGURATION": {
+    "RECIPE_TAGS": "Recipe Tags",
+    "INGREDIENTS": "Ingredients",
+    "MEASUREMENT_UNITS": "Measurement Units",
+    "INGREDIENT_CATEGORIES": "Ingredient Categories"
+  },
+  "SHOWCASE": {
+    "DESIGN_TOKENS": "Design Tokens",
+    "REUSABLE_COMPONENTS": "Reusable Components",
+    "ACCESSIBILITY_STANDARDS": "Accessibility Standards",
+    "IMPLEMENTATION_GUIDE": "Implementation Guide"
   }
 }
+

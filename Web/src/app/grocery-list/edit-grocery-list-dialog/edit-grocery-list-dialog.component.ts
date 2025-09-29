@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { GroceryListService } from '../../services/grocery-list.service';
 import { RecipeService } from '../../services/recipe.service';
 import { GroceryList, Meal } from '../../models/grocery-list.model';
@@ -33,7 +34,7 @@ interface MealWithRecipe extends Meal {
 @Component({
   selector: 'app-edit-grocery-list-dialog',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReusablePopupComponent],
+  imports: [CommonModule, FormsModule, TranslateModule, ReusablePopupComponent],
   templateUrl: './edit-grocery-list-dialog.component.html',
   styleUrl: './edit-grocery-list-dialog.component.scss'
 })
@@ -54,7 +55,7 @@ export class EditGroceryListDialogComponent implements OnInit, OnChanges {
   recipeMap: Map<string, string> = new Map();
 
   popupConfig: PopupConfig = {
-    title: 'Edit Grocery List',
+    title: '',
     icon: 'fas fa-edit',
     showCloseButton: true,
     size: 'lg',
@@ -66,11 +67,17 @@ export class EditGroceryListDialogComponent implements OnInit, OnChanges {
 
   constructor(
     private groceryListService: GroceryListService,
-    private recipeService: RecipeService
+    private recipeService: RecipeService,
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
+    this.updatePopupConfig();
     this.loadExistingGroceryLists();
+  }
+
+  private updatePopupConfig(): void {
+    this.popupConfig.title = this.translateService.instant('GROCERY_LISTS.EDIT_GROCERY_LIST');
   }
 
   ngOnChanges(changes: SimpleChanges): void {

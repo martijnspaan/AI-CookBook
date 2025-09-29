@@ -4,17 +4,17 @@
       <!-- Loading State -->
       <div *ngIf="isLoadingRecipe" class="text-center py-5">
         <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Loading...</span>
+          <span class="visually-hidden">{{ 'COMMON.LOADING' | translate }}</span>
         </div>
-        <p class="mt-2">Loading recipe details...</p>
+        <p class="mt-2">{{ 'RECIPES.LOADING_RECIPE_DETAILS' | translate }}</p>
       </div>
 
       <!-- Error State -->
       <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
-        <h4 class="alert-heading">Error!</h4>
+        <h4 class="alert-heading">{{ 'COMMON.ERROR' | translate }}</h4>
         <p>{{ errorMessage }}</p>
         <hr>
-        <button class="btn btn-outline-danger" (click)="navigateBackToRecipesList()">Go Back</button>
+        <button class="btn btn-outline-danger" (click)="navigateBackToRecipesList()">{{ 'RECIPES.GO_BACK' | translate }}</button>
       </div>
 
       <!-- Recipe Details -->
@@ -23,23 +23,23 @@
           <div class="recipe-body">
             <!-- Title (only shown when editing) -->
             <div class="mb-2" *ngIf="isEditingMode">
-              <label class="form-label fw-bold">Title</label>
+              <label class="form-label fw-bold">{{ 'RECIPES.TITLE' | translate }}</label>
               <input 
                 type="text" 
                 class="form-control" 
                 [(ngModel)]="editedRecipe!.title"
-                placeholder="Recipe title">
+                [placeholder]="'RECIPES.TITLE' | translate">
             </div>
 
             <!-- Description -->
             <div class="mb-2">
-              <label class="form-label fw-bold">Description</label>
+              <label class="form-label fw-bold">{{ 'RECIPES.DESCRIPTION' | translate }}</label>
               <textarea 
                 *ngIf="isEditingMode" 
                 class="form-control" 
                 rows="3"
                 [(ngModel)]="editedRecipe!.description"
-                placeholder="Recipe description"></textarea>
+                [placeholder]="'RECIPES.DESCRIPTION' | translate"></textarea>
               <div *ngIf="!isEditingMode" class="recipe-field">
                 {{ recipe.description }}
               </div>
@@ -49,10 +49,10 @@
             <div class="mb-2">
               <div class="row g-2">
                 <div class="col">
-                  <label class="form-label fw-bold">Cookbook</label>
+                  <label class="form-label fw-bold">{{ 'RECIPES.COOKBOOK' | translate }}</label>
                   <div *ngIf="isEditingMode">
                     <select class="form-select" [(ngModel)]="editedRecipe!.cookbookId">
-                      <option value="">No cookbook</option>
+                      <option value="">{{ 'RECIPES.NO_COOKBOOK' | translate }}</option>
                       <option *ngFor="let cookbook of cookbooks" [value]="cookbook.id">{{ cookbook.title }}</option>
                     </select>
                   </div>
@@ -61,9 +61,9 @@
                   </div>
                 </div>
                 <div class="col-auto page-field-container">
-                  <label class="form-label fw-bold">Page</label>
+                  <label class="form-label fw-bold">{{ 'RECIPES.PAGE' | translate }}</label>
                   <div *ngIf="isEditingMode">
-                    <input type="number" class="form-control page-input" [(ngModel)]="editedRecipe!.page" min="1" placeholder="Page" maxlength="3">
+                    <input type="number" class="form-control page-input" [(ngModel)]="editedRecipe!.page" min="1" [placeholder]="'RECIPES.PAGE' | translate" maxlength="3">
                   </div>
                   <div *ngIf="!isEditingMode" class="recipe-field">
                     {{ recipe.page }}
@@ -74,7 +74,7 @@
 
             <!-- Meal Categories -->
             <div class="mb-2">
-                <label class="form-label fw-bold">Meal Categories</label>
+                <label class="form-label fw-bold">{{ 'RECIPES.MEAL_CATEGORIES' | translate }}</label>
               <div *ngIf="isEditingMode">
                 <div class="d-flex flex-wrap gap-3">
                   <div *ngFor="let mealType of availableMealTypes" class="form-check">
@@ -85,7 +85,7 @@
                       [checked]="isMealTypeSelected(mealType)"
                       (change)="toggleMealType(mealType)">
                     <label class="form-check-label" [for]="'mealType-' + mealType">
-                      {{ mealType }}
+                      {{ getMealTypeTranslation(mealType) }}
                     </label>
                   </div>
                 </div>
@@ -93,16 +93,16 @@
               <div *ngIf="!isEditingMode" class="recipe-field">
                 <div class="d-flex flex-wrap gap-1">
                   <span *ngFor="let mealType of recipe.mealTypes" class="badge bg-primary">
-                    {{ mealType }}
+                    {{ getMealTypeTranslation(mealType) }}
                   </span>
-                  <span *ngIf="recipe.mealTypes.length === 0" class="text-muted">No meal types selected</span>
+                  <span *ngIf="recipe.mealTypes.length === 0" class="text-muted">{{ 'RECIPES.NO_MEAL_TYPES_SELECTED' | translate }}</span>
                 </div>
               </div>
             </div>
 
             <!-- Tags -->
             <div class="mb-2">
-              <label class="form-label fw-bold">Tags</label>
+              <label class="form-label fw-bold">{{ 'RECIPES.TAGS' | translate }}</label>
               <div *ngIf="isEditingMode">
                 <div class="tags-container">
                   <div *ngFor="let tag of editedRecipe!.tags; let i = index; trackBy: trackByIndex" class="tag-input-group">
@@ -110,14 +110,14 @@
                       type="text" 
                       class="form-control" 
                       [(ngModel)]="editedRecipe!.tags[i]"
-                      placeholder="Tag">
+                      [placeholder]="'RECIPES.TAG_PLACEHOLDER' | translate">
                     <button class="btn btn-outline-danger" type="button" (click)="removeTagAtIndex(i)" [disabled]="editedRecipe!.tags.length <= 1">
                       <i class="fas fa-times"></i>
                     </button>
                   </div>
                 </div>
                 <button class="btn btn-outline-primary btn-sm" (click)="addEmptyTag()">
-                  <i class="fas fa-plus"></i> Add Tag
+                  <i class="fas fa-plus"></i> {{ 'RECIPES.ADD_TAG' | translate }}
                 </button>
               </div>
               <div *ngIf="!isEditingMode" class="recipe-field">
@@ -125,14 +125,14 @@
                   <span *ngFor="let tag of recipe.tags" class="badge bg-secondary">
                     {{ tag }}
                   </span>
-                  <span *ngIf="recipe.tags.length === 0" class="text-muted">No tags</span>
+                  <span *ngIf="recipe.tags.length === 0" class="text-muted">{{ 'RECIPES.NO_TAGS' | translate }}</span>
                 </div>
               </div>
             </div>
 
             <!-- Ingredients -->
             <div class="mb-2">
-              <label class="form-label fw-bold">Ingredients</label>
+              <label class="form-label fw-bold">{{ 'RECIPES.INGREDIENTS' | translate }}</label>
               <div *ngIf="isEditingMode">
                 <div class="ingredients-table-container mb-2">
                   <table class="table table-sm ingredients-table">
@@ -141,7 +141,7 @@
                         <td colspan="5">
                           <app-ingredient-autocomplete
                             [inputValue]="editedRecipe!.ingredients[i].name"
-                            placeholder="Enter ingredient name"
+                            [placeholder]="'RECIPES.INGREDIENT_NAME_PLACEHOLDER' | translate"
                             [required]="true"
                             size="sm"
                             (valueChange)="onIngredientNameChange(i, $event)"
@@ -153,7 +153,7 @@
                                 type="number" 
                                 class="form-control form-control-sm" 
                                 [(ngModel)]="editedRecipe!.ingredients[i].amount.value"
-                                placeholder="Amount"
+                                [placeholder]="'RECIPES.AMOUNT' | translate"
                                 step="0.1">
                             </div>
                             <div class="col-3">
@@ -176,7 +176,7 @@
                                 type="button" 
                                 (click)="removeIngredientAtIndex(i)" 
                                 [disabled]="editedRecipe!.ingredients.length <= 1"
-                                title="Remove ingredient">
+                                [title]="'RECIPES.REMOVE_INGREDIENT' | translate">
                                 <i class="fas fa-times"></i>
                               </button>
                             </div>
@@ -187,14 +187,14 @@
                   </table>
                 </div>
                 <button class="btn btn-outline-primary btn-sm" (click)="addEmptyIngredient()">
-                  <i class="fas fa-plus"></i> Add Ingredient
+                  <i class="fas fa-plus"></i> {{ 'RECIPES.ADD_INGREDIENT' | translate }}
                 </button>
               </div>
               <div *ngIf="!isEditingMode" class="recipe-field">
                 <div *ngIf="recipe.ingredients.length > 0" class="ingredients-list">
                   <div *ngFor="let typeGroup of getIngredientsByType()" class="ingredient-type-group mb-3">
                     <h6 class="ingredient-type-header text-muted mb-2">
-                      <i class="fas fa-tag me-1"></i>{{ typeGroup.type || 'Overig' }}
+                      <i class="fas fa-tag me-1"></i>{{ typeGroup.type || ('RECIPES.OTHER' | translate) }}
                     </h6>
                     <div class="ingredient-items">
                       <div *ngFor="let ingredient of typeGroup.ingredients" class="ingredient-item mb-1">
@@ -206,13 +206,13 @@
                     </div>
                   </div>
                 </div>
-                <div *ngIf="recipe.ingredients.length === 0" class="text-muted">No ingredients</div>
+                <div *ngIf="recipe.ingredients.length === 0" class="text-muted">{{ 'RECIPES.NO_INGREDIENTS' | translate }}</div>
               </div>
             </div>
 
             <!-- Recipe Content -->
             <div class="mb-2">
-              <label class="form-label fw-bold">Recipe</label>
+              <label class="form-label fw-bold">{{ 'RECIPES.RECIPE_STEPS' | translate }}</label>
               <div *ngIf="isEditingMode">
                 <div class="recipe-steps-container">
                   <div *ngFor="let step of editedRecipe!.recipe; let i = index; trackBy: trackByIndex" class="recipe-step-input-group">
@@ -221,20 +221,20 @@
                       type="text" 
                       class="form-control" 
                       [(ngModel)]="editedRecipe!.recipe[i]"
-                      placeholder="Recipe step">
+                      [placeholder]="'RECIPES.RECIPE_STEP_PLACEHOLDER' | translate">
                     <button class="btn btn-outline-danger" type="button" (click)="removeRecipeStepAtIndex(i)" [disabled]="editedRecipe!.recipe.length <= 1">
                       <i class="fas fa-times"></i>
                     </button>
                   </div>
                 </div>
                 <button class="btn btn-outline-primary btn-sm" (click)="addEmptyRecipeStep()">
-                  <i class="fas fa-plus"></i> Add Step
+                  <i class="fas fa-plus"></i> {{ 'RECIPES.ADD_STEP' | translate }}
                 </button>
               </div>
               <div *ngIf="!isEditingMode" class="recipe-field">
                 <ol class="mb-0">
                   <li *ngFor="let step of recipe.recipe" class="recipe-step">{{ step }}</li>
-                  <li *ngIf="recipe.recipe.length === 0" class="text-muted">No recipe steps</li>
+                  <li *ngIf="recipe.recipe.length === 0" class="text-muted">{{ 'RECIPES.NO_RECIPE_STEPS' | translate }}</li>
                 </ol>
             </div>
           </div>
@@ -245,9 +245,9 @@
           <button 
             class="btn btn-danger btn-sm" 
             (click)="deleteRecipeWithConfirmation()"
-            title="Delete recipe">
+            [title]="'RECIPES.DELETE_RECIPE' | translate">
             <i class="fas fa-trash me-1"></i>
-            Delete Recipe
+            {{ 'RECIPES.DELETE_RECIPE' | translate }}
           </button>
         </div>
       </div>

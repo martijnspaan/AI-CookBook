@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { RecipeAssignment } from '../week-calendar/week-calendar.component';
 import { GroceryListService } from '../../services/grocery-list.service';
 import { GroceryList } from '../../models/grocery-list.model';
@@ -23,7 +24,7 @@ export interface MealSelection {
 @Component({
   selector: 'app-grocery-list-dialog',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReusablePopupComponent],
+  imports: [CommonModule, FormsModule, TranslateModule, ReusablePopupComponent],
   templateUrl: './grocery-list-dialog.component.html',
   styleUrl: './grocery-list-dialog.component.scss'
 })
@@ -41,7 +42,7 @@ export class GroceryListDialogComponent implements OnInit, OnChanges {
   isLoadingGroceryLists: boolean = false;
 
   popupConfig: PopupConfig = {
-    title: 'Create Grocery List',
+    title: '',
     icon: 'fas fa-shopping-cart',
     showCloseButton: true,
     size: 'lg',
@@ -51,11 +52,19 @@ export class GroceryListDialogComponent implements OnInit, OnChanges {
     closeOnEscape: true
   };
 
-  constructor(private groceryListService: GroceryListService) {}
+  constructor(
+    private groceryListService: GroceryListService,
+    private translateService: TranslateService
+  ) {}
 
   ngOnInit(): void {
+    this.updatePopupConfig();
     this.generateGroceryDayOptions();
     this.loadExistingGroceryLists();
+  }
+
+  private updatePopupConfig(): void {
+    this.popupConfig.title = this.translateService.instant('GROCERY_LISTS.CREATE_GROCERY_LIST');
   }
 
   ngOnChanges(changes: SimpleChanges): void {

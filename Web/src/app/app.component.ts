@@ -11,6 +11,7 @@ import { RecipeModalService } from './services/recipe-modal.service';
 import { GroceryListDialogService } from './services/grocery-list-dialog.service';
 import { RecipeSelectionDialogService, RecipeSelectionDialogData } from './services/recipe-selection-dialog.service';
 import { FooterService, FooterButtonConfig } from './services/footer.service';
+import { LanguageService } from './services/language.service';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { Recipe } from './models/recipe.model';
@@ -24,7 +25,7 @@ import { Recipe } from './models/recipe.model';
 })
 export class AppComponent implements OnInit, OnDestroy {
   readonly applicationTitle = 'AI Cookbook';
-  currentPageTitle = 'AI Cookbook';
+  currentPageTitle = '';
   private readonly destroySubject = new Subject<void>();
   
   // Recipe selection dialog state
@@ -68,10 +69,25 @@ export class AppComponent implements OnInit, OnDestroy {
     private groceryListDialogService: GroceryListDialogService,
     private recipeSelectionDialogService: RecipeSelectionDialogService,
     private footerService: FooterService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private languageService: LanguageService
   ) {}
 
   ngOnInit(): void {
+    // Initialize language service first to restore user's language preference
+    // The language service will automatically load the saved language from localStorage
+    // and set it as the current language for the translation service
+    
+    // Set initial page title
+    this.pageTitleService.setPageTitleFromTranslation('PAGE_TITLES.AI_COOKBOOK');
+    
+    // Listen to language changes and re-translate footer buttons
+    this.translate.onLangChange
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe(() => {
+        this.updateFooterForCurrentRoute();
+      });
+    
     this.pageTitleService.pageTitle$
       .pipe(takeUntil(this.destroySubject))
       .subscribe(title => {

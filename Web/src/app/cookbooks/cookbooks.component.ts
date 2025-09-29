@@ -65,7 +65,7 @@ export class CookbooksComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.pageTitleService.setPageTitle('Cookbooks');
+    this.pageTitleService.setPageTitleFromTranslation('PAGE_TITLES.COOKBOOKS');
   }
 
   ngOnDestroy(): void {

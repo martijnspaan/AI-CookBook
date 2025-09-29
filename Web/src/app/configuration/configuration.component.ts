@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { PageTitleService } from '../services/page-title.service';
 import { ConfigurationTagsComponent } from './configuration-tags/configuration-tags.component';
 import { ConfigurationIngredientsComponent } from './configuration-ingredients/configuration-ingredients.component';
@@ -19,6 +20,7 @@ export interface AccordionSection {
   standalone: true,
   imports: [
     CommonModule,
+    TranslateModule,
     ConfigurationTagsComponent,
     ConfigurationIngredientsComponent,
     ConfigurationUnitsComponent,
@@ -30,41 +32,49 @@ export interface AccordionSection {
 export class ConfigurationComponent implements OnInit {
   expandedSection: 'tags' | 'ingredients' | 'units' | 'categories' | null = null;
   
-  accordionSections: AccordionSection[] = [
-    {
-      id: 'tags',
-      title: 'Recipe Tags',
-      icon: 'fas fa-tags',
-      content: '',
-      expanded: false
-    },
-    {
-      id: 'ingredients',
-      title: 'Ingredients',
-      icon: 'fas fa-carrot',
-      content: '',
-      expanded: false
-    },
-    {
-      id: 'units',
-      title: 'Measurement Units',
-      icon: 'fas fa-weight',
-      content: '',
-      expanded: false
-    },
-    {
-      id: 'categories',
-      title: 'Ingredient Categories',
-      icon: 'fas fa-utensils',
-      content: '',
-      expanded: false
-    }
-  ];
+  accordionSections: AccordionSection[] = [];
 
-  constructor(private readonly pageTitleService: PageTitleService) {}
+  constructor(
+    private readonly pageTitleService: PageTitleService,
+    private readonly translateService: TranslateService
+  ) {}
 
   ngOnInit(): void {
     this.pageTitleService.setPageTitle('Recipe Settings');
+    this.updateAccordionSections();
+  }
+
+  private updateAccordionSections(): void {
+    this.accordionSections = [
+      {
+        id: 'tags',
+        title: this.translateService.instant('CONFIGURATION.RECIPE_TAGS'),
+        icon: 'fas fa-tags',
+        content: '',
+        expanded: false
+      },
+      {
+        id: 'ingredients',
+        title: this.translateService.instant('CONFIGURATION.INGREDIENTS'),
+        icon: 'fas fa-carrot',
+        content: '',
+        expanded: false
+      },
+      {
+        id: 'units',
+        title: this.translateService.instant('CONFIGURATION.MEASUREMENT_UNITS'),
+        icon: 'fas fa-weight',
+        content: '',
+        expanded: false
+      },
+      {
+        id: 'categories',
+        title: this.translateService.instant('CONFIGURATION.INGREDIENT_CATEGORIES'),
+        icon: 'fas fa-utensils',
+        content: '',
+        expanded: false
+      }
+    ];
   }
 
   toggleSection(sectionId: string): void {

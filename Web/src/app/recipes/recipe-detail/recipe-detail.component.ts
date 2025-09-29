@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -17,7 +18,7 @@ import { IngredientAutocompleteComponent } from '../../shared/ingredient-autocom
 @Component({
   selector: 'app-recipe-detail',
   standalone: true,
-  imports: [CommonModule, FormsModule, IngredientAutocompleteComponent],
+  imports: [CommonModule, FormsModule, TranslateModule, IngredientAutocompleteComponent],
   templateUrl: './recipe-detail.component.html',
   styleUrl: './recipe-detail.component.scss'
 })
@@ -33,6 +34,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
   isEditingMode = false;
   editedRecipe: Recipe | null = null;
   availableMealTypes: string[] = [];
+  mealTypeKeys: string[] = ['breakfast', 'lunch', 'dinner'];
   availableIngredientTypes: string[] = [];
   availableUnits: string[] = [];
   private readonly destroySubject = new Subject<void>();
@@ -45,7 +47,8 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     private readonly cookbookService: CookbookService,
     private readonly recipeSettingsService: RecipeSettingsService,
     private readonly pageTitleService: PageTitleService,
-    private readonly footerService: FooterService
+    private readonly footerService: FooterService,
+    private readonly translate: TranslateService
   ) { }
 
   ngOnInit(): void {
@@ -71,14 +74,14 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   private setupFooterButtons(): void {
-    this.footerService.setFooterConfig({
+    this.footerService.setFooterConfigFromTranslation({
       showLeftButton: true,
-      leftButtonText: 'Back to Recipes',
+      leftButtonTranslationKey: 'BUTTONS.BACK_TO_RECIPES',
       leftButtonIcon: 'fas fa-arrow-left',
       leftButtonClass: 'btn-outline-secondary',
       leftButtonClickHandler: () => this.navigateBackToRecipesList(),
       showRightButton: true,
-      rightButtonText: 'Edit Recipe',
+      rightButtonTranslationKey: 'BUTTONS.EDIT_RECIPE',
       rightButtonIcon: 'fas fa-edit',
       rightButtonClass: 'btn-primary',
       rightButtonClickHandler: () => this.onRightButtonClick()
@@ -137,12 +140,12 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
           this.recipeSettings = settings;
           if (settings) {
             // Meal types are always fixed: Breakfast, Lunch, Dinner
-            this.availableMealTypes = ['Breakfast', 'Lunch', 'Dinner'];
+            this.loadTranslatedMealTypes();
             this.availableIngredientTypes = settings.categories || ['groente', 'fruit', 'olie', 'zuivel', 'kruid', 'anders'];
             this.availableUnits = settings.units || ['mg', 'g', 'kg', 'ml', 'dl', 'l', 'tbsp', 'tsp', 'cup', 'piece', 'pinch'];
           } else {
             // Fallback to default values if no settings found
-            this.availableMealTypes = ['Breakfast', 'Lunch', 'Dinner'];
+            this.loadTranslatedMealTypes();
             this.availableIngredientTypes = ['groente', 'fruit', 'olie', 'zuivel', 'kruid', 'anders'];
             this.availableUnits = ['mg', 'g', 'kg', 'ml', 'dl', 'l', 'tbsp', 'tsp', 'cup', 'piece', 'pinch'];
           }
@@ -151,12 +154,24 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         error: (error) => {
           console.error('Error loading recipe settings:', error);
           // Fallback to default values on error
-          this.availableMealTypes = ['Breakfast', 'Lunch', 'Dinner'];
+          this.loadTranslatedMealTypes();
           this.availableIngredientTypes = ['groente', 'fruit', 'olie', 'zuivel', 'kruid', 'anders'];
           this.availableUnits = ['mg', 'g', 'kg', 'ml', 'dl', 'l', 'tbsp', 'tsp', 'cup', 'piece', 'pinch'];
           this.isLoadingRecipeSettings = false;
         }
       });
+  }
+
+  private loadTranslatedMealTypes(): void {
+    this.availableMealTypes = this.mealTypeKeys.map(key => 
+      this.translate.instant(`MEAL_TYPES.${key.toUpperCase()}`)
+    );
+  }
+
+  getMealTypeTranslation(mealType: string): string {
+    // Convert meal type to lowercase for key lookup
+    const key = mealType.toLowerCase();
+    return this.translate.instant(`MEAL_TYPES.${key.toUpperCase()}`);
   }
 
   enableEditingMode(): void {

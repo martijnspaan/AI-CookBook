@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges, ContentChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 
 export interface PopupConfig {
   title: string;
@@ -15,7 +16,7 @@ export interface PopupConfig {
 @Component({
   selector: 'app-reusable-popup',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './reusable-popup.component.html',
   styleUrl: './reusable-popup.component.scss',
   host: {

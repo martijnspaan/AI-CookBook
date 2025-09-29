@@ -13,7 +13,7 @@
           *ngFor="let mealType of recipe.mealTypes" 
           class="badge bg-primary me-1"
           [class.compact-badge]="compactMode">
-          {{ mealType }}
+          {{ getMealTypeTranslation(mealType) }}
         </span>
       </div>
     </div>

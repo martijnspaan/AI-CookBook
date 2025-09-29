@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { RecipeService } from '../../services/recipe.service';
@@ -8,7 +9,7 @@ import { Recipe } from '../../models/recipe.model';
 @Component({
   selector: 'app-recipe-grid',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './recipe-grid.component.html',
   styleUrl: './recipe-grid.component.scss'
 })
@@ -21,7 +22,10 @@ export class RecipeGridComponent implements OnInit, OnDestroy {
   errorMessage: string | null = null;
   private readonly destroySubject = new Subject<void>();
 
-  constructor(private readonly recipeService: RecipeService) {}
+  constructor(
+    private readonly recipeService: RecipeService,
+    private readonly translate: TranslateService
+  ) {}
 
   ngOnInit(): void {
     this.loadAllRecipes();
@@ -62,5 +66,11 @@ export class RecipeGridComponent implements OnInit, OnDestroy {
 
   getTagsAsCommaSeparatedString(tags: string[]): string {
     return tags.join(', ');
+  }
+
+  getMealTypeTranslation(mealType: string): string {
+    // Convert meal type to lowercase for key lookup
+    const key = mealType.toLowerCase();
+    return this.translate.instant(`MEAL_TYPES.${key.toUpperCase()}`);
   }
 }

@@ -8,11 +8,11 @@
   <div class="dialog-content">
     <!-- Dialog Header -->
     <div class="dialog-header">
-      <h4 class="dialog-title">Select Recipe</h4>
+      <h4 class="dialog-title">{{ 'RECIPES.SELECT_RECIPE' | translate }}</h4>
       <button 
         type="button" 
         class="btn-close" 
-        aria-label="Close"
+        [attr.aria-label]="'RECIPES.CLOSE_DIALOG' | translate"
         (click)="closeDialog()">
         <span aria-hidden="true">&times;</span>
       </button>
@@ -21,7 +21,7 @@
     <!-- Dialog Body -->
     <div class="dialog-body">
       <p class="text-muted mb-3" *ngIf="selectedMealType && selectedDate">
-        Choose a recipe for {{ selectedMealType }} on {{ getDateDisplayString() }}
+        {{ 'RECIPES.CHOOSE_RECIPE_FOR' | translate: {mealType: getTranslatedMealType(), date: getDateDisplayString()} }}
       </p>
 
       <!-- Filter Section -->
@@ -31,7 +31,7 @@
             <app-multi-select-dropdown
               [options]="mealTypeOptions"
               [selectedValues]="selectedMealTypeFilters"
-              [placeholder]="'All Meal Categories'"
+              [placeholder]="'RECIPES.ALL_MEAL_CATEGORIES' | translate"
               [disabled]="false"
               (selectionChanged)="onMealTypeSelectionChanged($event)">
             </app-multi-select-dropdown>
@@ -41,7 +41,7 @@
             <app-multi-select-dropdown
               [options]="cookbookOptions"
               [selectedValues]="selectedCookbookFilters"
-              [placeholder]="'All Cookbooks'"
+              [placeholder]="'RECIPES.ALL_COOKBOOKS' | translate"
               [disabled]="isLoadingCookbooks"
               (selectionChanged)="onCookbookSelectionChanged($event)">
             </app-multi-select-dropdown>
@@ -52,7 +52,7 @@
             class="btn btn-link btn-sm clear-filters-btn"
             (click)="clearFilters()"
             [disabled]="selectedMealTypeFilters.length === 0 && selectedCookbookFilters.length === 0 && searchQuery.length === 0"
-            title="Clear filters">
+            [title]="'RECIPES.CLEAR_FILTERS' | translate">
             <i class="fas fa-times"></i>
           </button>
         </div>
@@ -68,7 +68,7 @@
             <input
               type="text"
               class="form-control"
-              placeholder="Search recipes by title, tags, or ingredients..."
+              [placeholder]="'RECIPES.SEARCH_PLACEHOLDER' | translate"
               [(ngModel)]="searchQuery"
               (input)="onSearchInput($event)"
               (focus)="onSearchFocus()"
@@ -79,7 +79,7 @@
               type="button" 
               class="btn btn-outline-secondary"
               (click)="clearSearch()"
-              title="Clear search">
+              [title]="'RECIPES.CLEAR_SEARCH' | translate">
               <i class="fas fa-times"></i>
             </button>
           </div>
@@ -104,13 +104,14 @@
         <div class="alert alert-info">
           <div class="d-flex justify-content-between align-items-center">
             <div>
-              <h6 class="alert-heading mb-1">Current Recipe</h6>
+              <h6 class="alert-heading mb-1">{{ 'RECIPES.CURRENT_RECIPE' | translate }}</h6>
               <p class="mb-0">{{ currentRecipe.title }}</p>
             </div>
             <button 
               type="button" 
               class="btn btn-outline-danger btn-sm"
-              (click)="removeRecipe()">
+              (click)="removeRecipe()"
+              [title]="'RECIPES.REMOVE_RECIPE' | translate">
               <i class="fas fa-trash"></i>
             </button>
           </div>
@@ -120,16 +121,16 @@
       <!-- Loading State -->
       <div *ngIf="isLoadingRecipes" class="text-center py-4">
         <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Loading...</span>
+          <span class="visually-hidden">{{ 'COMMON.LOADING' | translate }}</span>
         </div>
-        <p class="mt-2">Loading recipes...</p>
+        <p class="mt-2">{{ 'RECIPES.LOADING_RECIPES_TEXT' | translate }}</p>
       </div>
 
       <!-- Error State -->
       <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
-        <h6 class="alert-heading">Error!</h6>
+        <h6 class="alert-heading">{{ 'COMMON.ERROR' | translate }}</h6>
         <p>{{ errorMessage }}</p>
-        <button class="btn btn-outline-danger btn-sm" (click)="loadAllRecipes()">Try Again</button>
+        <button class="btn btn-outline-danger btn-sm" (click)="loadAllRecipes()">{{ 'COMMON.TRY_AGAIN' | translate }}</button>
       </div>
 
       <!-- Recipes Grid -->
@@ -147,8 +148,8 @@
       <div *ngIf="!isLoadingRecipes && !errorMessage && recipes.length === 0" class="text-center py-4">
         <div class="text-muted">
           <i class="fas fa-egg"></i>
-          <h6 class="mt-2">No recipes available</h6>
-          <p class="small">There are no recipes to choose from.</p>
+          <h6 class="mt-2">{{ 'RECIPES.NO_RECIPES_AVAILABLE' | translate }}</h6>
+          <p class="small">{{ 'RECIPES.NO_RECIPES_TO_CHOOSE' | translate }}</p>
         </div>
       </div>
     </div>

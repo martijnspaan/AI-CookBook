@@ -3,6 +3,13 @@
     "TITLE": "AI Kookboek",
     "MEAL_PLANNER": "AI Maaltijdplanner"
   },
+  "PAGE_TITLES": {
+    "RECIPE_COLLECTION": "Receptenverzameling",
+    "COOKBOOKS": "Kookboeken",
+    "GROCERY_LISTS": "Boodschappenlijsten",
+    "WEEK_MENU": "Weekmenu",
+    "AI_COOKBOOK": "AI Kookboek"
+  },
   "NAVIGATION": {
     "COOKBOOKS": "Kookboeken",
     "ALL_RECIPES": "Alle Recepten",
@@ -57,7 +64,50 @@
     "ALL_COOKBOOKS": "Alle Kookboeken",
     "CLEAR_FILTERS": "Filters wissen",
     "CLEAR_SEARCH": "Zoekopdracht wissen",
-    "CHOOSE_RECIPE_FOR": "Kies een recept voor {{mealType}} op {{date}}"
+    "CHOOSE_RECIPE_FOR": "Kies een recept voor {{mealType}} op {{date}}",
+    "LOADING_RECIPES_TEXT": "Recepten laden...",
+    "ERROR_LOADING_RECIPES": "Recepten laden mislukt. Zorg ervoor dat de API draait.",
+    "CLOSE_DIALOG": "Sluiten",
+    "REMOVE_RECIPE": "Recept verwijderen",
+    "NO_RECIPES_FOUND": "Geen recepten gevonden",
+    "NO_RECIPES_AVAILABLE_MOMENT": "Er zijn momenteel geen recepten beschikbaar.",
+    "TITLE": "Titel",
+    "DESCRIPTION": "Beschrijving",
+    "COOKBOOK": "Kookboek",
+    "MEAL_CATEGORIES": "Maaltijdcategorieën",
+    "TAGS": "Tags",
+    "ACTIONS": "Acties",
+    "DELETE_RECIPE": "Recept verwijderen",
+    "CREATE_NEW_RECIPE": "Nieuw Recept Aanmaken",
+    "TITLE_REQUIRED": "Titel *",
+    "DESCRIPTION_LABEL": "Beschrijving",
+    "TAGS_LABEL": "Tags",
+    "TAG_PLACEHOLDER": "Tag",
+    "ADD_TAG": "Tag Toevoegen",
+    "COOKBOOK_LABEL": "Kookboek",
+    "NO_COOKBOOK": "Geen kookboek",
+    "PAGE": "Pagina",
+    "PAGE_PLACEHOLDER": "Paginanummer in kookboek",
+    "MEAL_CATEGORIES_LABEL": "Maaltijdcategorieën",
+    "INGREDIENTS": "Ingrediënten",
+    "INGREDIENT_NAME_PLACEHOLDER": "Voer ingrediëntnaam in",
+    "AMOUNT": "Hoeveelheid",
+    "REMOVE_INGREDIENT": "Ingrediënt verwijderen",
+    "ADD_INGREDIENT": "Ingrediënt Toevoegen",
+    "RECIPE_STEPS": "Recept",
+    "RECIPE_STEP_PLACEHOLDER": "Receptstap",
+    "ADD_STEP": "Stap Toevoegen",
+    "CANCEL": "Annuleren",
+    "CREATING": "Aanmaken...",
+    "CREATE_RECIPE": "Recept Aanmaken",
+    "LOADING_RECIPE_DETAILS": "Receptdetails laden...",
+    "GO_BACK": "Terug",
+    "NO_MEAL_TYPES_SELECTED": "Geen maaltijdcategorieën geselecteerd",
+    "NO_TAGS": "Geen tags",
+    "NO_INGREDIENTS": "Geen ingrediënten",
+    "NO_RECIPE_STEPS": "Geen receptstappen",
+    "DELETE_RECIPE": "Recept Verwijderen",
+    "OTHER": "Overig"
   },
   "WEEK_MENU": {
     "SAVING_WEEK_MENU": "Weekmenu opslaan...",
@@ -69,7 +119,18 @@
     "CREATE_FIRST_GROCERY_LIST": "Maak je eerste boodschappenlijst door maaltijden te plannen in het Weekmenu.",
     "GO_TO_WEEK_MENU": "Ga naar Weekmenu",
     "EDIT_GROCERY_LIST": "Boodschappenlijst bewerken",
-    "DELETE_GROCERY_LIST": "Boodschappenlijst verwijderen"
+    "DELETE_GROCERY_LIST": "Boodschappenlijst verwijderen",
+    "CREATE_GROCERY_LIST": "Boodschappenlijst Aanmaken",
+    "CHOOSE_GROCERY_DAY": "Kies je boodschappendag:",
+    "SELECT_MEALS_TO_INCLUDE": "Selecteer maaltijden om op te nemen:",
+    "LOADING_EXISTING_LISTS": "Bestaande boodschappenlijsten laden...",
+    "NO_MEALS_SELECTED": "Geen maaltijden geselecteerd voor deze week. Voeg eerst wat recepten toe aan je weekmenu.",
+    "NO_MEALS_IN_LIST": "Geen maaltijden in deze boodschappenlijst.",
+    "UPDATING": "Bijwerken...",
+    "UPDATE_GROCERY_LIST": "Boodschappenlijst Bijwerken",
+    "GROCERY_DAY": "Boodschappendag:",
+    "LOADING_RECIPES": "Recepten laden...",
+    "CLOSE": "Sluiten"
   },
   "MEAL_TYPES": {
     "BREAKFAST": "Ontbijt",
@@ -80,6 +141,22 @@
   "BUTTONS": {
     "NEW_RECIPE": "Nieuw Recept",
     "NEW_COOKBOOK": "Nieuw Kookboek",
-    "NEW_GROCERY_LIST": "Nieuwe Boodschappenlijst"
+    "NEW_GROCERY_LIST": "Nieuwe Boodschappenlijst",
+    "BACK_TO_RECIPES": "Terug",
+    "EDIT_RECIPE": "Recept Bewerken",
+    "BACK_TO_GROCERY_LISTS": "Terug"
+  },
+  "CONFIGURATION": {
+    "RECIPE_TAGS": "Recept Tags",
+    "INGREDIENTS": "Ingrediënten",
+    "MEASUREMENT_UNITS": "Meetbare Eenheden",
+    "INGREDIENT_CATEGORIES": "Ingrediënt Categorieën"
+  },
+  "SHOWCASE": {
+    "DESIGN_TOKENS": "Design Tokens",
+    "REUSABLE_COMPONENTS": "Herbruikbare Componenten",
+    "ACCESSIBILITY_STANDARDS": "Toegankelijkheidsstandaarden",
+    "IMPLEMENTATION_GUIDE": "Implementatiegids"
   }
 }
+

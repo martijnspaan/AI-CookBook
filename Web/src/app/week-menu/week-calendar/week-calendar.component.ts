@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 export interface WeekDate {
   date: Date;
@@ -25,7 +26,7 @@ export interface RecipeAssignment {
 @Component({
   selector: 'app-week-calendar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './week-calendar.component.html',
   styleUrl: './week-calendar.component.scss'
 })
@@ -41,11 +42,19 @@ export class WeekCalendarComponent implements AfterViewInit, OnChanges {
   currentWeek: WeekDate[] = [];
   allDays: WeekDate[] = [];
   private readonly DAYS_TO_SHOW = 14; // Show 14 days starting from current day
-  mealSlots: MealSlot[] = [
-    { type: 'breakfast', label: 'Breakfast' },
-    { type: 'lunch', label: 'Lunch' },
-    { type: 'dinner', label: 'Dinner' }
-  ];
+  mealSlots: MealSlot[] = [];
+
+  constructor(private readonly translate: TranslateService) {
+    this.initializeMealSlots();
+  }
+
+  private initializeMealSlots(): void {
+    this.mealSlots = [
+      { type: 'breakfast', label: this.translate.instant('MEAL_TYPES.BREAKFAST') },
+      { type: 'lunch', label: this.translate.instant('MEAL_TYPES.LUNCH') },
+      { type: 'dinner', label: this.translate.instant('MEAL_TYPES.DINNER') }
+    ];
+  }
 
   ngOnInit() {
     this.generateAllDays();

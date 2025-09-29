@@ -7,12 +7,12 @@
     <!-- Loading State -->
     <div *ngIf="isLoadingRecipes" class="loading-state">
       <div class="spinner"></div>
-      <p>Loading recipes...</p>
+      <p>{{ 'GROCERY_LISTS.LOADING_RECIPES' | translate }}</p>
     </div>
 
     <!-- Grocery Day Display (Read-only) -->
     <div class="mb-3" *ngIf="!isLoadingRecipes">
-      <label class="form-label fw-bold">Grocery day:</label>
+      <label class="form-label fw-bold">{{ 'GROCERY_LISTS.GROCERY_DAY' | translate }}</label>
       <div class="form-control-plaintext bg-light p-2 rounded border">
         <i class="fas fa-calendar-alt me-2 text-muted"></i>
         {{ getFormattedGroceryDay() }}
@@ -22,10 +22,10 @@
     <!-- Meal Selection -->
     <div class="mb-2 flex-grow-1 d-flex flex-column" *ngIf="!isLoadingRecipes">
       <div class="mb-2">
-        <label class="form-label fw-bold">Select meals to include:</label>
+        <label class="form-label fw-bold">{{ 'GROCERY_LISTS.SELECT_MEALS_TO_INCLUDE' | translate }}</label>
         <div *ngIf="isLoadingGroceryLists" class="text-muted small">
           <i class="fas fa-spinner fa-spin me-1"></i>
-          Loading existing grocery lists...
+          {{ 'GROCERY_LISTS.LOADING_EXISTING_LISTS' | translate }}
         </div>
       </div>
       
@@ -77,7 +77,7 @@
       
       <div *ngIf="mealSelections.length === 0 && !isLoadingRecipes" class="text-muted text-center py-3">
         <i class="fas fa-info-circle me-2"></i>
-        No meals in this grocery list.
+        {{ 'GROCERY_LISTS.NO_MEALS_IN_LIST' | translate }}
       </div>
     </div>
   </ng-template>
@@ -90,7 +90,7 @@
       (click)="updateGroceryList()">
       <i class="fas fa-spinner fa-spin me-2" *ngIf="isUpdating"></i>
       <i class="fas fa-save me-2" *ngIf="!isUpdating"></i>
-      {{ isUpdating ? 'Updating...' : 'Update Grocery List' }}
+      {{ isUpdating ? ('GROCERY_LISTS.UPDATING' | translate) : ('GROCERY_LISTS.UPDATE_GROCERY_LIST' | translate) }}
     </button>
   </ng-template>
 </app-reusable-popup>

@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { RecipeService } from '../../services/recipe.service';
@@ -15,7 +16,7 @@ import { MultiSelectDropdownComponent, MultiSelectOption } from '../../shared/mu
 @Component({
   selector: 'app-recipe-selection-dialog',
   standalone: true,
-  imports: [CommonModule, FormsModule, RecipeCardComponent, MultiSelectDropdownComponent],
+  imports: [CommonModule, FormsModule, TranslateModule, RecipeCardComponent, MultiSelectDropdownComponent],
   templateUrl: './recipe-selection-dialog.component.html',
   styleUrl: './recipe-selection-dialog.component.scss',
   host: {
@@ -57,7 +58,8 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy, OnChan
   constructor(
     private readonly recipeService: RecipeService,
     private readonly cookbookService: CookbookService,
-    private readonly recipeSettingsService: RecipeSettingsService
+    private readonly recipeSettingsService: RecipeSettingsService,
+    private readonly translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -97,7 +99,7 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy, OnChan
           this.isLoadingRecipes = false;
         },
         error: (error) => {
-          this.errorMessage = 'Failed to load recipes. Please make sure the API is running.';
+          this.errorMessage = this.translate.instant('RECIPES.ERROR_LOADING_RECIPES');
           this.isLoadingRecipes = false;
           console.error('Error loading recipes:', error);
         }
@@ -135,9 +137,9 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy, OnChan
           this.recipeSettings = settings;
           // Meal types are always fixed: Breakfast, Lunch, Dinner
           this.mealTypeOptions = [
-            { value: 'Breakfast', label: 'Breakfast' },
-            { value: 'Lunch', label: 'Lunch' },
-            { value: 'Dinner', label: 'Dinner' }
+            { value: 'Breakfast', label: this.translate.instant('MEAL_TYPES.BREAKFAST') },
+            { value: 'Lunch', label: this.translate.instant('MEAL_TYPES.LUNCH') },
+            { value: 'Dinner', label: this.translate.instant('MEAL_TYPES.DINNER') }
           ];
           this.isLoadingRecipeSettings = false;
         },
@@ -152,9 +154,9 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy, OnChan
     // Meal types are always fixed: Breakfast, Lunch, Dinner
     // This method is kept for compatibility but doesn't change the fixed meal types
     this.mealTypeOptions = [
-      { value: 'Breakfast', label: 'Breakfast' },
-      { value: 'Lunch', label: 'Lunch' },
-      { value: 'Dinner', label: 'Dinner' }
+      { value: 'Breakfast', label: this.translate.instant('MEAL_TYPES.BREAKFAST') },
+      { value: 'Lunch', label: this.translate.instant('MEAL_TYPES.LUNCH') },
+      { value: 'Dinner', label: this.translate.instant('MEAL_TYPES.DINNER') }
     ];
   }
 
@@ -360,5 +362,10 @@ export class RecipeSelectionDialogComponent implements OnInit, OnDestroy, OnChan
       month: 'short', 
       day: 'numeric' 
     });
+  }
+
+  getTranslatedMealType(): string {
+    if (!this.selectedMealType) return '';
+    return this.translate.instant(`MEAL_TYPES.${this.selectedMealType.toUpperCase()}`);
   }
 }

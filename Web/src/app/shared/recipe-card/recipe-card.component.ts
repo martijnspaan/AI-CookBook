@@ -1,5 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { CookbookService } from '../../services/cookbook.service';
@@ -9,7 +10,7 @@ import { Cookbook } from '../../models/cookbook.model';
 @Component({
   selector: 'app-recipe-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './recipe-card.component.html',
   styleUrl: './recipe-card.component.scss'
 })
@@ -24,7 +25,10 @@ export class RecipeCardComponent implements OnInit, OnDestroy {
   isLoadingCookbooks = false;
   private readonly destroySubject = new Subject<void>();
 
-  constructor(private readonly cookbookService: CookbookService) {}
+  constructor(
+    private readonly cookbookService: CookbookService,
+    private readonly translate: TranslateService
+  ) {}
 
   ngOnInit(): void {
     this.loadAllCookbooks();
@@ -62,6 +66,12 @@ export class RecipeCardComponent implements OnInit, OnDestroy {
     if (this.clickable) {
       this.recipeClicked.emit(this.recipe);
     }
+  }
+
+  getMealTypeTranslation(mealType: string): string {
+    // Convert meal type to lowercase for key lookup
+    const key = mealType.toLowerCase();
+    return this.translate.instant(`MEAL_TYPES.${key.toUpperCase()}`);
   }
 }
 

@@ -6,7 +6,7 @@
   <ng-template #popupBody>
     <!-- Grocery Day Selection -->
     <div class="mb-3">
-      <label class="form-label fw-bold">Choose your grocery day:</label>
+      <label class="form-label fw-bold">{{ 'GROCERY_LISTS.CHOOSE_GROCERY_DAY' | translate }}</label>
       <select 
         class="form-select" 
         [(ngModel)]="selectedGroceryDay" 
@@ -20,10 +20,10 @@
     <!-- Meal Selection -->
     <div class="mb-2 flex-grow-1 d-flex flex-column">
       <div class="mb-2">
-        <label class="form-label fw-bold">Select meals to include:</label>
+        <label class="form-label fw-bold">{{ 'GROCERY_LISTS.SELECT_MEALS_TO_INCLUDE' | translate }}</label>
         <div *ngIf="isLoadingGroceryLists" class="text-muted small">
           <i class="fas fa-spinner fa-spin me-1"></i>
-          Loading existing grocery lists...
+          {{ 'GROCERY_LISTS.LOADING_EXISTING_LISTS' | translate }}
         </div>
       </div>
       
@@ -75,7 +75,7 @@
       
       <div *ngIf="mealSelections.length === 0" class="text-muted text-center py-3">
         <i class="fas fa-info-circle me-2"></i>
-        No meals selected for this week. Please add some recipes to your week menu first.
+        {{ 'GROCERY_LISTS.NO_MEALS_SELECTED' | translate }}
       </div>
     </div>
   </ng-template>
@@ -87,7 +87,7 @@
       [disabled]="getSelectedMealsCount() === 0"
       (click)="createGroceryList()">
       <i class="fas fa-shopping-cart me-2"></i>
-      Create Grocery List
+      {{ 'GROCERY_LISTS.CREATE_GROCERY_LIST' | translate }}
     </button>
   </ng-template>
 </app-reusable-popup>

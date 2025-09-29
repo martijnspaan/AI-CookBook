@@ -1,7 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { LanguageService } from '../services/language.service';
 
 @Component({
   selector: 'app-hamburger-menu',
@@ -10,14 +13,25 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
   templateUrl: './hamburger-menu.component.html',
   styleUrl: './hamburger-menu.component.scss'
 })
-export class HamburgerMenuComponent {
+export class HamburgerMenuComponent implements OnInit, OnDestroy {
   isMenuOpen = false;
   currentLanguage = 'en';
+  private readonly destroySubject = new Subject<void>();
 
-  constructor(private translate: TranslateService) {
-    // Set default language
-    this.translate.setDefaultLang('en');
-    this.currentLanguage = this.translate.currentLang || 'en';
+  constructor(private languageService: LanguageService) {}
+
+  ngOnInit(): void {
+    // Subscribe to language changes
+    this.languageService.currentLanguage$
+      .pipe(takeUntil(this.destroySubject))
+      .subscribe(language => {
+        this.currentLanguage = language;
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroySubject.next();
+    this.destroySubject.complete();
   }
 
   toggleMenu(): void {
@@ -29,7 +43,7 @@ export class HamburgerMenuComponent {
   }
 
   switchLanguage(language: string): void {
-    this.translate.use(language);
-    this.currentLanguage = language;
+    this.languageService.setLanguage(language);
+    this.closeMenu(); // Close menu after language switch
   }
 }

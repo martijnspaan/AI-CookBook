@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { PageTitleService } from '../../services/page-title.service';
 import { GroceryListService } from '../../services/grocery-list.service';
 import { RecipeService } from '../../services/recipe.service';
@@ -64,7 +65,8 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
     private pageTitleService: PageTitleService,
     private groceryListService: GroceryListService,
     private recipeService: RecipeService,
-    private footerService: FooterService
+    private footerService: FooterService,
+    private translateService: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -86,14 +88,14 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
   }
 
   private setupFooterButtons(): void {
-    this.footerService.setFooterConfig({
+    this.footerService.setFooterConfigFromTranslation({
       showLeftButton: true,
-      leftButtonText: 'Back to Grocery Lists',
+      leftButtonTranslationKey: 'BUTTONS.BACK_TO_GROCERY_LISTS',
       leftButtonIcon: 'fas fa-arrow-left',
       leftButtonClass: 'btn-outline-secondary',
       leftButtonClickHandler: () => this.goBack(),
       showRightButton: false,
-      rightButtonText: '',
+      rightButtonTranslationKey: '',
       rightButtonIcon: '',
       rightButtonClass: 'btn-primary',
       rightButtonClickHandler: null
