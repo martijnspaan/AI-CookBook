@@ -81,7 +81,7 @@ export class WeekCalendarComponent implements AfterViewInit, OnChanges {
         date: date,
         dayName: date.toLocaleDateString('en-US', { weekday: 'short' }),
         dayNumber: date.getDate(),
-        month: date.toLocaleDateString('en-US', { month: 'short' }),
+        month: date.toLocaleDateString('en-US', { month: 'long' }),
         isWeekend: isWeekend
       });
     }
@@ -116,7 +116,7 @@ export class WeekCalendarComponent implements AfterViewInit, OnChanges {
         date: date,
         dayName: date.toLocaleDateString('en-US', { weekday: 'short' }),
         dayNumber: date.getDate(),
-        month: date.toLocaleDateString('en-US', { month: 'short' }),
+        month: date.toLocaleDateString('en-US', { month: 'long' }),
         isWeekend: isWeekend
       });
     }
