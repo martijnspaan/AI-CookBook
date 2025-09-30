@@ -1,21 +1,17 @@
-// Use design system page container classes instead of custom styles
-// The HTML now uses .page-container and .page-content classes from the design system
-
-// Header styles removed - using design system card header classes
-
-// Loading, error, and empty states now use design system classes
-// Bootstrap spinner, alert, and utility classes are used instead of custom styles
-
-// Grid layout now handled by Bootstrap row/col system in HTML
-
-// Card styling now uses design system .card and .card-elevated classes
+// Grocery List Card - Following recipe card design pattern
 .grocery-list-card {
+  background: #f8f9fa;
+  border: 2px solid #dee2e6;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out, border-color 0.15s ease-in-out;
   cursor: pointer;
-  transition: var(--transition-base);
   
   &:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    border-color: var(--color-primary-300);
   }
   
   &:active {
@@ -23,33 +19,83 @@
   }
 }
 
-// Card content styling now uses design system classes
-.meals-section {
-  .day-group {
-    margin-bottom: 1rem;
-    
-    &:last-child {
-      margin-bottom: 0;
-    }
+.grocery-list-card-content {
+  .grocery-list-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #212529;
+    line-height: 1.2;
   }
-
-  .day-header {
-    margin-bottom: 0.5rem;
-  }
-
-  .meals-list {
-    .meal-item {
-      border-bottom: 1px solid var(--color-neutral-200);
+  
+  .meals-section {
+    .day-group {
+      margin-bottom: 0.75rem;
       
       &:last-child {
-        border-bottom: none;
+        margin-bottom: 0;
+      }
+    }
+
+    .day-header {
+      margin-bottom: 0.5rem;
+      
+      .badge {
+        font-size: 0.8em;
+        padding: 0.35em 0.65em;
+      }
+    }
+
+    .meals-list {
+      .meal-item {
+        border-bottom: 1px solid var(--color-neutral-200);
+        padding: 0.25rem 0;
+        
+        &:last-child {
+          border-bottom: none;
+        }
+        
+        .meal-name {
+          font-size: 0.9rem;
+          line-height: 1.4;
+        }
+        
+        .badge {
+          font-size: 0.75em;
+          padding: 0.3em 0.6em;
+        }
       }
     }
   }
 }
 
-// All utility classes, badges, buttons, and modals now use design system classes
-// Bootstrap and design system components provide all necessary styling
+// Responsive adjustments
+@media (max-width: 450px) {
+  .grocery-list-card {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .grocery-list-card-content {
+    .grocery-list-title {
+      font-size: 1rem;
+    }
+    
+    .meals-section {
+      .meals-list {
+        .meal-item {
+          .meal-name {
+            font-size: 0.85rem;
+          }
+          
+          .badge {
+            font-size: 0.7em;
+            padding: 0.25em 0.5em;
+          }
+        }
+      }
+    }
+  }
+}
 
 // Reduce spacing to maximize card usage of available space
 .container-fluid {
