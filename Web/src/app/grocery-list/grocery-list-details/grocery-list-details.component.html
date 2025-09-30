@@ -20,7 +20,7 @@
       <!-- Meals Overview Section -->
       <div class="meals-overview-section">
         <h3 class="section-title">
-          <i class="fas fa-utensils me-2"></i>Planned Meals
+          <i class="fas fa-utensils me-2"></i>{{ 'GROCERY_LISTS.PLANNED_MEALS' | translate }}
         </h3>
         <div class="meals-overview">
           <div class="meals-list-compact">
@@ -35,19 +35,19 @@
       <!-- Shopping List Section -->
       <div class="ingredients-section shopping-list-section">
         <h3 class="section-title">
-          <i class="fas fa-shopping-cart me-2"></i>Shopping List
+          <i class="fas fa-shopping-cart me-2"></i>{{ 'GROCERY_LISTS.SHOPPING_LIST' | translate }}
         </h3>
         
         <!-- Empty ingredients state -->
         <div *ngIf="ingredientTypeGroups.length === 0" class="empty-ingredients">
           <div class="empty-icon">🥘</div>
-          <p>No ingredients found for the planned meals.</p>
+          <p>{{ 'GROCERY_LISTS.NO_INGREDIENTS_FOUND' | translate }}</p>
         </div>
 
         <!-- Main shopping list content (On List ingredients) -->
         <div *ngIf="ingredientTypeGroups.length > 0" class="shopping-list-content">
           <div *ngIf="getIngredientsByStatus('List').length === 0" class="empty-status-section">
-            <p class="text-muted">All ingredients have been processed</p>
+            <p class="text-muted">{{ 'GROCERY_LISTS.ALL_INGREDIENTS_PROCESSED' | translate }}</p>
           </div>
           <div *ngIf="getIngredientsByStatus('List').length > 0" class="ingredients-grouped">
             <div *ngFor="let typeGroup of getIngredientTypeGroupsByStatus('List')" class="ingredient-type-group">
@@ -121,10 +121,10 @@
       <!-- Basket Section -->
       <div class="ingredients-section basket-section">
         <h3 class="section-title">
-          <i class="fas fa-shopping-cart me-2"></i>Basket
+          <i class="fas fa-shopping-cart me-2"></i>{{ 'GROCERY_LISTS.BASKET' | translate }}
         </h3>
         <div *ngIf="getIngredientsByStatus('Basket').length === 0" class="empty-status-section">
-          <p class="text-muted">No ingredients added to cart yet</p>
+          <p class="text-muted">{{ 'GROCERY_LISTS.NO_INGREDIENTS_IN_CART' | translate }}</p>
         </div>
         <div *ngIf="getIngredientsByStatus('Basket').length > 0" class="ingredients-grouped">
           <div *ngFor="let typeGroup of getIngredientTypeGroupsByStatus('Basket')" class="ingredient-type-group">
@@ -195,10 +195,10 @@
       <!-- Online Section -->
       <div class="ingredients-section online-section">
         <h3 class="section-title">
-          <i class="fas fa-laptop me-2"></i>Online
+          <i class="fas fa-laptop me-2"></i>{{ 'GROCERY_LISTS.ONLINE' | translate }}
         </h3>
         <div *ngIf="getIngredientsByStatus('Online').length === 0" class="empty-status-section">
-          <p class="text-muted">No ingredients bought online yet</p>
+          <p class="text-muted">{{ 'GROCERY_LISTS.NO_INGREDIENTS_BOUGHT_ONLINE' | translate }}</p>
         </div>
         <div *ngIf="getIngredientsByStatus('Online').length > 0" class="ingredients-grouped">
           <div *ngFor="let typeGroup of getIngredientTypeGroupsByStatus('Online')" class="ingredient-type-group">
@@ -269,10 +269,10 @@
       <!-- Stock Section -->
       <div class="ingredients-section stock-section">
         <h3 class="section-title">
-          <i class="fas fa-home me-2"></i>Stock
+          <i class="fas fa-home me-2"></i>{{ 'GROCERY_LISTS.STOCK' | translate }}
         </h3>
         <div *ngIf="getIngredientsByStatus('Stock').length === 0" class="empty-status-section">
-          <p class="text-muted">No ingredients marked as in stock yet</p>
+          <p class="text-muted">{{ 'GROCERY_LISTS.NO_INGREDIENTS_IN_STOCK' | translate }}</p>
         </div>
         <div *ngIf="getIngredientsByStatus('Stock').length > 0" class="ingredients-grouped">
           <div *ngFor="let typeGroup of getIngredientTypeGroupsByStatus('Stock')" class="ingredient-type-group">

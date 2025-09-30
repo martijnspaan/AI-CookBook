@@ -173,7 +173,9 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
       this.aggregatedIngredients = [];
       this.isLoading = false;
       const formattedDate = this.getFormattedShoppingDate(groceryList.dayOfGrocery);
-      this.pageTitleService.setPageTitle(`Groceries ${formattedDate}`);
+      this.translateService.get('GROCERY_LISTS.GROCERY_LIST_DETAILS_TITLE').subscribe(title => {
+        this.pageTitleService.setPageTitle(`${title} ${formattedDate}`);
+      });
       return;
     }
 
@@ -190,7 +192,9 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
       this.aggregatedIngredients = [];
       this.isLoading = false;
       const formattedDate = this.getFormattedShoppingDate(groceryList.dayOfGrocery);
-      this.pageTitleService.setPageTitle(`Groceries ${formattedDate}`);
+      this.translateService.get('GROCERY_LISTS.GROCERY_LIST_DETAILS_TITLE').subscribe(title => {
+        this.pageTitleService.setPageTitle(`${title} ${formattedDate}`);
+      });
       return;
     }
 
@@ -228,7 +232,9 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
         this.aggregateIngredients();
         this.isLoading = false;
         const formattedDate = this.getFormattedShoppingDate(groceryList.dayOfGrocery);
-        this.pageTitleService.setPageTitle(`Groceries ${formattedDate}`);
+        this.translateService.get('GROCERY_LISTS.GROCERY_LIST_DETAILS_TITLE').subscribe(title => {
+        this.pageTitleService.setPageTitle(`${title} ${formattedDate}`);
+      });
       },
       error: (error) => {
         console.error('Error loading recipes:', error);
@@ -236,7 +242,9 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
         this.aggregatedIngredients = [];
         this.isLoading = false;
         const formattedDate = this.getFormattedShoppingDate(groceryList.dayOfGrocery);
-        this.pageTitleService.setPageTitle(`Groceries ${formattedDate}`);
+        this.translateService.get('GROCERY_LISTS.GROCERY_LIST_DETAILS_TITLE').subscribe(title => {
+        this.pageTitleService.setPageTitle(`${title} ${formattedDate}`);
+      });
       }
     });
   }

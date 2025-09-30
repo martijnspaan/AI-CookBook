@@ -132,7 +132,18 @@
     "UPDATE_GROCERY_LIST": "Update",
     "GROCERY_DAY": "Grocery day:",
     "LOADING_RECIPES": "Loading recipes...",
-    "CLOSE": "Close"
+    "CLOSE": "Close",
+    "PLANNED_MEALS": "Planned Meals",
+    "SHOPPING_LIST": "Shopping List",
+    "BASKET": "Basket",
+    "ONLINE": "Online",
+    "STOCK": "Stock",
+    "NO_INGREDIENTS_FOUND": "No ingredients found for the planned meals.",
+    "ALL_INGREDIENTS_PROCESSED": "All ingredients have been processed",
+    "NO_INGREDIENTS_IN_CART": "No ingredients added to cart yet",
+    "NO_INGREDIENTS_BOUGHT_ONLINE": "No ingredients bought online yet",
+    "NO_INGREDIENTS_IN_STOCK": "No ingredients marked as in stock yet",
+    "GROCERY_LIST_DETAILS_TITLE": "Groceries"
   },
   "MEAL_TYPES": {
     "BREAKFAST": "Breakfast",

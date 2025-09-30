@@ -132,7 +132,18 @@
     "UPDATE_GROCERY_LIST": "Bijwerken",
     "GROCERY_DAY": "Boodschappendag:",
     "LOADING_RECIPES": "Recepten laden...",
-    "CLOSE": "Sluiten"
+    "CLOSE": "Sluiten",
+    "PLANNED_MEALS": "Geplande Maaltijden",
+    "SHOPPING_LIST": "Boodschappenlijst",
+    "BASKET": "Winkelwagen",
+    "ONLINE": "Online",
+    "STOCK": "Voorraad",
+    "NO_INGREDIENTS_FOUND": "Geen ingrediënten gevonden voor de geplande maaltijden.",
+    "ALL_INGREDIENTS_PROCESSED": "Alle ingrediënten zijn verwerkt",
+    "NO_INGREDIENTS_IN_CART": "Nog geen ingrediënten toegevoegd aan winkelwagen",
+    "NO_INGREDIENTS_BOUGHT_ONLINE": "Nog geen ingrediënten online gekocht",
+    "NO_INGREDIENTS_IN_STOCK": "Nog geen ingrediënten gemarkeerd als op voorraad",
+    "GROCERY_LIST_DETAILS_TITLE": "Boodschappen"
   },
   "MEAL_TYPES": {
     "BREAKFAST": "Ontbijt",
