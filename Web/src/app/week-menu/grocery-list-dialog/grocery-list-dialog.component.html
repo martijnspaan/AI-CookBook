@@ -27,53 +27,46 @@
         </div>
       </div>
       
-      <div class="meal-selection-container">
-        <div *ngFor="let dateGroup of mealsByDate" class="date-group mb-2">
-          <div class="date-header">
-            <h6 class="mb-1 text-primary">{{ getDisplayDate(dateGroup.date) }}</h6>
+      <div class="meals-selection-compact">
+        <div *ngFor="let dateGroup of mealsByDate" class="date-group-compact">
+          <div class="date-header-compact">
+            <h6 class="date-title-compact">{{ getDisplayDate(dateGroup.date) }}</h6>
           </div>
           
-          <div class="meals-list">
-            <div *ngFor="let meal of dateGroup.meals" class="meal-row" [class.meal-already-used]="meal.isAlreadyUsed">
-              <div class="form-check">
-                <!-- Container for both checkbox and grocery cart icon to ensure same positioning -->
-                <div class="form-check-input-container">
-                  <!-- Show checkbox for available meals -->
-                  <input 
-                    *ngIf="!meal.isAlreadyUsed"
-                    class="form-check-input" 
-                    type="checkbox" 
-                    [id]="'meal-' + meal.date + '-' + meal.mealType"
-                    [(ngModel)]="meal.isSelected"
-                    (change)="onMealSelectionChanged(meal)">
-                  
-                  <!-- Show grayed-out grocery cart icon for already used meals -->
-                  <div 
-                    *ngIf="meal.isAlreadyUsed"
-                    class="grocery-cart-icon-disabled"
-                    [id]="'meal-' + meal.date + '-' + meal.mealType">
-                    <i class="fas fa-shopping-cart"></i>
-                  </div>
-                </div>
+          <div class="meals-list-compact">
+            <div *ngFor="let meal of dateGroup.meals" class="meal-item-compact" [class.meal-already-used]="meal.isAlreadyUsed">
+              <div class="meal-checkbox-container">
+                <input 
+                  *ngIf="!meal.isAlreadyUsed"
+                  class="meal-checkbox" 
+                  type="checkbox" 
+                  [id]="'meal-' + meal.date + '-' + meal.mealType"
+                  [(ngModel)]="meal.isSelected"
+                  (change)="onMealSelectionChanged(meal)">
                 
-                <label 
-                  class="form-check-label d-flex align-items-center justify-content-between w-100" 
-                  [for]="'meal-' + meal.date + '-' + meal.mealType"
-                  [class.text-muted]="meal.isAlreadyUsed">
-                  <span class="recipe-name">
-                    {{ meal.recipeTitle }}
-                  </span>
-                  <span class="badge" [class.bg-primary]="!meal.isAlreadyUsed" [class.bg-secondary]="meal.isAlreadyUsed">
-                    {{ getMealTypeLabel(meal.mealType) }}
-                  </span>
-                </label>
+                <div 
+                  *ngIf="meal.isAlreadyUsed"
+                  class="meal-disabled-icon"
+                  [id]="'meal-' + meal.date + '-' + meal.mealType">
+                  <i class="fas fa-shopping-cart"></i>
+                </div>
               </div>
+              
+              <label 
+                class="meal-label-compact" 
+                [for]="'meal-' + meal.date + '-' + meal.mealType"
+                [class.text-muted]="meal.isAlreadyUsed">
+                <span class="meal-name-compact">{{ meal.recipeTitle }}</span>
+                <span class="meal-badge-compact" [class.bg-primary]="!meal.isAlreadyUsed" [class.bg-secondary]="meal.isAlreadyUsed">
+                  {{ getMealTypeLabel(meal.mealType) }}
+                </span>
+              </label>
             </div>
           </div>
         </div>
       </div>
       
-      <div *ngIf="mealSelections.length === 0" class="text-muted text-center py-3">
+      <div *ngIf="mealSelections.length === 0" class="empty-meals-state">
         <i class="fas fa-info-circle me-2"></i>
         {{ 'GROCERY_LISTS.NO_MEALS_SELECTED' | translate }}
       </div>
@@ -81,13 +74,15 @@
   </ng-template>
 
   <ng-template #popupFooter>
-    <button 
-      type="button" 
-      class="btn btn-success" 
-      [disabled]="getSelectedMealsCount() === 0"
-      (click)="createGroceryList()">
-      <i class="fas fa-shopping-cart me-2"></i>
-      {{ 'GROCERY_LISTS.CREATE_GROCERY_LIST' | translate }}
-    </button>
+    <div class="d-flex justify-content-end w-100">
+      <button 
+        type="button" 
+        class="btn btn-success" 
+        [disabled]="getSelectedMealsCount() === 0"
+        (click)="createGroceryList()">
+        <i class="fas fa-shopping-cart me-2"></i>
+        {{ 'GROCERY_LISTS.CREATE_GROCERY_LIST' | translate }}
+      </button>
+    </div>
   </ng-template>
 </app-reusable-popup>
