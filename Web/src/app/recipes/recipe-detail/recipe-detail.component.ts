@@ -8,6 +8,7 @@ import { takeUntil } from 'rxjs/operators';
 import { RecipeService } from '../../services/recipe.service';
 import { CookbookService } from '../../services/cookbook.service';
 import { RecipeSettingsService } from '../../services/recipe-settings.service';
+import { MealTypeTranslationService } from '../../services/meal-type-translation.service';
 import { Recipe, UpdateRecipeRequest } from '../../models/recipe.model';
 import { Cookbook } from '../../models/cookbook.model';
 import { RecipeSettings } from '../../models/recipe-settings.model';
@@ -46,6 +47,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     private readonly recipeService: RecipeService,
     private readonly cookbookService: CookbookService,
     private readonly recipeSettingsService: RecipeSettingsService,
+    private readonly mealTypeTranslationService: MealTypeTranslationService,
     private readonly pageTitleService: PageTitleService,
     private readonly footerService: FooterService,
     private readonly translate: TranslateService
@@ -164,14 +166,12 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private loadTranslatedMealTypes(): void {
     this.availableMealTypes = this.mealTypeKeys.map(key => 
-      this.translate.instant(`MEAL_TYPES.${key.toUpperCase()}`)
+      this.mealTypeTranslationService.getMealTypeTranslation(key)
     );
   }
 
   getMealTypeTranslation(mealType: string): string {
-    // Convert meal type to lowercase for key lookup
-    const key = mealType.toLowerCase();
-    return this.translate.instant(`MEAL_TYPES.${key.toUpperCase()}`);
+    return this.mealTypeTranslationService.getMealTypeTranslation(mealType);
   }
 
   enableEditingMode(): void {

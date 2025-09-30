@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { PageTitleService } from '../../services/page-title.service';
 import { GroceryListService } from '../../services/grocery-list.service';
 import { RecipeService } from '../../services/recipe.service';
@@ -46,7 +46,7 @@ interface IngredientTypeGroup {
 @Component({
   selector: 'app-grocery-list-details',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './grocery-list-details.component.html',
   styleUrl: './grocery-list-details.component.scss'
 })
@@ -443,17 +443,17 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
     const typeGroups = new Map<string, AggregatedIngredient[]>();
     
     this.aggregatedIngredients.forEach(ingredient => {
-      const type = ingredient.type.toLowerCase();
-      if (!typeGroups.has(type)) {
-        typeGroups.set(type, []);
+      const mappedCategory = this.mapIngredientTypeToCategory(ingredient.type);
+      if (!typeGroups.has(mappedCategory)) {
+        typeGroups.set(mappedCategory, []);
       }
-      typeGroups.get(type)!.push(ingredient);
+      typeGroups.get(mappedCategory)!.push(ingredient);
     });
     
     // Convert to array and sort ingredients within each type
     const typeGroupArray = Array.from(typeGroups.entries())
       .map(([type, ingredients]) => ({
-        type: this.capitalizeFirstLetter(type),
+        type: type,
         ingredients: ingredients.sort((a, b) => a.name.localeCompare(b.name))
       }));
     
@@ -481,6 +481,41 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
       // Fallback to alphabetical sorting
       this.ingredientTypeGroups = typeGroupArray.sort((a, b) => a.type.localeCompare(b.type));
     }
+  }
+
+  private mapIngredientTypeToCategory(ingredientType: string): string {
+    const typeMapping: { [key: string]: string } = {
+      'groente': 'Groenten',
+      'fruit': 'Fruit',
+      'brood': 'Brood',
+      'kaas': 'Kaas/vleeswaren',
+      'vleeswaren': 'Kaas/vleeswaren',
+      'vlees': 'Vlees',
+      'zuivel': 'Zuivel',
+      'vis': 'Vis',
+      'graan': 'Graan',
+      'kruid': 'Kruiden',
+      'kruiderij': 'Kruiden',
+      'pasta': 'Pasta',
+      'superfood': 'Superfoods',
+      'superfoods': 'Superfoods',
+      'noot': 'Noten',
+      'noten': 'Noten',
+      'spread': 'Spread',
+      'saus': 'Saus',
+      'zoetstof': 'Zoetstof',
+      'vet': 'Vet',
+      'olie': 'Vet',
+      'schoonmaak': 'Schoonmaak',
+      'diepvries': 'Diepvries',
+      'peulvrucht': 'Overig',
+      'plantaardig': 'Overig',
+      'vloeistof': 'Overig',
+      'anders': 'Overig',
+      'overig': 'Overig'
+    };
+    
+    return typeMapping[ingredientType.toLowerCase()] || this.capitalizeFirstLetter(ingredientType);
   }
 
   private capitalizeFirstLetter(string: string): string {
@@ -527,17 +562,17 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
     const typeGroups = new Map<string, AggregatedIngredient[]>();
     
     ingredientsByStatus.forEach(ingredient => {
-      const type = ingredient.type.toLowerCase();
-      if (!typeGroups.has(type)) {
-        typeGroups.set(type, []);
+      const mappedCategory = this.mapIngredientTypeToCategory(ingredient.type);
+      if (!typeGroups.has(mappedCategory)) {
+        typeGroups.set(mappedCategory, []);
       }
-      typeGroups.get(type)!.push(ingredient);
+      typeGroups.get(mappedCategory)!.push(ingredient);
     });
     
     // Convert to array and sort ingredients within each type
     const typeGroupArray = Array.from(typeGroups.entries())
       .map(([type, ingredients]) => ({
-        type: this.capitalizeFirstLetter(type),
+        type: type,
         ingredients: ingredients.sort((a, b) => a.name.localeCompare(b.name))
       }));
     

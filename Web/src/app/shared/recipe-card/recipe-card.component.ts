@@ -4,6 +4,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { CookbookService } from '../../services/cookbook.service';
+import { MealTypeTranslationService } from '../../services/meal-type-translation.service';
 import { Recipe } from '../../models/recipe.model';
 import { Cookbook } from '../../models/cookbook.model';
 
@@ -27,7 +28,8 @@ export class RecipeCardComponent implements OnInit, OnDestroy {
 
   constructor(
     private readonly cookbookService: CookbookService,
-    private readonly translate: TranslateService
+    private readonly translate: TranslateService,
+    private readonly mealTypeTranslationService: MealTypeTranslationService
   ) {}
 
   ngOnInit(): void {
@@ -69,9 +71,7 @@ export class RecipeCardComponent implements OnInit, OnDestroy {
   }
 
   getMealTypeTranslation(mealType: string): string {
-    // Convert meal type to lowercase for key lookup
-    const key = mealType.toLowerCase();
-    return this.translate.instant(`MEAL_TYPES.${key.toUpperCase()}`);
+    return this.mealTypeTranslationService.getMealTypeTranslation(mealType);
   }
 }
 

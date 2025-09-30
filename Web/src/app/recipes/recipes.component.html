@@ -17,6 +17,77 @@
         <button class="btn btn-outline-danger" (click)="loadAllRecipes()">{{ 'COMMON.TRY_AGAIN' | translate }}</button>
       </div>
 
+      <!-- Filtering Section -->
+      <div *ngIf="!isLoadingRecipes && !errorMessage && allRecipes.length > 0" class="filter-section mb-4">
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+          <div class="filter-dropdown">
+            <app-multi-select-dropdown
+              [options]="mealTypeOptions"
+              [selectedValues]="selectedMealTypeFilters"
+              [placeholder]="'RECIPES.ALL_MEAL_CATEGORIES' | translate"
+              [disabled]="false"
+              (selectionChanged)="onMealTypeSelectionChanged($event)">
+            </app-multi-select-dropdown>
+          </div>
+          
+          <div class="filter-dropdown">
+            <app-multi-select-dropdown
+              [options]="cookbookOptions"
+              [selectedValues]="selectedCookbookFilters"
+              [placeholder]="'RECIPES.ALL_COOKBOOKS' | translate"
+              [disabled]="isLoadingCookbooks"
+              (selectionChanged)="onCookbookSelectionChanged($event)">
+            </app-multi-select-dropdown>
+          </div>
+          
+          <button 
+            type="button" 
+            class="btn btn-link btn-sm clear-filters-btn"
+            (click)="clearFilters()"
+            [disabled]="selectedMealTypeFilters.length === 0 && selectedCookbookFilters.length === 0 && searchQuery.length === 0"
+            [title]="'RECIPES.CLEAR_FILTERS' | translate">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section mt-3">
+          <div class="search-container position-relative">
+            <div class="input-group">
+              <span class="input-group-text">
+                <i class="fas fa-search"></i>
+              </span>
+              <input
+                type="text"
+                class="form-control"
+                [placeholder]="'RECIPES.SEARCH_PLACEHOLDER' | translate"
+                [value]="searchQuery"
+                (input)="onSearchInput($event)"
+                (focus)="onSearchFocus()"
+                (blur)="onSearchBlur()">
+              <button 
+                *ngIf="searchQuery.length > 0"
+                class="btn btn-outline-secondary" 
+                type="button" 
+                (click)="clearSearch()"
+                [title]="'RECIPES.CLEAR_SEARCH' | translate">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+            
+            <!-- Search Suggestions -->
+            <div *ngIf="showSearchSuggestions && searchSuggestions.length > 0" 
+                 class="search-suggestions dropdown-menu show position-absolute w-100">
+              <div *ngFor="let suggestion of searchSuggestions" 
+                   class="dropdown-item suggestion-item"
+                   (click)="selectSearchSuggestion(suggestion)">
+                {{ suggestion }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Recipes Display -->
       <div *ngIf="!isLoadingRecipes && !errorMessage && recipes.length > 0">
         <!-- Mobile Card Layout (≤450px) -->
@@ -91,8 +162,10 @@
       <div *ngIf="!isLoadingRecipes && !errorMessage && recipes.length === 0" class="text-center py-5">
         <div class="text-muted">
           <i class="fas fa-utensils fa-3x mb-3"></i>
-          <h4>{{ 'RECIPES.NO_RECIPES_FOUND' | translate }}</h4>
-          <p>{{ 'RECIPES.NO_RECIPES_AVAILABLE_MOMENT' | translate }}</p>
+          <h4 *ngIf="allRecipes.length === 0">{{ 'RECIPES.NO_RECIPES_FOUND' | translate }}</h4>
+          <h4 *ngIf="allRecipes.length > 0">{{ 'RECIPES.NO_RECIPES_MATCH_FILTERS' | translate }}</h4>
+          <p *ngIf="allRecipes.length === 0">{{ 'RECIPES.NO_RECIPES_AVAILABLE_MOMENT' | translate }}</p>
+          <p *ngIf="allRecipes.length > 0">{{ 'RECIPES.TRY_ADJUSTING_FILTERS' | translate }}</p>
         </div>
       </div>
     </div>

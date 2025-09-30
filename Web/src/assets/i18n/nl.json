@@ -71,6 +71,8 @@
     "REMOVE_RECIPE": "Recept verwijderen",
     "NO_RECIPES_FOUND": "Geen recepten gevonden",
     "NO_RECIPES_AVAILABLE_MOMENT": "Er zijn momenteel geen recepten beschikbaar.",
+    "NO_RECIPES_MATCH_FILTERS": "Geen recepten komen overeen met uw filters",
+    "TRY_ADJUSTING_FILTERS": "Probeer uw filters of zoektermen aan te passen.",
     "TITLE": "Titel",
     "DESCRIPTION": "Beschrijving",
     "COOKBOOK": "Kookboek",
@@ -114,6 +116,7 @@
   },
   "GROCERY_LISTS": {
     "LOADING_GROCERY_LISTS": "Boodschappenlijsten laden...",
+    "LOADING_GROCERY_LIST_DETAILS": "Boodschappenlijst details laden...",
     "NO_GROCERY_LISTS_YET": "Nog Geen Boodschappenlijsten",
     "CREATE_FIRST_GROCERY_LIST": "Maak je eerste boodschappenlijst door maaltijden te plannen in het Weekmenu.",
     "GO_TO_WEEK_MENU": "Ga naar Weekmenu",

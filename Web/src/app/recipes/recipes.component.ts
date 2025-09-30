@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { FormBuilder, FormGroup, FormArray, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, FormControl, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -9,6 +9,7 @@ import { RecipeService } from '../services/recipe.service';
 import { CookbookService } from '../services/cookbook.service';
 import { RecipeModalService } from '../services/recipe-modal.service';
 import { RecipeSettingsService } from '../services/recipe-settings.service';
+import { MealTypeTranslationService } from '../services/meal-type-translation.service';
 import { Recipe, Ingredient, CreateRecipeRequest } from '../models/recipe.model';
 import { Cookbook } from '../models/cookbook.model';
 import { RecipeSettings } from '../models/recipe-settings.model';
@@ -16,16 +17,19 @@ import { PageTitleService } from '../services/page-title.service';
 import { RecipeCardComponent } from '../shared/recipe-card/recipe-card.component';
 import { ReusablePopupComponent, PopupConfig } from '../shared/reusable-popup';
 import { IngredientAutocompleteComponent } from '../shared/ingredient-autocomplete/ingredient-autocomplete.component';
+import { MultiSelectDropdownComponent, MultiSelectOption } from '../shared/multi-select-dropdown/multi-select-dropdown.component';
 
 @Component({
   selector: 'app-recipes',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, TranslateModule, RecipeCardComponent, ReusablePopupComponent, IngredientAutocompleteComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, TranslateModule, RecipeCardComponent, ReusablePopupComponent, IngredientAutocompleteComponent, MultiSelectDropdownComponent],
   templateUrl: './recipes.component.html',
   styleUrl: './recipes.component.scss'
 })
 export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   recipes: Recipe[] = [];
+  allRecipes: Recipe[] = [];
+  filteredRecipes: Recipe[] = [];
   cookbooks: Cookbook[] = [];
   recipeSettings: RecipeSettings | null = null;
   isLoadingRecipes = false;
@@ -39,6 +43,16 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   availableIngredientTypes: string[] = [];
   availableUnits: string[] = [];
   showCreateRecipeModal = false;
+  
+  // Filtering properties
+  selectedMealTypeFilters: string[] = [];
+  selectedCookbookFilters: string[] = [];
+  mealTypeOptions: MultiSelectOption[] = [];
+  cookbookOptions: MultiSelectOption[] = [];
+  searchQuery: string = '';
+  searchSuggestions: string[] = [];
+  showSearchSuggestions: boolean = false;
+  
   private readonly destroySubject = new Subject<void>();
 
   createRecipePopupConfig: PopupConfig = {
@@ -57,6 +71,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     private readonly cookbookService: CookbookService,
     private readonly recipeModalService: RecipeModalService,
     private readonly recipeSettingsService: RecipeSettingsService,
+    private readonly mealTypeTranslationService: MealTypeTranslationService,
     private readonly router: Router,
     private readonly formBuilder: FormBuilder,
     private readonly pageTitleService: PageTitleService,
@@ -123,7 +138,8 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
       .pipe(takeUntil(this.destroySubject))
       .subscribe({
         next: (recipes) => {
-          this.recipes = recipes;
+          this.allRecipes = recipes;
+          this.applyFilters();
           this.isLoadingRecipes = false;
         },
         error: (error) => {
@@ -142,6 +158,10 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
       .subscribe({
         next: (cookbooks) => {
           this.cookbooks = cookbooks;
+          this.cookbookOptions = cookbooks.map(cookbook => ({
+            value: cookbook.id,
+            label: cookbook.title
+          }));
           this.isLoadingCookbooks = false;
         },
         error: (error) => {
@@ -185,14 +205,18 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private loadTranslatedMealTypes(): void {
     this.availableMealTypes = this.mealTypeKeys.map(key => 
-      this.translate.instant(`MEAL_TYPES.${key.toUpperCase()}`)
+      this.mealTypeTranslationService.getMealTypeTranslation(key)
     );
+    
+    // Also populate meal type options for filtering
+    this.mealTypeOptions = this.mealTypeKeys.map(key => ({
+      value: key.charAt(0).toUpperCase() + key.slice(1), // Convert to proper case
+      label: this.mealTypeTranslationService.getMealTypeTranslation(key)
+    }));
   }
 
   getMealTypeTranslation(mealType: string): string {
-    // Convert meal type to lowercase for key lookup
-    const key = mealType.toLowerCase();
-    return this.translate.instant(`MEAL_TYPES.${key.toUpperCase()}`);
+    return this.mealTypeTranslationService.getMealTypeTranslation(mealType);
   }
 
   getTagsAsCommaSeparatedString(tags: string[]): string {
@@ -463,5 +487,152 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
           }
         });
     }
+  }
+
+  // Filtering methods
+  applyFilters(): void {
+    let filtered = [...this.allRecipes];
+
+    if (this.selectedMealTypeFilters.length > 0) {
+      filtered = filtered.filter(recipe => 
+        this.selectedMealTypeFilters.some(filter => 
+          recipe.mealTypes.includes(filter)
+        )
+      );
+    }
+
+    if (this.selectedCookbookFilters.length > 0) {
+      filtered = filtered.filter(recipe => 
+        recipe.cookbookId && this.selectedCookbookFilters.includes(recipe.cookbookId)
+      );
+    }
+
+    // Apply search filter
+    if (this.searchQuery.trim().length > 0) {
+      filtered = this.filterBySearchQuery(filtered);
+    }
+
+    this.filteredRecipes = filtered;
+    this.recipes = this.filteredRecipes;
+  }
+
+  filterBySearchQuery(recipes: Recipe[]): Recipe[] {
+    const query = this.searchQuery.toLowerCase().trim();
+    
+    return recipes.filter(recipe => {
+      // Search in title
+      if (recipe.title.toLowerCase().includes(query)) {
+        return true;
+      }
+      
+      // Search in tags
+      if (recipe.tags.some(tag => tag.toLowerCase().includes(query))) {
+        return true;
+      }
+      
+      // Search in ingredients
+      if (recipe.ingredients.some(ingredient => 
+        ingredient.name.toLowerCase().includes(query) ||
+        ingredient.type.toLowerCase().includes(query)
+      )) {
+        return true;
+      }
+      
+      return false;
+    });
+  }
+
+  clearFilters(): void {
+    this.selectedMealTypeFilters = [];
+    this.selectedCookbookFilters = [];
+    this.searchQuery = '';
+    this.searchSuggestions = [];
+    this.showSearchSuggestions = false;
+    this.applyFilters();
+  }
+
+  onMealTypeSelectionChanged(selectedValues: string[]): void {
+    this.selectedMealTypeFilters = selectedValues;
+    this.applyFilters();
+  }
+
+  onCookbookSelectionChanged(selectedValues: string[]): void {
+    this.selectedCookbookFilters = selectedValues;
+    this.applyFilters();
+  }
+
+  // Search functionality methods
+  onSearchInput(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.searchQuery = target.value;
+    this.generateSearchSuggestions();
+    this.applyFilters();
+  }
+
+  onSearchFocus(): void {
+    if (this.searchQuery.length > 0) {
+      this.generateSearchSuggestions();
+      this.showSearchSuggestions = true;
+    }
+  }
+
+  onSearchBlur(): void {
+    // Delay hiding suggestions to allow for clicks on suggestions
+    setTimeout(() => {
+      this.showSearchSuggestions = false;
+    }, 200);
+  }
+
+  clearSearch(): void {
+    this.searchQuery = '';
+    this.searchSuggestions = [];
+    this.showSearchSuggestions = false;
+    this.applyFilters();
+  }
+
+  selectSearchSuggestion(suggestion: string): void {
+    this.searchQuery = suggestion;
+    this.showSearchSuggestions = false;
+    this.applyFilters();
+  }
+
+  generateSearchSuggestions(): void {
+    if (this.searchQuery.length < 2) {
+      this.searchSuggestions = [];
+      return;
+    }
+
+    const query = this.searchQuery.toLowerCase();
+    const suggestions = new Set<string>();
+
+    // Add matching titles
+    this.allRecipes.forEach(recipe => {
+      if (recipe.title.toLowerCase().includes(query)) {
+        suggestions.add(recipe.title);
+      }
+    });
+
+    // Add matching tags
+    this.allRecipes.forEach(recipe => {
+      recipe.tags.forEach(tag => {
+        if (tag.toLowerCase().includes(query)) {
+          suggestions.add(tag);
+        }
+      });
+    });
+
+    // Add matching ingredient names and types
+    this.allRecipes.forEach(recipe => {
+      recipe.ingredients.forEach(ingredient => {
+        if (ingredient.name.toLowerCase().includes(query)) {
+          suggestions.add(ingredient.name);
+        }
+        if (ingredient.type.toLowerCase().includes(query)) {
+          suggestions.add(ingredient.type);
+        }
+      });
+    });
+
+    this.searchSuggestions = Array.from(suggestions).slice(0, 8); // Limit to 8 suggestions
   }
 }

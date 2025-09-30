@@ -71,6 +71,8 @@
     "REMOVE_RECIPE": "Remove recipe",
     "NO_RECIPES_FOUND": "No recipes found",
     "NO_RECIPES_AVAILABLE_MOMENT": "There are no recipes available at the moment.",
+    "NO_RECIPES_MATCH_FILTERS": "No recipes match your filters",
+    "TRY_ADJUSTING_FILTERS": "Try adjusting your filters or search terms.",
     "TITLE": "Title",
     "DESCRIPTION": "Description",
     "COOKBOOK": "Cookbook",
@@ -114,6 +116,7 @@
   },
   "GROCERY_LISTS": {
     "LOADING_GROCERY_LISTS": "Loading grocery lists...",
+    "LOADING_GROCERY_LIST_DETAILS": "Loading grocery list details...",
     "NO_GROCERY_LISTS_YET": "No Grocery Lists Yet",
     "CREATE_FIRST_GROCERY_LIST": "Create your first grocery list by planning meals in the Week Menu.",
     "GO_TO_WEEK_MENU": "Go to Week Menu",
