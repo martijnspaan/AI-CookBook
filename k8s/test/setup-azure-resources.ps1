@@ -2,15 +2,14 @@
 # Prerequisites: Azure CLI
 
 param(
-    [string]$ResourceGroup = "ai-cookbook-rg",
+    [string]$ResourceGroup = "rg-martijn",
     [string]$Location = "West Europe",
-    [string]$AksClusterName = "ai-cookbook-aks",
-    [string]$ContainerRegistryName = "ai-cookbook-registry",
-    [string]$NodeCount = 2,
-    [string]$NodeSize = "Standard_B2s"
+    [string]$ContainerRegistryName = "aicookbookmartijn",
+    [string]$ApiContainerGroupName = "ai-cookbook-api",
+    [string]$WebContainerGroupName = "ai-cookbook-web"
 )
 
-Write-Host "Setting up Azure resources for AI Cookbook test environment..." -ForegroundColor Green
+Write-Host "Setting up Azure resources for AI Cookbook test environment using Azure Container Instances (ACI)..." -ForegroundColor Green
 
 # Check if Azure CLI is available
 if (-not (Get-Command az -ErrorAction SilentlyContinue)) {
@@ -27,75 +26,83 @@ if (-not $azAccount) {
 }
 Write-Host "Logged into Azure as: $azAccount" -ForegroundColor Green
 
-# Create resource group
-Write-Host "Creating resource group '$ResourceGroup'..." -ForegroundColor Yellow
-az group create --name $ResourceGroup --location "$Location"
+# Check if resource group exists
+Write-Host "Checking resource group '$ResourceGroup'..." -ForegroundColor Yellow
+$rgExists = az group show --name $ResourceGroup --query "name" -o tsv 2>$null
 
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed to create resource group"
-    exit 1
+if (-not $rgExists) {
+    Write-Host "Creating resource group '$ResourceGroup'..." -ForegroundColor Yellow
+    az group create --name $ResourceGroup --location "$Location"
+    
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to create resource group"
+        exit 1
+    }
+} else {
+    Write-Host "Resource group '$ResourceGroup' already exists" -ForegroundColor Green
 }
 
-# Create Azure Container Registry
-Write-Host "Creating Azure Container Registry '$ContainerRegistryName'..." -ForegroundColor Yellow
-az acr create --resource-group $ResourceGroup --name $ContainerRegistryName --sku Basic --admin-enabled true
+# Check if Azure Container Registry exists
+Write-Host "Checking Azure Container Registry '$ContainerRegistryName'..." -ForegroundColor Yellow
+$acrExists = az acr show --name $ContainerRegistryName --resource-group $ResourceGroup --query "name" -o tsv 2>$null
 
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed to create Azure Container Registry"
-    exit 1
+if (-not $acrExists) {
+    Write-Host "Creating Azure Container Registry '$ContainerRegistryName'..." -ForegroundColor Yellow
+    az acr create --resource-group $ResourceGroup --name $ContainerRegistryName --sku Basic --admin-enabled true
+    
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Failed to create Azure Container Registry"
+        exit 1
+    }
+} else {
+    Write-Host "Azure Container Registry '$ContainerRegistryName' already exists" -ForegroundColor Green
 }
 
 # Get ACR login server
 $acrLoginServer = az acr show --name $ContainerRegistryName --resource-group $ResourceGroup --query "loginServer" -o tsv
 Write-Host "Container Registry login server: $acrLoginServer" -ForegroundColor Green
 
-# Create AKS cluster
-Write-Host "Creating AKS cluster '$AksClusterName'..." -ForegroundColor Yellow
-az aks create `
-    --resource-group $ResourceGroup `
-    --name $AksClusterName `
-    --node-count $NodeCount `
-    --node-vm-size $NodeSize `
-    --enable-addons monitoring `
-    --generate-ssh-keys `
-    --attach-acr $ContainerRegistryName
+# Check if Azure Container Instances exist
+Write-Host "Checking Azure Container Instances..." -ForegroundColor Yellow
 
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed to create AKS cluster"
-    exit 1
+# Check API Container Group
+$apiExists = az container show --resource-group $ResourceGroup --name $ApiContainerGroupName --query "name" -o tsv 2>$null
+if ($apiExists) {
+    Write-Host "API Container Group '$ApiContainerGroupName' already exists" -ForegroundColor Green
+} else {
+    Write-Host "API Container Group '$ApiContainerGroupName' not found. You may need to create it manually." -ForegroundColor Yellow
 }
 
-# Get AKS credentials
-Write-Host "Getting AKS credentials..." -ForegroundColor Yellow
-az aks get-credentials --resource-group $ResourceGroup --name $AksClusterName --overwrite-existing
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Failed to get AKS credentials"
-    exit 1
+# Check Web Container Group
+$webExists = az container show --resource-group $ResourceGroup --name $WebContainerGroupName --query "name" -o tsv 2>$null
+if ($webExists) {
+    Write-Host "Web Container Group '$WebContainerGroupName' already exists" -ForegroundColor Green
+} else {
+    Write-Host "Web Container Group '$WebContainerGroupName' not found. You may need to create it manually." -ForegroundColor Yellow
 }
 
-# Install NGINX Ingress Controller
-Write-Host "Installing NGINX Ingress Controller..." -ForegroundColor Yellow
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/cloud/deploy.yaml
-
-if ($LASTEXITCODE -ne 0) {
-    Write-Warning "Failed to install NGINX Ingress Controller. You may need to install it manually."
+# Get Container Instance information
+if ($apiExists) {
+    Write-Host "Getting API Container Instance information..." -ForegroundColor Yellow
+    $apiInfo = az container show --resource-group $ResourceGroup --name $ApiContainerGroupName --query "{name:name, ipAddress:ipAddress.ip, fqdn:ipAddress.fqdn, state:containers[0].instanceView.currentState.state}" -o table
+    Write-Host "API Container Information:" -ForegroundColor Cyan
+    Write-Host $apiInfo
 }
 
-# Wait for ingress controller to be ready
-Write-Host "Waiting for NGINX Ingress Controller to be ready..." -ForegroundColor Yellow
-kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.kubernetes.io/component=controller --timeout=300s
+if ($webExists) {
+    Write-Host "Getting Web Container Instance information..." -ForegroundColor Yellow
+    $webInfo = az container show --resource-group $ResourceGroup --name $WebContainerGroupName --query "{name:name, ipAddress:ipAddress.ip, fqdn:ipAddress.fqdn, state:containers[0].instanceView.currentState.state}" -o table
+    Write-Host "Web Container Information:" -ForegroundColor Cyan
+    Write-Host $webInfo
+}
 
-# Get cluster information
-Write-Host "`nAzure resources created successfully!" -ForegroundColor Green
+# Get resource information
+Write-Host "`nAzure resources setup completed successfully!" -ForegroundColor Green
 Write-Host "Resource Group: $ResourceGroup" -ForegroundColor Cyan
-Write-Host "AKS Cluster: $AksClusterName" -ForegroundColor Cyan
+Write-Host "API Container Group: $ApiContainerGroupName" -ForegroundColor Cyan
+Write-Host "Web Container Group: $WebContainerGroupName" -ForegroundColor Cyan
 Write-Host "Container Registry: $acrLoginServer" -ForegroundColor Cyan
 Write-Host "Location: $Location" -ForegroundColor Cyan
-
-# Get AKS cluster info
-Write-Host "`nAKS Cluster Information:" -ForegroundColor Cyan
-az aks show --resource-group $ResourceGroup --name $AksClusterName --query "{name:name,location:location,provisioningState:provisioningState,kubernetesVersion:kubernetesVersion,nodeCount:agentPoolProfiles[0].count}" -o table
 
 # Get ACR info
 Write-Host "`nContainer Registry Information:" -ForegroundColor Cyan
@@ -103,8 +110,8 @@ az acr show --name $ContainerRegistryName --resource-group $ResourceGroup --quer
 
 Write-Host "`nNext steps:" -ForegroundColor Yellow
 Write-Host "1. Update the Azure Container Registry name in deploy-test.ps1 if different from '$ContainerRegistryName'" -ForegroundColor White
-Write-Host "2. Update the Resource Group and AKS Cluster name in deploy-test.ps1 if different" -ForegroundColor White
-Write-Host "3. Run ./deploy-test.ps1 to deploy the application" -ForegroundColor White
+Write-Host "2. Update the Resource Group name in deploy-test.ps1 if different from '$ResourceGroup'" -ForegroundColor White
+Write-Host "3. Run ./deploy-test.ps1 to deploy the application to ACI" -ForegroundColor White
 Write-Host "4. Update the CosmosDB connection string in secret-test.yaml with your actual connection string" -ForegroundColor White
 Write-Host "5. Update the TLS certificate in tls-secret-test.yaml with your actual certificate" -ForegroundColor White
 

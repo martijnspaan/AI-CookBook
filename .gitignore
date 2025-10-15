@@ -353,3 +353,7 @@ MigrationBackup/
 .env.local
 .env.development
 .env.production
+
+# Secrets configuration files
+**/secrets.config
+**/secrets.config.local

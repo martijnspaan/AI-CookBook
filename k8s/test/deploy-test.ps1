@@ -2,23 +2,27 @@
 # Prerequisites: Azure CLI, kubectl, Docker, Azure Container Registry access
 
 param(
-    [string]$AzureContainerRegistry = "aicookbookregistry.azurecr.io",
     [string]$ImageTag = "1.0.0-test",
-    [string]$ResourceGroup = "AI-CookBook",
-    [string]$AksClusterName = "k8s-ai-cookbook",
+    [string]$ConfigPath = "secrets.config",
+    [string]$ApiContainerGroupName = "ai-cookbook-api",
+    [string]$WebContainerGroupName = "ai-cookbook-web",
     [switch]$SkipImageBuild = $false,
     [switch]$SkipImagePush = $false,
     [switch]$SkipAzureSetup = $false
 )
 
-Write-Host "Starting AI Cookbook test environment deployment to Azure Kubernetes..." -ForegroundColor Green
+# Load secrets configuration
+. "$PSScriptRoot/load-secrets.ps1"
+$secrets = Load-SecretsConfig -ConfigPath $ConfigPath
+
+# Set variables from secrets configuration
+$AzureContainerRegistry = $secrets["AZURE_CONTAINER_REGISTRY"]
+$ResourceGroup = $secrets["AZURE_RESOURCE_GROUP"]
+$CosmosDbConnectionString = $secrets["COSMOSDB_CONNECTION_STRING"]
+
+Write-Host "Starting AI Cookbook test environment deployment to Azure Container Instances (ACI)..." -ForegroundColor Green
 
 # Check if required tools are available
-if (-not (Get-Command kubectl -ErrorAction SilentlyContinue)) {
-    Write-Error "kubectl is not installed or not in PATH"
-    exit 1
-}
-
 if (-not (Get-Command az -ErrorAction SilentlyContinue)) {
     Write-Error "Azure CLI is not installed or not in PATH"
     exit 1
@@ -26,11 +30,6 @@ if (-not (Get-Command az -ErrorAction SilentlyContinue)) {
 
 if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
     Write-Error "Docker is not installed or not in PATH"
-    exit 1
-}
-
-if (-not (Get-Command openssl -ErrorAction SilentlyContinue)) {
-    Write-Error "OpenSSL is not installed or not in PATH. Please install OpenSSL to generate TLS certificates."
     exit 1
 }
 
@@ -47,13 +46,23 @@ if (-not $SkipAzureSetup) {
     }
     Write-Host "Logged into Azure as: $azAccount" -ForegroundColor Green
 
-    # Get AKS credentials
-    Write-Host "Getting AKS credentials..." -ForegroundColor Yellow
-    az aks get-credentials --resource-group $ResourceGroup --name $AksClusterName --overwrite-existing
-
-    if ($LASTEXITCODE -ne 0) {
-        Write-Error "Failed to get AKS credentials. Please check your resource group and cluster name."
-        exit 1
+    # Check if ACI resources exist, create if they don't
+    Write-Host "Checking Azure Container Instances..." -ForegroundColor Yellow
+    
+    # Check API Container Group
+    $apiExists = az container show --resource-group $ResourceGroup --name $ApiContainerGroupName --query "name" -o tsv 2>$null
+    if (-not $apiExists) {
+        Write-Host "API Container Group '$ApiContainerGroupName' not found. It will be created during deployment." -ForegroundColor Yellow
+    } else {
+        Write-Host "API Container Group '$ApiContainerGroupName' found." -ForegroundColor Green
+    }
+    
+    # Check Web Container Group
+    $webExists = az container show --resource-group $ResourceGroup --name $WebContainerGroupName --query "name" -o tsv 2>$null
+    if (-not $webExists) {
+        Write-Host "Web Container Group '$WebContainerGroupName' not found. It will be created during deployment." -ForegroundColor Yellow
+    } else {
+        Write-Host "Web Container Group '$WebContainerGroupName' found." -ForegroundColor Green
     }
 
     # Login to Azure Container Registry
@@ -126,132 +135,130 @@ if (-not $SkipImagePush) {
     Write-Host "Images pushed successfully!" -ForegroundColor Green
 }
 
-# Generate TLS certificate for test environment
-Write-Host "Generating TLS certificate for test environment..." -ForegroundColor Yellow
-$certificateScript = "../../azure/generate-test-certificate.ps1"
-if (Test-Path $certificateScript) {
-    & $certificateScript -Domain "ai-cookbook-test.westeurope.cloudapp.azure.com" -OutputPath "certificates"
-    if ($LASTEXITCODE -ne 0) {
-        Write-Error "Failed to generate TLS certificate"
-        exit 1
-    }
-    Write-Host "TLS certificate generated successfully!" -ForegroundColor Green
-} else {
-    Write-Warning "Certificate generation script not found at $certificateScript"
-    Write-Warning "Proceeding without certificate generation. HTTPS may not work properly."
+# Get current container instance information
+Write-Host "Getting current container instance information..." -ForegroundColor Yellow
+
+$apiInfo = az container show --resource-group $ResourceGroup --name $ApiContainerGroupName --query "{ipAddress:ipAddress.ip, fqdn:ipAddress.fqdn, state:containers[0].instanceView.currentState.state}" -o json | ConvertFrom-Json
+$webInfo = az container show --resource-group $ResourceGroup --name $WebContainerGroupName --query "{ipAddress:ipAddress.ip, fqdn:ipAddress.fqdn, state:containers[0].instanceView.currentState.state}" -o json | ConvertFrom-Json
+
+Write-Host "Current API Container - IP: $($apiInfo.ipAddress), State: $($apiInfo.state)" -ForegroundColor Cyan
+Write-Host "Current Web Container - IP: $($webInfo.ipAddress), State: $($webInfo.state)" -ForegroundColor Cyan
+
+# Deploy updated images to Azure Container Instances
+Write-Host "Deploying updated images to Azure Container Instances..." -ForegroundColor Yellow
+
+# Create or update API Container Group with new image
+Write-Host "Creating/updating API Container Group with new image..." -ForegroundColor Cyan
+az container create `
+    --resource-group $ResourceGroup `
+    --name $ApiContainerGroupName `
+    --image $AzureContainerRegistry/ai-cookbook-api:$ImageTag `
+    --registry-login-server $AzureContainerRegistry `
+    --registry-username $(az acr credential show --name $AzureContainerRegistry.Split('.')[0] --query "username" -o tsv) `
+    --registry-password $(az acr credential show --name $AzureContainerRegistry.Split('.')[0] --query "passwords[0].value" -o tsv) `
+    --ports 4201 `
+    --ip-address Public `
+    --cpu 1 `
+    --memory 2 `
+    --restart-policy Always `
+    --environment-variables `
+        ASPNETCORE_ENVIRONMENT=Test `
+        ASPNETCORE_URLS=http://+:4201 `
+        LOG_LEVEL=Debug `
+        COSMOSDB_CONNECTION_STRING="$CosmosDbConnectionString" `
+        API_TITLE="AI Cookbook API - Test" `
+        API_VERSION="1.0.0" `
+        API_DESCRIPTION="AI Cookbook API for recipe management - Test Environment" `
+        CORS_ALLOWED_ORIGINS="*" `
+        SWAGGER_ENABLED="true"
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Failed to update API Container Group"
+    exit 1
 }
 
-# Update image references in deployment files
-Write-Host "Updating image references in deployment files..." -ForegroundColor Yellow
+# Create or update Web Container Group with new image
+Write-Host "Creating/updating Web Container Group with new image..." -ForegroundColor Cyan
+az container create `
+    --resource-group $ResourceGroup `
+    --name $WebContainerGroupName `
+    --image $AzureContainerRegistry/ai-cookbook-web:$ImageTag `
+    --registry-login-server $AzureContainerRegistry `
+    --registry-username $(az acr credential show --name $AzureContainerRegistry.Split('.')[0] --query "username" -o tsv) `
+    --registry-password $(az acr credential show --name $AzureContainerRegistry.Split('.')[0] --query "passwords[0].value" -o tsv) `
+    --ports 80 `
+    --ip-address Public `
+    --cpu 1 `
+    --memory 1 `
+    --restart-policy Always
 
-# Update API deployment
-$apiDeploymentContent = Get-Content "api-deployment-test.yaml" -Raw
-$apiDeploymentContent = $apiDeploymentContent -replace "ai-cookbook-api:1.0.0-test", "$AzureContainerRegistry/ai-cookbook-api:$ImageTag"
-Set-Content "api-deployment-test.yaml" -Value $apiDeploymentContent
-
-# Update Web deployment
-$webDeploymentContent = Get-Content "web-deployment-test.yaml" -Raw
-$webDeploymentContent = $webDeploymentContent -replace "ai-cookbook-web:1.0.0-test", "$AzureContainerRegistry/ai-cookbook-web:$ImageTag"
-Set-Content "web-deployment-test.yaml" -Value $webDeploymentContent
-
-# Apply Kubernetes manifests with best practices
-Write-Host "Applying Kubernetes manifests with best practices..." -ForegroundColor Yellow
-
-# 1. Security and Resource Management
-Write-Host "Applying security and resource management..." -ForegroundColor Cyan
-kubectl apply -f pod-security-test.yaml
-kubectl apply -f resource-quotas-test.yaml
-
-# 2. RBAC and Configuration
-Write-Host "Applying RBAC and configuration..." -ForegroundColor Cyan
-kubectl apply -f rbac-test.yaml
-kubectl apply -f configmap-test.yaml
-kubectl apply -f secret-test.yaml
-
-# Apply TLS secret (use generated certificate if available)
-if (Test-Path "certificates/tls-secret-test.yaml") {
-    Write-Host "Applying generated TLS certificate..." -ForegroundColor Cyan
-    kubectl apply -f certificates/tls-secret-test.yaml
-} else {
-    Write-Host "Applying default TLS secret (may need manual certificate setup)..." -ForegroundColor Yellow
-    kubectl apply -f tls-secret-test.yaml
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Failed to update Web Container Group"
+    exit 1
 }
 
-# 3. Application Deployments
-Write-Host "Applying application deployments..." -ForegroundColor Cyan
-kubectl apply -f api-deployment-test.yaml
-kubectl apply -f web-deployment-test.yaml
-kubectl apply -f api-service-test.yaml
-kubectl apply -f web-service-test.yaml
+Write-Host "Azure Container Instances updated successfully!" -ForegroundColor Green
 
-# 4. High Availability and Scaling
-Write-Host "Applying high availability and scaling..." -ForegroundColor Cyan
-kubectl apply -f pod-disruption-budget-test.yaml
-kubectl apply -f hpa-test.yaml
+# Wait for container instances to be ready
+Write-Host "Waiting for container instances to be ready..." -ForegroundColor Yellow
 
-# 5. Network and Ingress
-Write-Host "Applying network policies and ingress..." -ForegroundColor Cyan
-kubectl apply -f network-policy-test.yaml
-kubectl apply -f ingress-test.yaml
+# Wait for API container
+Write-Host "Waiting for API container to be running..." -ForegroundColor Cyan
+$maxWaitTime = 300 # 5 minutes
+$waitTime = 0
+do {
+    Start-Sleep -Seconds 10
+    $waitTime += 10
+    $apiState = az container show --resource-group $ResourceGroup --name $ApiContainerGroupName --query "containers[0].instanceView.currentState.state" -o tsv
+    Write-Host "API Container State: $apiState (waited $waitTime seconds)" -ForegroundColor Yellow
+} while ($apiState -ne "Running" -and $waitTime -lt $maxWaitTime)
 
-# 6. Monitoring and Operations (Optional - requires Prometheus operator)
-Write-Host "Applying monitoring and operational tools..." -ForegroundColor Cyan
-try {
-    kubectl apply -f monitoring-test.yaml
-    Write-Host "Monitoring configuration applied successfully" -ForegroundColor Green
-} catch {
-    Write-Warning "Monitoring configuration skipped (Prometheus operator may not be installed)"
+if ($apiState -ne "Running") {
+    Write-Warning "API container did not reach Running state within $maxWaitTime seconds"
 }
 
-try {
-    kubectl apply -f backup-test.yaml
-    Write-Host "Backup configuration applied successfully" -ForegroundColor Green
-} catch {
-    Write-Warning "Backup configuration skipped (may require additional setup)"
+# Wait for Web container
+Write-Host "Waiting for Web container to be running..." -ForegroundColor Cyan
+$waitTime = 0
+do {
+    Start-Sleep -Seconds 10
+    $waitTime += 10
+    $webState = az container show --resource-group $ResourceGroup --name $WebContainerGroupName --query "containers[0].instanceView.currentState.state" -o tsv
+    Write-Host "Web Container State: $webState (waited $waitTime seconds)" -ForegroundColor Yellow
+} while ($webState -ne "Running" -and $waitTime -lt $maxWaitTime)
+
+if ($webState -ne "Running") {
+    Write-Warning "Web container did not reach Running state within $maxWaitTime seconds"
 }
 
-Write-Host "Kubernetes manifests applied successfully!" -ForegroundColor Green
+# Get container instance information
+Write-Host "Deployment completed! Container instance information:" -ForegroundColor Green
 
-# Wait for deployments to be ready
-Write-Host "Waiting for deployments to be ready..." -ForegroundColor Yellow
-kubectl wait --for=condition=available --timeout=300s deployment/api-deployment-test -n ai-cookbook-test
-kubectl wait --for=condition=available --timeout=300s deployment/web-deployment-test -n ai-cookbook-test
+Write-Host "`n=== API Container Group ===" -ForegroundColor Yellow
+az container show --resource-group $ResourceGroup --name $ApiContainerGroupName --query "{name:name, ipAddress:ipAddress.ip, fqdn:ipAddress.fqdn, state:containers[0].instanceView.currentState.state, restartCount:containers[0].instanceView.restartCount}" -o table
 
-# Get service information
-Write-Host "Deployment completed! Service information:" -ForegroundColor Green
+Write-Host "`n=== Web Container Group ===" -ForegroundColor Yellow
+az container show --resource-group $ResourceGroup --name $WebContainerGroupName --query "{name:name, ipAddress:ipAddress.ip, fqdn:ipAddress.fqdn, state:containers[0].instanceView.currentState.state, restartCount:containers[0].instanceView.restartCount}" -o table
 
-Write-Host "`n=== Pods ===" -ForegroundColor Yellow
-kubectl get pods -n ai-cookbook-test -o wide
-
-Write-Host "`n=== Services ===" -ForegroundColor Yellow
-kubectl get services -n ai-cookbook-test
-
-Write-Host "`n=== Ingress ===" -ForegroundColor Yellow
-kubectl get ingress -n ai-cookbook-test
-
-Write-Host "`n=== Horizontal Pod Autoscalers ===" -ForegroundColor Yellow
-kubectl get hpa -n ai-cookbook-test
-
-Write-Host "`n=== Pod Disruption Budgets ===" -ForegroundColor Yellow
-kubectl get pdb -n ai-cookbook-test
-
-Write-Host "`n=== Network Policies ===" -ForegroundColor Yellow
-kubectl get networkpolicies -n ai-cookbook-test
-
-Write-Host "`n=== Resource Quotas ===" -ForegroundColor Yellow
-kubectl describe resourcequota -n ai-cookbook-test
+# Get final IP addresses
+$finalApiInfo = az container show --resource-group $ResourceGroup --name $ApiContainerGroupName --query "{ipAddress:ipAddress.ip, fqdn:ipAddress.fqdn}" -o json | ConvertFrom-Json
+$finalWebInfo = az container show --resource-group $ResourceGroup --name $WebContainerGroupName --query "{ipAddress:ipAddress.ip, fqdn:ipAddress.fqdn}" -o json | ConvertFrom-Json
 
 Write-Host "`nTo access the application:" -ForegroundColor Cyan
-Write-Host "Test environment: https://ai-cookbook-test.westeurope.cloudapp.azure.com" -ForegroundColor White
-Write-Host "API: https://ai-cookbook-test.westeurope.cloudapp.azure.com/api" -ForegroundColor White
-Write-Host "API Swagger: https://ai-cookbook-test.westeurope.cloudapp.azure.com/api/swagger" -ForegroundColor White
-Write-Host "Alternative URL: https://k8s-ai-cookbook-dns-e3byex43.hcp.westeurope.azmk8s.io" -ForegroundColor White
+Write-Host "Web Application: http://$($finalWebInfo.ipAddress)" -ForegroundColor White
+Write-Host "API: http://$($finalApiInfo.ipAddress):4201" -ForegroundColor White
+Write-Host "API Swagger: http://$($finalApiInfo.ipAddress):4201/swagger" -ForegroundColor White
 
 Write-Host "`nTo check logs:" -ForegroundColor Cyan
-Write-Host "API logs: kubectl logs -f deployment/api-deployment-test -n ai-cookbook-test" -ForegroundColor White
-Write-Host "Web logs: kubectl logs -f deployment/web-deployment-test -n ai-cookbook-test" -ForegroundColor White
+Write-Host "API logs: az container logs --resource-group $ResourceGroup --name $ApiContainerGroupName" -ForegroundColor White
+Write-Host "Web logs: az container logs --resource-group $ResourceGroup --name $WebContainerGroupName" -ForegroundColor White
 
-Write-Host "`nTo delete the deployment:" -ForegroundColor Cyan
-Write-Host "kubectl delete namespace ai-cookbook-test" -ForegroundColor White
+Write-Host "`nTo restart containers:" -ForegroundColor Cyan
+Write-Host "API restart: az container restart --resource-group $ResourceGroup --name $ApiContainerGroupName" -ForegroundColor White
+Write-Host "Web restart: az container restart --resource-group $ResourceGroup --name $WebContainerGroupName" -ForegroundColor White
+
+Write-Host "`nTo delete the containers:" -ForegroundColor Cyan
+Write-Host "API delete: az container delete --resource-group $ResourceGroup --name $ApiContainerGroupName --yes" -ForegroundColor White
+Write-Host "Web delete: az container delete --resource-group $ResourceGroup --name $WebContainerGroupName --yes" -ForegroundColor White
 
 Write-Host "`nTest environment deployment completed successfully!" -ForegroundColor Green

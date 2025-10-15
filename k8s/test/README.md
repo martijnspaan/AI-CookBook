@@ -1,14 +1,13 @@
 # AI Cookbook Test Environment
 
-This directory contains Kubernetes manifests and deployment scripts for the AI Cookbook test environment on Azure Kubernetes Service (AKS).
+This directory contains deployment scripts for the AI Cookbook test environment on Azure Container Instances (ACI) in the rg-martijn resource group.
 
 ## Prerequisites
 
 - Azure CLI installed and configured
-- kubectl installed
 - Docker installed
-- Access to Azure Container Registry
-- AKS cluster with NGINX Ingress Controller
+- Access to Azure Container Registry (aicookbookmartijn.azurecr.io)
+- Existing Azure Container Instances in rg-martijn resource group
 
 ## Quick Start
 
@@ -19,11 +18,10 @@ This directory contains Kubernetes manifests and deployment scripts for the AI C
 ./setup-azure-resources.ps1
 ```
 
-This will create:
-- Resource Group
-- Azure Container Registry
-- AKS Cluster
-- Install NGINX Ingress Controller
+This will verify and set up:
+- Resource Group (rg-martijn)
+- Azure Container Registry (aicookbookmartijn)
+- Azure Container Instances (ai-cookbook-api, ai-cookbook-web)
 
 ### 2. Deploy to Test Environment
 
@@ -39,27 +37,16 @@ This will create:
 ./cleanup-test.ps1
 ```
 
-## Manual Deployment
+## Manual Container Updates
 
-If you prefer to deploy manually:
+If you prefer to update containers manually:
 
 ```powershell
-# Apply all manifests at once
-kubectl apply -f deploy-all-test.yaml
+# Update API container with new image
+az container create --resource-group rg-martijn --name ai-cookbook-api --image aicookbookmartijn.azurecr.io/ai-cookbook-api:1.0.0-test --registry-login-server aicookbookmartijn.azurecr.io --registry-username <username> --registry-password <password> --ports 4201 --ip-address Public --cpu 1 --memory 2 --restart-policy Always
 
-# Or apply individual components
-kubectl apply -f namespace-test.yaml
-kubectl apply -f rbac-test.yaml
-kubectl apply -f configmap-test.yaml
-kubectl apply -f secret-test.yaml
-kubectl apply -f tls-secret-test.yaml
-kubectl apply -f api-deployment-test.yaml
-kubectl apply -f api-service-test.yaml
-kubectl apply -f web-deployment-test.yaml
-kubectl apply -f web-service-test.yaml
-kubectl apply -f pod-disruption-budget-test.yaml
-kubectl apply -f network-policy-test.yaml
-kubectl apply -f ingress-test.yaml
+# Update Web container with new image
+az container create --resource-group rg-martijn --name ai-cookbook-web --image aicookbookmartijn.azurecr.io/ai-cookbook-web:1.0.0-test --registry-login-server aicookbookmartijn.azurecr.io --registry-username <username> --registry-password <password> --ports 80 --ip-address Public --cpu 1 --memory 1 --restart-policy Always
 ```
 
 ## Configuration
@@ -68,67 +55,67 @@ kubectl apply -f ingress-test.yaml
 
 The test environment uses the following configuration:
 
-- **Namespace**: `ai-cookbook-test`
+- **Resource Group**: `rg-martijn`
 - **Environment**: `Test`
 - **Log Level**: `Debug` (more verbose logging)
-- **Database**: `CookBookTest` (separate from production)
-- **CORS**: Configured for Azure domains
-
-### Secrets
-
-Before deploying, update the following secrets:
-
-1. **CosmosDB Connection String** in `secret-test.yaml`
-2. **TLS Certificate** in `tls-secret-test.yaml`
+- **Database**: `CookBook` (CosmosDB in rg-martijn)
+- **CORS**: Configured for ACI IP addresses and localhost
 
 ### Image Configuration
 
 The deployment scripts expect images to be available in Azure Container Registry:
-- `ai-cookbook-api:1.0.0-test`
-- `ai-cookbook-web:1.0.0-test`
+- `aicookbookmartijn.azurecr.io/ai-cookbook-api:1.0.0-test`
+- `aicookbookmartijn.azurecr.io/ai-cookbook-web:1.0.0-test`
+
+### Container Configuration
+
+The containers are configured in a unified deployment with:
+- **API Container**: 1 CPU, 2GB RAM, Port 4201
+- **Web Container**: 1 CPU, 1GB RAM, Port 80
+- **Shared IP Address**: Both containers use the same public IP
+- **Restart Policy**: Always
+- **Total Resources**: 2 CPU, 3GB RAM
 
 ## Access URLs
 
 After deployment, the application will be available at:
 
-- **Web Application**: `https://ai-cookbook-test.westeurope.cloudapp.azure.com`
-- **API**: `https://ai-cookbook-test.westeurope.cloudapp.azure.com/api`
-- **API Swagger**: `https://ai-cookbook-test.westeurope.cloudapp.azure.com/api/swagger`
-- **Alternative URL**: `https://k8s-ai-cookbook-dns-e3byex43.hcp.westeurope.azmk8s.io`
+- **Web Application**: `http://20.56.205.169`
+- **API**: `http://20.56.205.169:4201`
+- **API Swagger**: `http://20.56.205.169:4201/swagger`
+
+Note: Both containers share the same IP address in the unified deployment. IP addresses may change when containers are recreated. Check the deployment output for current IPs.
 
 ## Monitoring
 
 ### Check Deployment Status
 
 ```powershell
-# Check pods
-kubectl get pods -n ai-cookbook-test
+# Check unified container group
+az container show --resource-group rg-martijn --name ai-cookbook-unified --query "{name:name, state:properties.instanceView.state, ip:properties.ipAddress.ip, containers:properties.containers[].{name:name, state:properties.instanceView.currentState.state}}" -o table
 
-# Check services
-kubectl get services -n ai-cookbook-test
-
-# Check ingress
-kubectl get ingress -n ai-cookbook-test
+# Check specific containers within the group
+az container show --resource-group rg-martijn --name ai-cookbook-unified --query "properties.containers[].{name:name, state:properties.instanceView.currentState.state, restartCount:properties.instanceView.restartCount}" -o table
 ```
 
 ### View Logs
 
 ```powershell
 # API logs
-kubectl logs -f deployment/api-deployment-test -n ai-cookbook-test
+az container logs --resource-group rg-martijn --name ai-cookbook-unified --container-name ai-cookbook-api
 
 # Web logs
-kubectl logs -f deployment/web-deployment-test -n ai-cookbook-test
+az container logs --resource-group rg-martijn --name ai-cookbook-unified --container-name ai-cookbook-web
 ```
 
 ### Health Checks
 
 ```powershell
-# Check API health
-kubectl get pods -n ai-cookbook-test -l app=api
+# Check API container status
+az container show --resource-group rg-martijn --name ai-cookbook-unified --query "properties.containers[?name=='ai-cookbook-api'].properties.instanceView.currentState" -o table
 
-# Check Web health
-kubectl get pods -n ai-cookbook-test -l app=web
+# Check Web container status
+az container show --resource-group rg-martijn --name ai-cookbook-unified --query "properties.containers[?name=='ai-cookbook-web'].properties.instanceView.currentState" -o table
 ```
 
 ## Troubleshooting
@@ -136,33 +123,37 @@ kubectl get pods -n ai-cookbook-test -l app=web
 ### Common Issues
 
 1. **Image Pull Errors**: Ensure images are pushed to Azure Container Registry
-2. **Ingress Issues**: Verify NGINX Ingress Controller is installed and running
-3. **Secret Issues**: Check that secrets are properly base64 encoded
-4. **Network Issues**: Verify network policies allow required traffic
+2. **Container Start Issues**: Check container logs for startup errors
+3. **Network Issues**: Verify containers have public IP addresses
+4. **Authentication Issues**: Ensure ACR credentials are correct
 
 ### Debug Commands
 
 ```powershell
-# Describe deployment
-kubectl describe deployment api-deployment-test -n ai-cookbook-test
+# Check container events for API
+az container show --resource-group rg-martijn --name ai-cookbook-unified --query "properties.containers[?name=='ai-cookbook-api'].properties.instanceView.events" -o table
 
-# Check events
-kubectl get events -n ai-cookbook-test --sort-by='.lastTimestamp'
+# Check container events for Web
+az container show --resource-group rg-martijn --name ai-cookbook-unified --query "properties.containers[?name=='ai-cookbook-web'].properties.instanceView.events" -o table
 
-# Check ingress controller
-kubectl get pods -n ingress-nginx
+# Check container logs with timestamps
+az container logs --resource-group rg-martijn --name ai-cookbook-unified --container-name ai-cookbook-api --follow
+
+# Restart unified container group
+az container restart --resource-group rg-martijn --name ai-cookbook-unified
 ```
 
 ## Security Considerations
 
 - All secrets should be managed through Azure Key Vault in production
-- TLS certificates should be properly configured
-- Network policies restrict traffic between namespaces
-- Pod security contexts enforce non-root execution
+- Container images should be scanned for vulnerabilities
+- Network access is restricted to specific IP addresses
+- Containers run with minimal required permissions
 
 ## Cost Optimization
 
-- Use appropriate node sizes for test environment
-- Consider using spot instances for non-critical workloads
+- Use appropriate container sizes for test environment (1 CPU, 1-2GB RAM)
+- Containers automatically scale based on demand
 - Monitor resource usage and adjust limits accordingly
 - Clean up test environments when not in use
+- Consider using Azure Container Instances for cost-effective testing
