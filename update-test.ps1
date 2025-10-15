@@ -90,7 +90,7 @@ if ($Image -eq "all" -or $Image -eq "api") {
     Write-Host "Building API Docker image (this may take several minutes)..." -ForegroundColor Yellow
     Write-Host "Starting API build at $(Get-Date)" -ForegroundColor Cyan
     
-    docker build -t $AzureContainerRegistry/ai-cookbook-api:$ImageTag -f API/API.Application/Dockerfile API/
+    docker build  -t $AzureContainerRegistry/ai-cookbook-api:$ImageTag -f API/API.Application/Dockerfile API/
 
     if ($LASTEXITCODE -ne 0) {
         Write-Host "Failed to build API image" -ForegroundColor Red
@@ -114,7 +114,7 @@ if ($Image -eq "all" -or $Image -eq "web") {
     Write-Host "Building Web Docker image (this may take several minutes)..." -ForegroundColor Yellow
     Write-Host "Starting Web build at $(Get-Date)" -ForegroundColor Cyan
     
-    docker build -t $AzureContainerRegistry/ai-cookbook-web:$ImageTag -f Web/Dockerfile Web/
+    docker build  -t $AzureContainerRegistry/ai-cookbook-web:$ImageTag -f Web/Dockerfile Web/
 
     if ($LASTEXITCODE -ne 0) {
         Write-Host "Failed to build Web image" -ForegroundColor Red
@@ -134,6 +134,9 @@ if ($Image -eq "all" -or $Image -eq "web") {
     Write-Host "Web image pushed successfully" -ForegroundColor Green
 }
 
+# Initialize variables
+$skipUpdate = $false
+
 # Deploy or update unified container group with new images
 if ($isNewDeployment) {
     Write-Host "Creating new unified container group with images..." -ForegroundColor Yellow
@@ -141,7 +144,7 @@ if ($isNewDeployment) {
     # For new deployment, ensure both images are built
     if ($Image -eq "api" -and (-not (docker images -q "$AzureContainerRegistry/ai-cookbook-web:$ImageTag"))) {
         Write-Host "Building Web image for new deployment..." -ForegroundColor Yellow
-        docker build -t $AzureContainerRegistry/ai-cookbook-web:$ImageTag -f Web/Dockerfile Web/
+        docker build  -t $AzureContainerRegistry/ai-cookbook-web:$ImageTag -f Web/Dockerfile Web/
         if ($LASTEXITCODE -ne 0) {
             Write-Host "Failed to build Web image" -ForegroundColor Red
             exit 1
@@ -153,7 +156,7 @@ if ($isNewDeployment) {
         }
     } elseif ($Image -eq "web" -and (-not (docker images -q "$AzureContainerRegistry/ai-cookbook-api:$ImageTag"))) {
         Write-Host "Building API image for new deployment..." -ForegroundColor Yellow
-        docker build -t $AzureContainerRegistry/ai-cookbook-api:$ImageTag -f API/API.Application/Dockerfile API/
+        docker build  -t $AzureContainerRegistry/ai-cookbook-api:$ImageTag -f API/API.Application/Dockerfile API/
         if ($LASTEXITCODE -ne 0) {
             Write-Host "Failed to build API image" -ForegroundColor Red
             exit 1
@@ -174,36 +177,55 @@ if ($isNewDeployment) {
 } else {
     Write-Host "Updating existing unified container group with new images..." -ForegroundColor Yellow
     
-    # Get current container group configuration BEFORE deleting to preserve existing image tags
+    # Get current container group configuration to preserve existing settings
     Write-Host "Getting current container group configuration..." -ForegroundColor Yellow
-    $currentConfig = az container show --resource-group $ResourceGroup --name $ContainerGroupName --query "properties" -o json | ConvertFrom-Json
+    $fullConfig = az container show --resource-group $ResourceGroup --name $ContainerGroupName -o json | ConvertFrom-Json
+    $currentConfig = $fullConfig.properties
+
+    # Find the API and Web containers in the current configuration
+    $apiContainer = $fullConfig.containers | Where-Object { $_.name -eq "ai-cookbook-api" }
+    $webContainer = $fullConfig.containers | Where-Object { $_.name -eq "ai-cookbook-web" }
+    
+    Write-Host "Found API container: $($apiContainer.name) with image: $($apiContainer.image)" -ForegroundColor Cyan
+    Write-Host "Found Web container: $($webContainer.name) with image: $($webContainer.image)" -ForegroundColor Cyan
 
     # Determine which images to use based on what was built
     $apiImage = if ($Image -eq "all" -or $Image -eq "api") { 
         "$AzureContainerRegistry/ai-cookbook-api:$ImageTag" 
     } else { 
-        $currentConfig.containers[0].image 
+        if ($apiContainer) { $apiContainer.image } else { "" }
     }
 
     $webImage = if ($Image -eq "all" -or $Image -eq "web") { 
         "$AzureContainerRegistry/ai-cookbook-web:$ImageTag" 
     } else { 
-        $currentConfig.containers[1].image 
+        if ($webContainer) { $webContainer.image } else { "" }
     }
 
     Write-Host "API Image: $apiImage" -ForegroundColor Cyan
     Write-Host "Web Image: $webImage" -ForegroundColor Cyan
     
-    # Delete existing container group
-    Write-Host "Deleting existing container group..." -ForegroundColor Yellow
-    az container delete --resource-group $ResourceGroup --name $ContainerGroupName --yes
-
-    if ($LASTEXITCODE -ne 0) {
-        Write-Warning "Failed to delete existing container group. Continuing anyway..."
+    # Check if we actually need to update (images are different)
+    $needsUpdate = $false
+    
+    # Always update if we built new images (since we generate new tags each time)
+    if ($Image -eq "all" -or $Image -eq "api") {
+        $needsUpdate = $true
+        Write-Host "API image needs update: $($apiContainer.image) -> $apiImage" -ForegroundColor Yellow
     }
-
-    # Wait a moment for deletion to complete
-    Start-Sleep -Seconds 10
+    if ($Image -eq "all" -or $Image -eq "web") {
+        $needsUpdate = $true
+        Write-Host "Web image needs update: $($webContainer.image) -> $webImage" -ForegroundColor Yellow
+    }
+    
+    if (-not $needsUpdate) {
+        Write-Host "No image updates needed. Container group is already up to date." -ForegroundColor Green
+        # Skip the update process
+        $skipUpdate = $true
+    } else {
+        Write-Host "Performing delete/recreate update of container group..." -ForegroundColor Yellow
+        $skipUpdate = $false
+    }
 }
 
 # Create updated YAML configuration
@@ -261,6 +283,7 @@ properties:
     password: $(az acr credential show --name $AzureContainerRegistry.Split('.')[0] --query "passwords[0].value" -o tsv)
   ipAddress:
     type: Public
+    dnsNameLabel: ai-cookbook-test
     ports:
     - protocol: TCP
       port: 4201
@@ -274,19 +297,70 @@ properties:
 $yamlFile = "temp-update-container-group.yaml"
 $yamlConfig | Out-File -FilePath $yamlFile -Encoding UTF8
 
-# Create the container group with new images
-Write-Host "Creating container group with new images..." -ForegroundColor Yellow
-az container create --resource-group $ResourceGroup --file $yamlFile
+# Create or update the container group with new images
+if ($isNewDeployment -or $skipUpdate) {
+    if ($isNewDeployment) {
+        Write-Host "Creating new container group with images..." -ForegroundColor Yellow
+    } else {
+        Write-Host "Skipping update - no changes needed" -ForegroundColor Green
+        Remove-Item $yamlFile -ErrorAction SilentlyContinue
+        # Get the current IP address and DNS info for display
+        $finalInfo = az container show --resource-group $ResourceGroup --name $ContainerGroupName --query "{ipAddress:ipAddress.ip, fqdn:ipAddress.fqdn}" -o json | ConvertFrom-Json
+        
+        $updatedServices = @()
+        if ($Image -eq "all" -or $Image -eq "api") { $updatedServices += "API" }
+        if ($Image -eq "all" -or $Image -eq "web") { $updatedServices += "Web" }
 
-if ($LASTEXITCODE -ne 0) {
-    Write-Host "Failed to create container group" -ForegroundColor Red
-    Remove-Item $yamlFile -ErrorAction SilentlyContinue
-    exit 1
+        Write-Host "Update completed successfully for: $($updatedServices -join ', ')" -ForegroundColor Green
+        
+        # Display both DNS name (preferred) and IP address
+        if ($finalInfo.fqdn) {
+            Write-Host "Test environment (DNS): http://$($finalInfo.fqdn)" -ForegroundColor Green
+            Write-Host "API endpoints (DNS): http://$($finalInfo.fqdn):4201" -ForegroundColor Green
+            Write-Host "API Swagger (DNS): http://$($finalInfo.fqdn):4201/swagger" -ForegroundColor Green
+            Write-Host "`nIP Address (if needed): $($finalInfo.ipAddress)" -ForegroundColor Yellow
+        } else {
+            Write-Host "Test environment: http://$($finalInfo.ipAddress)" -ForegroundColor Cyan
+            Write-Host "API endpoints: http://$($finalInfo.ipAddress):4201" -ForegroundColor Cyan
+            Write-Host "API Swagger: http://$($finalInfo.ipAddress):4201/swagger" -ForegroundColor Cyan
+        }
+        exit 0
+    }
+    
+    az container create --resource-group $ResourceGroup --file $yamlFile
+    
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Failed to create container group" -ForegroundColor Red
+        Remove-Item $yamlFile -ErrorAction SilentlyContinue
+        exit 1
+    }
+    
+    Write-Host "Created new container group with images" -ForegroundColor Green
+} else {
+    Write-Host "Deleting existing container group..." -ForegroundColor Yellow
+    az container delete --resource-group $ResourceGroup --name $ContainerGroupName --yes
+    
+    if ($LASTEXITCODE -ne 0) {
+        Write-Warning "Failed to delete existing container group. Continuing anyway..."
+    }
+    
+    # Wait a moment for deletion to complete
+    Start-Sleep -Seconds 5
+    
+    Write-Host "Creating container group with new images..." -ForegroundColor Yellow
+    az container create --resource-group $ResourceGroup --file $yamlFile
+    
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "Failed to create container group" -ForegroundColor Red
+        Remove-Item $yamlFile -ErrorAction SilentlyContinue
+        exit 1
+    }
+    
+    Write-Host "Recreated container group with new images" -ForegroundColor Green
 }
 
 # Clean up temporary file
 Remove-Item $yamlFile -ErrorAction SilentlyContinue
-Write-Host "Recreated container group with new images" -ForegroundColor Green
 
 # Wait for container group to be ready
 Write-Host "Waiting for container group to be ready..." -ForegroundColor Yellow
@@ -296,29 +370,41 @@ $waitTime = 0
 do {
     Start-Sleep -Seconds 10
     $waitTime += 10
-    $groupState = az container show --resource-group $ResourceGroup --name $ContainerGroupName --query "properties.instanceView.state" -o tsv
+    $groupState = az container show --resource-group $ResourceGroup --name $ContainerGroupName --query "instanceView.state" -o tsv 2>$null
+    if (-not $groupState) {
+        $groupState = "Unknown"
+    }
     Write-Host "Container Group State: $groupState (waited $waitTime seconds)" -ForegroundColor Yellow
 } while ($groupState -ne "Running" -and $waitTime -lt $maxWaitTime)
 
 if ($groupState -ne "Running") {
-    Write-Warning "Container group did not reach Running state within $maxWaitTime seconds"
+    Write-Warning "Container group did not reach Running state within $maxWaitTime seconds. Current state: $groupState"
 }
 
 # Check final container status
 Write-Host "Checking final container status..." -ForegroundColor Green
-az container show --resource-group $ResourceGroup --name $ContainerGroupName --query "{name:name, ipAddress:properties.ipAddress.ip, state:properties.instanceView.state, containers:properties.containers[].{name:name, state:properties.instanceView.currentState.state}}" -o table
+az container show --resource-group $ResourceGroup --name $ContainerGroupName --query "{name:name, ipAddress:ipAddress.ip, state:instanceView.state, containers:containers[].{name:name, state:instanceView.currentState.state}}" -o table
 
-# Get final IP address
-$finalInfo = az container show --resource-group $ResourceGroup --name $ContainerGroupName --query "{ipAddress:properties.ipAddress.ip}" -o json | ConvertFrom-Json
+# Get final IP address and DNS info
+$finalInfo = az container show --resource-group $ResourceGroup --name $ContainerGroupName --query "{ipAddress:ipAddress.ip, fqdn:ipAddress.fqdn}" -o json | ConvertFrom-Json
 
 $updatedServices = @()
 if ($Image -eq "all" -or $Image -eq "api") { $updatedServices += "API" }
 if ($Image -eq "all" -or $Image -eq "web") { $updatedServices += "Web" }
 
 Write-Host "Update completed successfully for: $($updatedServices -join ', ')" -ForegroundColor Green
-Write-Host "Test environment: http://$($finalInfo.ipAddress)" -ForegroundColor Cyan
-Write-Host "API endpoints: http://$($finalInfo.ipAddress):4201" -ForegroundColor Cyan
-Write-Host "API Swagger: http://$($finalInfo.ipAddress):4201/swagger" -ForegroundColor Cyan
+
+# Display both DNS name (preferred) and IP address
+if ($finalInfo.fqdn) {
+    Write-Host "Test environment (DNS): http://$($finalInfo.fqdn)" -ForegroundColor Green
+    Write-Host "API endpoints (DNS): http://$($finalInfo.fqdn):4201" -ForegroundColor Green
+    Write-Host "API Swagger (DNS): http://$($finalInfo.fqdn):4201/swagger" -ForegroundColor Green
+    Write-Host "`nIP Address (if needed): $($finalInfo.ipAddress)" -ForegroundColor Yellow
+} else {
+    Write-Host "Test environment: http://$($finalInfo.ipAddress)" -ForegroundColor Cyan
+    Write-Host "API endpoints: http://$($finalInfo.ipAddress):4201" -ForegroundColor Cyan
+    Write-Host "API Swagger: http://$($finalInfo.ipAddress):4201/swagger" -ForegroundColor Cyan
+}
 
 Write-Host "`nTo check logs:" -ForegroundColor Yellow
 Write-Host "API logs: az container logs --resource-group $ResourceGroup --name $ContainerGroupName --container-name ai-cookbook-api" -ForegroundColor White

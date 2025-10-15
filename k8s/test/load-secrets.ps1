@@ -47,5 +47,4 @@ function Load-SecretsConfig {
     return $secrets
 }
 
-# Export the function for use in other scripts
-Export-ModuleMember -Function Load-SecretsConfig
+# Function is available for use in other scripts when this file is dot-sourced
