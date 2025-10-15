@@ -124,6 +124,10 @@ public class Startup(IConfiguration configuration)
             });
         });
 
+        // Add health checks
+        services.AddHealthChecks()
+            .AddCheck("self", () => Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckResult.Healthy(), new[] { "ready" });
+
         // Add CORS services
         services.AddCors(options =>
         {
@@ -202,6 +206,16 @@ public class Startup(IConfiguration configuration)
         {
             endpoints.MapGet("/", () => Results.Redirect("/swagger"))
                 .ExcludeFromDescription();
+            
+            // Add health check endpoints
+            endpoints.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions()
+            {
+                Predicate = _ => true
+            });
+            endpoints.MapHealthChecks("/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions()
+            {
+                Predicate = check => check.Tags.Contains("ready")
+            });
             
             // Map recipes endpoints
             endpoints.MapRecipesEndpoints();

@@ -3,6 +3,8 @@ using API.Infrastructure.CosmosDb.Interfaces;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using System.Net;
+using System.Net.Http;
 
 namespace API.Infrastructure.CosmosDb.Services;
 
@@ -74,6 +76,11 @@ public class CosmosDbClientService(IOptions<CosmosDbConfiguration> configuration
             _logger.LogInformation("Initializing Cosmos DB client...");
             _logger.LogInformation("Connection String: {ConnectionString}", 
                 _configuration.ConnectionString?.Substring(0, Math.Min(50, _configuration.ConnectionString?.Length ?? 0)) + "...");
+            
+            // Log environment information for debugging
+            _logger.LogInformation("Environment: {Environment}", Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"));
+            _logger.LogInformation("SSL Validation Disabled: {SslDisabled}", 
+                Environment.GetEnvironmentVariable("COSMOSDB_DISABLE_SSL_VALIDATION"));
 
             // Validate connection string format
             if (string.IsNullOrWhiteSpace(_configuration.ConnectionString))
@@ -81,8 +88,25 @@ public class CosmosDbClientService(IOptions<CosmosDbConfiguration> configuration
                 throw new InvalidOperationException("Cosmos DB connection string is null or empty");
             }
 
-            // Create Cosmos client
-            _cosmosClient = new CosmosClient(_configuration.ConnectionString);
+            // Create Cosmos client with optimized options for Azure Cosmos DB
+            CosmosClientOptions clientOptions = new CosmosClientOptions()
+            {
+                // Use Gateway mode - recommended for Kubernetes environments
+                ConnectionMode = ConnectionMode.Gateway,
+                // Optimize for Azure Cosmos DB
+                EnableContentResponseOnWrite = false,
+                // Set reasonable timeouts for Azure
+                RequestTimeout = TimeSpan.FromSeconds(30),
+                // Enable TCP connection endpoint rediscovery for Azure
+                EnableTcpConnectionEndpointRediscovery = true,
+                // Configure retry policy for Azure
+                MaxRetryAttemptsOnRateLimitedRequests = 3,
+                MaxRetryWaitTimeOnRateLimitedRequests = TimeSpan.FromSeconds(30)
+            };
+            
+            _logger.LogInformation("Configured Cosmos DB client for Azure Cosmos DB");
+
+            _cosmosClient = new CosmosClient(_configuration.ConnectionString, clientOptions);
 
             // Test connection
             await _cosmosClient.ReadAccountAsync();
@@ -91,7 +115,19 @@ public class CosmosDbClientService(IOptions<CosmosDbConfiguration> configuration
 
             if (_configuration.CreateIfNotExists)
             {
-                await CreateDatabaseIfNotExistsAsync(cancellationToken);
+                // Add timeout for database creation to prevent hanging
+                using var timeoutCts = new CancellationTokenSource(TimeSpan.FromMinutes(2));
+                using var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
+                
+                try
+                {
+                    await CreateDatabaseIfNotExistsAsync(combinedCts.Token);
+                }
+                catch (OperationCanceledException) when (timeoutCts.Token.IsCancellationRequested)
+                {
+                    _logger.LogWarning("Database creation timed out after 2 minutes. Continuing with basic database reference.");
+                    _database = _cosmosClient.GetDatabase(_configuration.DatabaseName);
+                }
             }
             else
             {
@@ -231,3 +267,4 @@ public class CosmosDbClientService(IOptions<CosmosDbConfiguration> configuration
         }
     }
 }
+

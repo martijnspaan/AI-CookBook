@@ -28,15 +28,16 @@ COPY --from=build /app/dist/ai-cookbook-web/ /usr/share/nginx/html/
 # Copy nginx configuration template
 COPY nginx.conf /etc/nginx/nginx.conf.template
 
-# Set proper permissions
-RUN chown -R nginx:nginx /usr/share/nginx/html
+# Create nginx temp directories in /tmp and set permissions
+RUN mkdir -p /tmp/nginx_client_temp /tmp/nginx_proxy_temp /tmp/nginx_fastcgi_temp /tmp/nginx_uwsgi_temp /tmp/nginx_scgi_temp && \
+    chown -R root:root /usr/share/nginx/html /tmp/nginx_*
 
-# Expose port 80
-EXPOSE 80
+# Expose port 4200
+EXPOSE 4200
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:80/ || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:4200/ || exit 1
 
 # Start script that substitutes environment variables and starts nginx
 CMD ["sh", "-c", "envsubst '${API_URL}' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"]

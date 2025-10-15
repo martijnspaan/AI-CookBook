@@ -65,8 +65,7 @@ spec:
     defaultRequest:
       cpu: "100m"
       memory: "128Mi"
-    type: Container
-  - max:
+    max:
       cpu: "2"
       memory: "2Gi"
     min:
@@ -179,8 +178,8 @@ data:
   # Recipes Configuration
   RECIPES_PATH: "recipes"
   
-  # CosmosDB Configuration
-  COSMOSDB_DATABASE_NAME: "CookBook"
+  # CosmosDB Configuration - Local Emulator
+  COSMOSDB_DATABASE_NAME: "CookBookTest"
   COSMOSDB_CONTAINER_NAME: "Recipes"
   COSMOSDB_WEEK_MENU_CONTAINER_NAME: "WeekMenu"
   COSMOSDB_COOKBOOK_CONTAINER_NAME: "Cookbooks"
@@ -220,7 +219,7 @@ data:
   # Base64 encoded values - replace with your actual values
   # To encode: echo -n "your-value" | base64
   # WARNING: This is for development only. In production, use external secret management
-  COSMOSDB_CONNECTION_STRING: "QWNjb3VudEVuZHBvaW50PWh0dHBzOi8vY29zbW9zLWFpLWNvb2tib29rLmRvY3VtZW50cy5henVyZS5jb206NDQzLztBY2NvdW50S2V5PTA3ZXRhR05TVW8zU0VKUTBPYnFNM0dxRXAzN1l0VUlwbXBGaEZPU3BuYnZQZnpmYndmNDdtWVdZbmp5MkNPeHpVTXh1NUEwbHlxcFBBQ0RiRm9PcDF3PT0="
+  COSMOSDB_CONNECTION_STRING: "QWNjb3VudEVuZHBvaW50PWh0dHBzOi8vYWljb29rYm9vay1jb3Ntb3NkYi5kb2N1bWVudHMuYXp1cmUuY29tOjQ0My87QWNjb3VudEtleT1mMlFFekpaSEVYbDZTblFmMVNZWkVjMzFSd1hxOU5NWGdlTkczeXBtT2hkbzFVS0VWdVM1d0NFbzNyV3BjcUdya1phUWw5SmNZRlU3QUNEYlRnOUY3UT09Ow=="
   # Add additional secrets as needed
   # JWT_SECRET: ""
   # API_KEY: ""
@@ -297,7 +296,7 @@ spec:
           type: RuntimeDefault
       containers:
       - name: api
-        image: ai-cookbook-api:latest
+        image: ai-cookbook-api:localhost
         imagePullPolicy: IfNotPresent
         ports:
         - name: http
@@ -333,20 +332,20 @@ spec:
             path: /health
             port: 4201
             scheme: HTTP
-          initialDelaySeconds: 30
+          initialDelaySeconds: 120
           periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
+          timeoutSeconds: 10
+          failureThreshold: 5
           successThreshold: 1
         readinessProbe:
           httpGet:
             path: /health/ready
             port: 4201
             scheme: HTTP
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          timeoutSeconds: 3
-          failureThreshold: 3
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 10
+          failureThreshold: 5
           successThreshold: 1
         volumeMounts:
         - name: tmp
@@ -427,12 +426,15 @@ spec:
           type: RuntimeDefault
       containers:
       - name: web
-        image: ai-cookbook-web:latest
+        image: ai-cookbook-web:localhost
         imagePullPolicy: IfNotPresent
         ports:
         - name: http
           containerPort: 4200
           protocol: TCP
+        env:
+        - name: API_URL
+          value: "http://api-service:4201"
         resources:
           requests:
             memory: "128Mi"
@@ -442,9 +444,9 @@ spec:
             cpu: "200m"
         securityContext:
           allowPrivilegeEscalation: false
-          readOnlyRootFilesystem: true
-          runAsNonRoot: true
-          runAsUser: 1000
+          readOnlyRootFilesystem: false
+          runAsNonRoot: false
+          runAsUser: 0
           capabilities:
             drop:
             - ALL
