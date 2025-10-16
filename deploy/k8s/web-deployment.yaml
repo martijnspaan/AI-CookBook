@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: meal-week-planner-web
+  namespace: default
+  labels:
+    app: meal-week-planner-web
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: meal-week-planner-web
+  template:
+    metadata:
+      labels:
+        app: meal-week-planner-web
+        version: v1
+    spec:
+      containers:
+      - name: web
+        image: docker.io/library/meal-week-planner-web:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 4200
+          protocol: TCP
+        env:
+        - name: API_URL
+          value: "http://localhost:4201"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 4200
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 4200
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: shared-data
+          mountPath: /shared-data
+      volumes:
+      - name: shared-data
+        hostPath:
+          path: /shared-data
+          type: DirectoryOrCreate
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: meal-week-planner-web-service
+  namespace: default
+  labels:
+    app: meal-week-planner-web
+spec:
+  type: ClusterIP
+  selector:
+    app: meal-week-planner-web
+  ports:
+  - protocol: TCP
+    port: 4200
+    targetPort: 4200

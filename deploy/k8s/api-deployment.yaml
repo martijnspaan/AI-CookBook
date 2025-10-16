@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: meal-week-planner-api
+  namespace: default
+  labels:
+    app: meal-week-planner-api
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: meal-week-planner-api
+  template:
+    metadata:
+      labels:
+        app: meal-week-planner-api
+        version: v1
+    spec:
+      containers:
+      - name: api
+        image: docker.io/library/meal-week-planner-api:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 4201
+          protocol: TCP
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Development"
+        - name: ASPNETCORE_URLS
+          value: "http://+:4201"
+        - name: COSMOSDB_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: meal-week-planner-secrets
+              key: cosmosdb-connection-string
+        - name: COSMOSDB_DATABASE_NAME
+          valueFrom:
+            secretKeyRef:
+              name: meal-week-planner-secrets
+              key: cosmosdb-database-name
+        - name: COSMOSDB_PARTITION_KEY_PATH
+          valueFrom:
+            secretKeyRef:
+              name: meal-week-planner-secrets
+              key: cosmosdb-partition-key-path
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 4201
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 4201
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: shared-data
+          mountPath: /shared-data
+      volumes:
+      - name: shared-data
+        hostPath:
+          path: /shared-data
+          type: DirectoryOrCreate
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: meal-week-planner-api-service
+  namespace: default
+  labels:
+    app: meal-week-planner-api
+spec:
+  type: ClusterIP
+  selector:
+    app: meal-week-planner-api
+  ports:
+  - protocol: TCP
+    port: 4201
+    targetPort: 4201

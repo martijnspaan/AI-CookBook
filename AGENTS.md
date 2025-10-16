@@ -22,15 +22,14 @@ The Meal Week Planner is an intelligent culinary application that revolutionizes
 ```
 ├── Web/                    # Angular frontend application
 ├── API/                    # .NET Core backend services & APIs
-├── k8s/                    # Kubernetes manifests & deployment configs
+├── deploy/                 # Kubernetes manifests & deployment configs
 ├── azure/                  # Azure infrastructure scripts & templates
-└── API/API.Application/recipes/  # Recipe data files (JSON format)
 ```
 
 ### Development Environment Standards
-- **Frontend**: Angular application with responsive design
+- **Frontend**: Angular application with responsive design supporting both tablets and mobile devices
 - **Backend**: .NET Core API following clean architecture principles
-- **Infrastructure**: Kubernetes orchestration with Azure cloud integration
+- **Infrastructure**: Kubernetes orchestration with Azure cloud integration using Azure Container Instances for hosting containers
 - **Testing**: Comprehensive unit and integration testing suite
 
 ## 🛠️ Development Workflow

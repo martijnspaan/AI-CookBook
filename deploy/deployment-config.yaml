@@ -1,0 +1,32 @@
+# Meal Week Planner Deployment Configuration
+# This file contains deployment-specific configuration
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: meal-week-planner-config
+  namespace: default
+data:
+  # API Configuration
+  API_URL: "http://localhost:4201"
+  API_PORT: "4201"
+  ASPNETCORE_ENVIRONMENT: "Development"
+  ASPNETCORE_URLS: "http://+:4201"
+  
+  # Web Configuration
+  WEB_PORT: "4200"
+  NGINX_PORT: "4200"
+  
+  # Shared Configuration
+  CLUSTER_NAME: "meal-week-planner"
+  SHARED_DATA_PATH: "/shared-data"
+  
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: meal-week-planner
+  labels:
+    name: meal-week-planner
+    app: meal-week-planner
+

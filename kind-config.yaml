@@ -1,0 +1,36 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: meal-week-planner
+nodes:
+- role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true"
+  extraPortMappings:
+  - containerPort: 80
+    hostPort: 80
+    protocol: TCP
+  - containerPort: 443
+    hostPort: 443
+    protocol: TCP
+  - containerPort: 4200
+    hostPort: 4200
+    protocol: TCP
+  - containerPort: 4201
+    hostPort: 4201
+    protocol: TCP
+- role: worker
+  extraMounts:
+  - hostPath: E:\Kind\shared-data
+    containerPath: /shared-data
+- role: worker
+  extraMounts:
+  - hostPath: E:\Kind\shared-data
+    containerPath: /shared-data
+networking:
+  apiServerAddress: "127.0.0.1"
+  apiServerPort: 6443
+

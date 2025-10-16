@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: meal-week-planner-ingress
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: localhost
+    http:
+      paths:
+      # API routes - proxy to API service (no rewrite for API paths)
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: meal-week-planner-api-service
+            port:
+              number: 4201
+      # Web application routes - proxy to web service
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: meal-week-planner-web-service
+            port:
+              number: 4200

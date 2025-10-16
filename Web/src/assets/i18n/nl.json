@@ -1,7 +1,7 @@
 {
   "APP": {
     "TITLE": "AI Kookboek",
-    "MEAL_PLANNER": "AI Maaltijdplanner"
+    "MEAL_PLANNER": "Meal Week Planner"
   },
   "PAGE_TITLES": {
     "RECIPE_COLLECTION": "Receptenverzameling",

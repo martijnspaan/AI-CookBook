@@ -357,3 +357,4 @@ MigrationBackup/
 # Secrets configuration files
 **/secrets.config
 **/secrets.config.local
+secrets.env
