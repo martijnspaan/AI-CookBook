@@ -173,6 +173,15 @@
     "REUSABLE_COMPONENTS": "Reusable Components",
     "ACCESSIBILITY_STANDARDS": "Accessibility Standards",
     "IMPLEMENTATION_GUIDE": "Implementation Guide"
+  },
+  "OFFLINE": {
+    "STATUS_OFFLINE": "You're offline",
+    "SYNCING": "Syncing data...",
+    "SYNC_ERROR": "Sync failed",
+    "RETRY_SYNC": "Retry",
+    "INSTALL_APP": "Install AI Cookbook for offline access",
+    "INSTALL": "Install",
+    "LAST_SYNC": "Last sync"
   }
 }
 

@@ -5,6 +5,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { HamburgerMenuComponent } from './hamburger-menu/hamburger-menu.component';
 import { FooterComponent } from './footer/footer.component';
 import { RecipeSelectionDialogComponent } from './week-menu/recipe-selection-dialog/recipe-selection-dialog.component';
+import { OfflineStatusComponent } from './shared/offline-status/offline-status.component';
 import { PageTitleService } from './services/page-title.service';
 import { CookbookModalService } from './services/cookbook-modal.service';
 import { RecipeModalService } from './services/recipe-modal.service';
@@ -19,7 +20,7 @@ import { Recipe } from './models/recipe.model';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, HamburgerMenuComponent, FooterComponent, RecipeSelectionDialogComponent, CommonModule, TranslateModule],
+  imports: [RouterOutlet, HamburgerMenuComponent, FooterComponent, RecipeSelectionDialogComponent, OfflineStatusComponent, CommonModule, TranslateModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

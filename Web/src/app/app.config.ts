@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZoneChangeDetection, importProvidersFrom } from '@angular/core';
+import { ApplicationConfig, provideZoneChangeDetection, importProvidersFrom, isDevMode } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
@@ -6,6 +6,7 @@ import { TranslateHttpLoader, TRANSLATE_HTTP_LOADER_CONFIG } from '@ngx-translat
 import { HttpClient } from '@angular/common/http';
 
 import { routes } from './app.routes';
+import { provideServiceWorker } from '@angular/service-worker';
 
 // Factory function for TranslateHttpLoader
 export function HttpLoaderFactory(http: HttpClient) {
@@ -33,6 +34,9 @@ export const appConfig: ApplicationConfig = {
         },
         defaultLanguage: 'en'
       })
-    )
+    ), provideServiceWorker('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            registrationStrategy: 'registerWhenStable:30000'
+          })
   ]
 };
