@@ -1,8 +1,8 @@
-# AI Cookbook - Agent Guidelines
+# Meal Week Planner - Agent Guidelines
 
 ## 🍳 Project Overview
 
-The AI Cookbook is an intelligent culinary application that revolutionizes meal planning and grocery management. The system enables users to create weekly meal schedules by selecting recipes, and automatically generates comprehensive grocery lists based on the chosen recipes.
+The Meal Week Planner is an intelligent culinary application that revolutionizes meal planning and grocery management. The system enables users to create weekly meal schedules by selecting recipes, and automatically generates comprehensive grocery lists based on the chosen recipes.
 
 ## 🤖 Agent Protocol
 
@@ -52,7 +52,7 @@ The AI Cookbook is an intelligent culinary application that revolutionizes meal 
 ### Security & Scope
 - **Restricted Environment**: All Azure operations limited to:
   - Subscription: `Playground - masp`
-  - Resource Group: `AI-CookBook`
+  - Resource Group: `MealWeekPlanner`
 - **Resource Naming**: Implement descriptive, standardized naming conventions
 - **Best Practices**: Follow Azure Well-Architected Framework principles
 

@@ -142,7 +142,7 @@ export class ShowcaseMenuComponent implements OnInit {
         content: `
           <p>Learn how to implement and customize our design system in your projects.</p>
           <ul>
-            <li><strong>Installation:</strong> <code>npm install @ai-cookbook/design-system</code></li>
+            <li><strong>Installation:</strong> <code>npm install @meal-week-planner/design-system</code></li>
             <li><strong>Import Styles:</strong> Include our CSS variables and component styles</li>
             <li><strong>Use Components:</strong> Import and use pre-built Angular components</li>
             <li><strong>Customization:</strong> Override CSS custom properties for theming</li>

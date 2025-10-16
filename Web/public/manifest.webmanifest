@@ -1,6 +1,6 @@
 {
-  "name": "AI Cookbook",
-  "short_name": "AI Cookbook",
+  "name": "Meal Week Planner",
+  "short_name": "Meal Week Planner",
   "description": "Intelligent meal planning and grocery management app",
   "display": "standalone",
   "scope": "./",

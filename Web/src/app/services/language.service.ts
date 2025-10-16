@@ -6,7 +6,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class LanguageService {
-  private readonly STORAGE_KEY = 'ai-cookbook-language';
+  private readonly STORAGE_KEY = 'meal-week-planner-language';
   private readonly DEFAULT_LANGUAGE = 'en';
   private readonly SUPPORTED_LANGUAGES = ['en', 'nl'];
   

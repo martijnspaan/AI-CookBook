@@ -1,6 +1,6 @@
 # API.Infrastructure.CosmosDb
 
-This library provides infrastructure services for connecting to and working with Azure Cosmos DB in the AI Cookbook API.
+This library provides infrastructure services for connecting to and working with Azure Cosmos DB in the Meal Week Planner API.
 
 ## Features
 
@@ -35,7 +35,7 @@ services.AddCosmosDb(configuration);
 {
   "CosmosDb": {
     "ConnectionString": "your-connection-string",
-    "DatabaseName": "AI-Cookbook",
+    "DatabaseName": "MealWeekPlanner",
     "ContainerName": "Recipes",
     "PartitionKeyPath": "/id",
     "Throughput": 400,

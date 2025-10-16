@@ -1,6 +1,6 @@
 # Environment Configuration Setup
 
-This document explains how to configure the AI Cookbook API using environment variables.
+This document explains how to configure the Meal Week Planner API using environment variables.
 
 ## Development Environment File (.env)
 
@@ -19,11 +19,11 @@ ASPNETCORE_URLS=https://localhost:7149;http://localhost:5000
 # DB_CONNECTION_STRING=Server=localhost;Database=AI_Cookbook_Dev;Trusted_Connection=true;TrustServerCertificate=true
 
 # API Settings
-API_TITLE=AI Cookbook API
+API_TITLE=Meal Week Planner API
 API_VERSION=v1
-API_DESCRIPTION=A minimal API for the AI Cookbook project
-API_CONTACT_NAME=AI Cookbook Team
-API_CONTACT_EMAIL=contact@aicookbook.com
+API_DESCRIPTION=A minimal API for the Meal Week Planner project
+API_CONTACT_NAME=Meal Week Planner Team
+API_CONTACT_EMAIL=contact@mealweekplanner.com
 
 # CORS Configuration
 CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:4200,http://localhost:8080
@@ -37,13 +37,13 @@ LOG_LEVEL_MICROSOFT_ASPNETCORE=Warning
 # Swagger Configuration
 SWAGGER_ENABLED=true
 SWAGGER_ROUTE_PREFIX=
-SWAGGER_DOCUMENT_TITLE=AI Cookbook API Documentation
+SWAGGER_DOCUMENT_TITLE=Meal Week Planner API Documentation
 
 # Recipes Configuration
 RECIPES_PATH=recipes
 
 # CosmosDB Configuration
-COSMOSDB_CONNECTION_STRING=AccountEndpoint=https://cosmos-ai-cookbook.documents.azure.com:443/;AccountKey=YOUR_ACTUAL_KEY_HERE
+COSMOSDB_CONNECTION_STRING=AccountEndpoint=https://cosmos-meal-week-planner.documents.azure.com:443/;AccountKey=YOUR_ACTUAL_KEY_HERE
 COSMOSDB_DATABASE_NAME=CookBook
 COSMOSDB_CONTAINER_NAME=Recipes
 COSMOSDB_PARTITION_KEY_PATH=/id
@@ -54,7 +54,7 @@ COSMOSDB_CREATE_IF_NOT_EXISTS=true
 ## Environment Variables
 
 ### API Configuration
-- `API_TITLE`: The title of the API (default: "AI Cookbook API")
+- `API_TITLE`: The title of the API (default: "Meal Week Planner API")
 - `API_VERSION`: The version of the API (default: "v1")
 - `API_DESCRIPTION`: Description of the API
 - `API_CONTACT_NAME`: Contact name for the API

@@ -7,7 +7,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "ai-cookbook-web": {
+    "meal-week-planner-web": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -21,7 +21,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/ai-cookbook-web",
+            "outputPath": "dist/meal-week-planner-web",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -81,10 +81,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "ai-cookbook-web:build:production"
+              "buildTarget": "meal-week-planner-web:build:production"
             },
             "development": {
-              "buildTarget": "ai-cookbook-web:build:development"
+              "buildTarget": "meal-week-planner-web:build:development"
             }
           },
           "defaultConfiguration": "development"

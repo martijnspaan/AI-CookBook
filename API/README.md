@@ -1,12 +1,12 @@
-# AI Cookbook API
+# Meal Week Planner API
 
-This folder contains the API solution for the AI Cookbook project, organized using Clean Architecture principles.
+This folder contains the API solution for the Meal Week Planner project, organized using Clean Architecture principles.
 
 ## Project Structure
 
 ```
 API/
-├── AI-Cookbook.sln                    # Solution file
+├── MealWeekPlanner.sln                    # Solution file
 ├── API.Application/                   # Application layer (Web API)
 │   ├── API.Application.csproj        # Main API project
 │   ├── Program.cs                    # Application entry point
@@ -105,7 +105,7 @@ See `API.Application/ENVIRONMENT_SETUP.md` for detailed configuration instructio
 ### Project Dependencies
 
 - `API.Application` → `API.Infrastructure.CosmosDb`
-- Both projects are included in the `AI-Cookbook.sln` solution
+- Both projects are included in the `MealWeekPlanner.sln` solution
 
 ## Deployment
 

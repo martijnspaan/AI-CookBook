@@ -7,7 +7,7 @@ import { takeUntil } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class PageTitleService implements OnDestroy {
-  private pageTitleSubject = new BehaviorSubject<string>('AI Cookbook');
+  private pageTitleSubject = new BehaviorSubject<string>('Meal Week Planner');
   public pageTitle$ = this.pageTitleSubject.asObservable();
   
   private currentTranslationKey: string | null = null;

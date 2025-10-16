@@ -1,10 +1,10 @@
-# AI Cookbook Design System
+# Meal Week Planner Design System
 
-A comprehensive, modern design system for the AI Cookbook application featuring nature-inspired pastel green colors, clean typography, and reusable components.
+A comprehensive, modern design system for the Meal Week Planner application featuring nature-inspired pastel green colors, clean typography, and reusable components.
 
 ## 🎨 Design Philosophy
 
-The AI Cookbook design system is built around three core themes:
+The Meal Week Planner design system is built around three core themes:
 - **Cooking**: Warm, inviting colors that evoke the joy of preparing meals
 - **Healthy**: Fresh, natural tones that promote wellness and vitality
 - **Nature**: Earthy, organic colors that connect users to natural ingredients

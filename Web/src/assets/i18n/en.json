@@ -1,6 +1,6 @@
 {
   "APP": {
-    "TITLE": "AI Cookbook",
+    "TITLE": "Meal Week Planner",
     "MEAL_PLANNER": "AI Meal Planner"
   },
   "PAGE_TITLES": {
@@ -8,7 +8,7 @@
     "COOKBOOKS": "Cookbooks",
     "GROCERY_LISTS": "Grocery Lists",
     "WEEK_MENU": "Week Menu",
-    "AI_COOKBOOK": "AI Cookbook"
+    "AI_COOKBOOK": "Meal Week Planner"
   },
   "NAVIGATION": {
     "COOKBOOKS": "Cookbooks",
@@ -179,7 +179,7 @@
     "SYNCING": "Syncing data...",
     "SYNC_ERROR": "Sync failed",
     "RETRY_SYNC": "Retry",
-    "INSTALL_APP": "Install AI Cookbook for offline access",
+    "INSTALL_APP": "Install Meal Week Planner for offline access",
     "INSTALL": "Install",
     "LAST_SYNC": "Last sync"
   }

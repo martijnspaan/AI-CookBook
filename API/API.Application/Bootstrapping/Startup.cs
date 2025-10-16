@@ -113,13 +113,13 @@ public class Startup(IConfiguration configuration)
         {
             c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
             {
-                Title = Environment.GetEnvironmentVariable("API_TITLE") ?? "AI Cookbook API",
+                Title = Environment.GetEnvironmentVariable("API_TITLE") ?? "Meal Week Planner API",
                 Version = Environment.GetEnvironmentVariable("API_VERSION") ?? "v1",
-                Description = Environment.GetEnvironmentVariable("API_DESCRIPTION") ?? "A minimal API for the AI Cookbook project",
+                Description = Environment.GetEnvironmentVariable("API_DESCRIPTION") ?? "A minimal API for the Meal Week Planner project",
                 Contact = new Microsoft.OpenApi.Models.OpenApiContact
                 {
-                    Name = Environment.GetEnvironmentVariable("API_CONTACT_NAME") ?? "AI Cookbook Team",
-                    Email = Environment.GetEnvironmentVariable("API_CONTACT_EMAIL") ?? "contact@aicookbook.com"
+                    Name = Environment.GetEnvironmentVariable("API_CONTACT_NAME") ?? "Meal Week Planner Team",
+                    Email = Environment.GetEnvironmentVariable("API_CONTACT_EMAIL") ?? "contact@mealweekplanner.com"
                 }
             });
         });
@@ -183,9 +183,9 @@ public class Startup(IConfiguration configuration)
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "AI Cookbook API v1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Meal Week Planner API v1");
                 c.RoutePrefix = Environment.GetEnvironmentVariable("SWAGGER_ROUTE_PREFIX") ?? ""; // Set Swagger UI at the root URL
-                c.DocumentTitle = Environment.GetEnvironmentVariable("SWAGGER_DOCUMENT_TITLE") ?? "AI Cookbook API Documentation";
+                c.DocumentTitle = Environment.GetEnvironmentVariable("SWAGGER_DOCUMENT_TITLE") ?? "Meal Week Planner API Documentation";
                 c.DefaultModelsExpandDepth(-1); // Hide models section by default
             });
         }

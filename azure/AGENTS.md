@@ -5,7 +5,7 @@
 ### Environment Isolation
 - **Restricted Scope**: All Azure operations strictly limited to designated sandbox environment
   - **Subscription**: `Playground - masp`
-  - **Resource Group**: `AI-CookBook`
+  - **Resource Group**: `MealWeekPlanner`
 - **Access Control**: Implement role-based access control (RBAC) with least-privilege principles
 - **Network Security**: Configure network security groups and application security groups appropriately
 

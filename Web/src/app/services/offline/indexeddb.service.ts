@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { openDB, DBSchema, IDBPDatabase } from 'idb';
 
 /**
- * IndexedDB schema definition for the AI Cookbook application
+ * IndexedDB schema definition for the Meal Week Planner application
  */
-interface AICookbookDB extends DBSchema {
+interface MealWeekPlannerDB extends DBSchema {
   recipes: {
     key: string;
     value: RecipeData;
@@ -125,9 +125,9 @@ interface MetadataValue {
   providedIn: 'root'
 })
 export class IndexedDBService {
-  private readonly DB_NAME = 'ai-cookbook-db';
+  private readonly DB_NAME = 'meal-week-planner-db';
   private readonly DB_VERSION = 1;
-  private dbPromise: Promise<IDBPDatabase<AICookbookDB>>;
+  private dbPromise: Promise<IDBPDatabase<MealWeekPlannerDB>>;
 
   constructor() {
     this.dbPromise = this.initializeDatabase();
@@ -136,8 +136,8 @@ export class IndexedDBService {
   /**
    * Initialize the IndexedDB database with all object stores and indexes
    */
-  private async initializeDatabase(): Promise<IDBPDatabase<AICookbookDB>> {
-    return await openDB<AICookbookDB>(this.DB_NAME, this.DB_VERSION, {
+  private async initializeDatabase(): Promise<IDBPDatabase<MealWeekPlannerDB>> {
+    return await openDB<MealWeekPlannerDB>(this.DB_NAME, this.DB_VERSION, {
       upgrade(db) {
         // Recipes store
         if (!db.objectStoreNames.contains('recipes')) {
@@ -184,7 +184,7 @@ export class IndexedDBService {
   /**
    * Get the database instance
    */
-  private async getDb(): Promise<IDBPDatabase<AICookbookDB>> {
+  private async getDb(): Promise<IDBPDatabase<MealWeekPlannerDB>> {
     return await this.dbPromise;
   }
 

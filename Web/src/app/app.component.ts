@@ -25,7 +25,7 @@ import { Recipe } from './models/recipe.model';
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit, OnDestroy {
-  readonly applicationTitle = 'AI Cookbook';
+  readonly applicationTitle = 'Meal Week Planner';
   currentPageTitle = '';
   private readonly destroySubject = new Subject<void>();
   

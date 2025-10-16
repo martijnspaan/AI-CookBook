@@ -4,7 +4,7 @@
 
 The API has been configured to use Azure CosmosDB with the following settings:
 
-- **Endpoint**: `https://cosmos-ai-cookbook.documents.azure.com:443/`
+- **Endpoint**: `https://cosmos-meal-week-planner.documents.azure.com:443/`
 - **Database**: `CookBook`
 - **Container**: `Recipes`
 - **Partition Key**: `/id`
@@ -16,7 +16,7 @@ The API has been configured to use Azure CosmosDB with the following settings:
    - Update the `COSMOSDB_CONNECTION_STRING` with your actual CosmosDB account key
    - The connection string should look like:
      ```
-     COSMOSDB_CONNECTION_STRING=AccountEndpoint=https://cosmos-ai-cookbook.documents.azure.com:443/;AccountKey=YOUR_ACTUAL_KEY_HERE
+     COSMOSDB_CONNECTION_STRING=AccountEndpoint=https://cosmos-meal-week-planner.documents.azure.com:443/;AccountKey=YOUR_ACTUAL_KEY_HERE
      ```
    - All other CosmosDB settings are pre-configured in the environment file
 

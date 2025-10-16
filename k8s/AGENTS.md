@@ -55,7 +55,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: application-name
-  namespace: ai-cookbook
+  namespace: meal-week-planner
   labels:
     app: application-name
     version: "1.0.0"
@@ -120,16 +120,16 @@ spec:
 ### Common Debugging Commands
 ```bash
 # Check pod status
-kubectl get pods -n ai-cookbook
+kubectl get pods -n meal-week-planner
 
 # View pod logs
-kubectl logs -f <pod-name> -n ai-cookbook
+kubectl logs -f <pod-name> -n meal-week-planner
 
 # Describe resource details
-kubectl describe pod <pod-name> -n ai-cookbook
+kubectl describe pod <pod-name> -n meal-week-planner
 
 # Execute commands in running pod
-kubectl exec -it <pod-name> -n ai-cookbook -- /bin/bash
+kubectl exec -it <pod-name> -n meal-week-planner -- /bin/bash
 ```
 
 ### Health Check Configuration

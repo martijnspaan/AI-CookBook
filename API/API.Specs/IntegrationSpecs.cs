@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace API.Specs;
 
 /// <summary>
-/// Integration tests for the AI Cookbook API
+/// Integration tests for the Meal Week Planner API
 /// These tests run synchronously in the specified order to test the complete CRUD workflow
 /// </summary>
 [TestCaseOrderer("API.Specs.AttributeBasedTestCaseOrderer", "API.Specs")]

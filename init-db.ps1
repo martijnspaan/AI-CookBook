@@ -1,4 +1,4 @@
-# AI Cookbook Database Initialization Script
+# Meal Week Planner Database Initialization Script
 # This script seeds the database with example data for all entities
 
 param(
@@ -75,7 +75,7 @@ function Wait-ForApi {
 }
 
 # Main execution
-Write-Host "🍳 AI Cookbook Database Initialization" -ForegroundColor Cyan
+Write-Host "🍳 Meal Week Planner Database Initialization" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 
 # Wait for API to be ready
