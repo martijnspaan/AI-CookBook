@@ -17,6 +17,7 @@ import { PwaService } from './services/offline/pwa.service';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { Recipe } from './models/recipe.model';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -28,6 +29,8 @@ import { Recipe } from './models/recipe.model';
 export class AppComponent implements OnInit, OnDestroy {
   readonly applicationTitle = 'Meal Week Planner';
   currentPageTitle = '';
+  buildTime = '';
+  environment = environment;
   private readonly destroySubject = new Subject<void>();
   
   // Recipe selection dialog state
@@ -80,6 +83,22 @@ export class AppComponent implements OnInit, OnDestroy {
     // Initialize language service first to restore user's language preference
     // The language service will automatically load the saved language from localStorage
     // and set it as the current language for the translation service
+    
+    // Set build time for display (time only, no date)
+    // Use the actual build time injected during Docker build
+    // Keep in UTC to avoid timezone offset issues
+    const buildDate = new Date(environment.buildTime);
+    this.buildTime = buildDate.toLocaleTimeString('en-US', { 
+      timeZone: 'UTC',
+      hour12: true,
+      hour: 'numeric',
+      minute: '2-digit'
+    });
+    
+    // Debug: Log environment and build time
+    console.log('Environment production:', environment.production);
+    console.log('Build time from environment:', environment.buildTime);
+    console.log('Formatted build time:', this.buildTime);
     
     // Expose PWA service to window for console access
     this.pwaService.exposeToWindow();

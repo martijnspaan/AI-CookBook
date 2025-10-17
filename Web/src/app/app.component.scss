@@ -81,8 +81,6 @@
   height: 100%;
   width: 100%;
   padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
   
   @media (max-width: 450px) {
     padding: 1rem;
@@ -93,7 +91,31 @@
   }
 }
 
-.container-fluid {
-  padding-left: 0;
-  padding-right: 0;
+.build-time {
+  display: flex;
+  align-items: center;
+  color: var(--color-text-inverse);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: var(--font-family-primary);
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  
+  i {
+    font-size: 0.75rem;
+    opacity: 0.8;
+  }
+  
+  @media (max-width: 450px) {
+    font-size: 0.75rem;
+    padding: 0.125rem 0.375rem;
+    
+    i {
+      font-size: 0.625rem;
+    }
+  }
 }
+
+// Remove global container-fluid padding override that was causing layout issues

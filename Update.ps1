@@ -4,7 +4,7 @@
 param(
     [Parameter(Mandatory=$false)]
     [ValidateSet("all", "web", "api", "clean", "status", "logs")]
-    [string]$Component = "all",
+    [string]$Component = "web",
     
     [Parameter(Mandatory=$false)]
     [string]$ImageTag = "latest",
@@ -85,7 +85,19 @@ function Build-Image {
     }
     
     try {
-        docker build -t $fullImageName -f $dockerfilePath $BuildPath
+        # Generate build time for web builds
+        $buildTime = if ($ImageName -eq "meal-week-planner-web") { 
+            Get-Date -Format "yyyy-MM-ddTHH:mm:ss.fffZ" 
+        } else { 
+            $null 
+        }
+        
+        if ($buildTime) {
+            docker build --build-arg BUILD_TIME=$buildTime -t $fullImageName -f $dockerfilePath $BuildPath
+        } else {
+            docker build -t $fullImageName -f $dockerfilePath $BuildPath
+        }
+        
         if ($LASTEXITCODE -ne 0) {
             Write-ColorOutput "ERROR: Failed to build $ImageName" $RED
             exit 1
