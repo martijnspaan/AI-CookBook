@@ -2,7 +2,7 @@
 # This script seeds the database with example data for all entities
 
 param(
-    [string]$ApiBaseUrl = "http://localhost",
+    [string]$ApiBaseUrl = "http://localhost:4200",
     [switch]$Verbose = $false
 )
 
@@ -642,7 +642,7 @@ $recipes += @{
 $createdRecipes = @()
 foreach ($recipe in $recipes) {
     try {
-        response = Invoke-ApiRequest -Method "POST" -Uri "$ApiBaseUrl/api/recipes/upload" -Body $recipe        
+        $response = Invoke-ApiRequest -Method "POST" -Uri "$ApiBaseUrl/api/recipes/upload" -Body $recipe        
         
         # Check if response has error property
         if ($response.PSObject.Properties.Name -contains "error") {
@@ -665,18 +665,56 @@ foreach ($recipe in $recipes) {
     }
 }
 
+Write-Host "`nCreating Recipe Settings..." -ForegroundColor Yellow
+
+# Create comprehensive recipe settings
+$recipeSettings = @{
+    tags = @(        
+        "gezond", "vegetarisch", "veganistisch", "glutenvrij", "lactosevrij",
+        "snel", "makkelijk", "klassiek", "modern", "traditioneel",
+        "pittig", "zoet", "hartig", "zuur", "bitter",
+        "nederlands", "italiaans", "frans", "spaans", "grieks", "aziatisch", "mediterraan",
+        "winter", "zomer", "lente", "herfst",
+        "eiwitrijk", "koolhydraatarm", "vetarm", "vezelrijk",
+        "koud", "warm", "krokant", "zacht", "romig"
+    )
+    ingredients = @(
+        "aardappelen", "rijst", "pasta", "brood", "quinoa", "couscous", "bulgur",
+        "kip", "rundvlees", "varkensvlees", "lamsvlees", "kalkoen", "worst", "spek",
+        "zalm", "kabeljauw", "tonijn", "garnalen", "mosselen", "kreeft", "krab",
+        "eieren", "melk", "yoghurt", "kaas", "boter", "room", "crème fraîche",
+        "tomaten", "ui", "knoflook", "wortelen", "selderij", "paprika", "komkommer",
+        "spinazie", "sla", "broccoli", "bloemkool", "spruitjes", "boerenkool",
+        "appels", "bananen", "sinaasappels", "citroenen", "limoenen", "bessen",
+        "olijfolie", "zonnebloemolie", "kokosolie", "sesamolie",
+        "zout", "peper", "kruiden", "specerijen", "basilicum", "oregano", "tijm",
+        "suiker", "honing", "ahornsiroop", "vanille", "kaneel", "nootmuskaat"
+    )
+    units = @(
+        "gram", "kilogram", "liter", "milliliter", "deciliter",
+        "eetlepel", "theelepel", "kopje", "glas", "schaaltje",
+        "stuks", "plakjes", "snippers", "takjes", "teentjes",
+        "snufje", "beetje", "handje", "bosje", "bundel"
+    )
+    categories = @(
+        "Voorgerecht", "Soep", "Salade", "Hoofdgerecht", "Bijgerecht",
+        "Dessert", "Drank", "Saus", "Marinade", "Dressing",
+        "Ontbijt", "Lunch", "Diner", "Snack", "Tussendoortje",
+        "Vegetarisch", "Veganistisch", "Glutenvrij", "Lactosevrij",
+        "Nederlands", "Italiaans", "Frans", "Spaans", "Grieks", "Aziatisch",
+        "Mediterraan", "Mexicaans", "Indisch", "Thais", "Chinees", "Japans",
+        "Snel", "Makkelijk", "Klassiek", "Modern", "Gezond", "Comfort Food"
+    )
+}
+
+$recipeSettingsResponse = Invoke-ApiRequest -Method "PUT" -Uri "$ApiBaseUrl/api/recipesettings" -Body $recipeSettings
+Write-Host "[SUCCESS] Created recipe settings with $($recipeSettings.tags.Count) tags, $($recipeSettings.ingredients.Count) ingredients, $($recipeSettings.units.Count) units, and $($recipeSettings.categories.Count) categories" -ForegroundColor Green
+
 Write-Host "`nCreating Week Menu..." -ForegroundColor Yellow
 
 
-# Calculate current week and upcoming 5 days
+# Calculate current week and upcoming 5 days starting from today
 $today = Get-Date
-$currentWeek = [System.Globalization.CultureInfo]::CurrentCulture.Calendar.GetWeekOfYear($today, [System.Globalization.CalendarWeekRule]::FirstDay, [DayOfWeek]::Monday)
-$currentYear = $today.Year
-
-# Create week menu for current week with next 5 days
-$weekDays = @()
-$dayOfWeek = 1 # Monday
-
 $breakfastRecipes = $createdRecipes | Where-Object { $_.MealTypes -contains "Breakfast" }
 $lunchRecipes = $createdRecipes | Where-Object { $_.MealTypes -contains "Lunch" }
 $dinnerRecipes = $createdRecipes | Where-Object { $_.MealTypes -contains "Dinner" }
@@ -695,25 +733,61 @@ if ($dinnerRecipes.Count -eq 0) {
     exit 1
 }
 
+# Function to get week number and year for a given date
+function Get-WeekInfo {
+    param([DateTime]$Date)
+    $weekNumber = [System.Globalization.CultureInfo]::CurrentCulture.Calendar.GetWeekOfYear($Date, [System.Globalization.CalendarWeekRule]::FirstDay, [DayOfWeek]::Monday)
+    $year = $Date.Year
+    return @{ WeekNumber = $weekNumber; Year = $year }
+}
+
+# Group the next 5 days by week
+$weekGroups = @{}
+$recipeIndex = 0
+
 for ($i = 0; $i -lt 5; $i++) {
+    $targetDate = $today.AddDays($i)
+    $weekInfo = Get-WeekInfo -Date $targetDate
+    $weekKey = "$($weekInfo.Year)-W$($weekInfo.WeekNumber)"
+    
+    if (-not $weekGroups.ContainsKey($weekKey)) {
+        $weekGroups[$weekKey] = @{
+            WeekNumber = $weekInfo.WeekNumber
+            Year = $weekInfo.Year
+            Days = @()
+        }
+    }
+    
+    $dayOfWeek = [int]$targetDate.DayOfWeek
+    # Convert Sunday=0 to Sunday=7 for consistency with API expectations
+    if ($dayOfWeek -eq 0) {
+        $dayOfWeek = 7
+    }
+    
     $weekDay = @{
         dayOfWeek = $dayOfWeek
-        breakfastRecipeId = $breakfastRecipes[$i % $breakfastRecipes.Count].id
-        lunchRecipeId = $lunchRecipes[$i % $lunchRecipes.Count].id
-        dinnerRecipeId = $dinnerRecipes[$i % $dinnerRecipes.Count].id
+        breakfastRecipeId = $breakfastRecipes[$recipeIndex % $breakfastRecipes.Count].id
+        lunchRecipeId = $lunchRecipes[$recipeIndex % $lunchRecipes.Count].id
+        dinnerRecipeId = $dinnerRecipes[$recipeIndex % $dinnerRecipes.Count].id
     }
-    $weekDays += $weekDay
-    $dayOfWeek++
+    
+    $weekGroups[$weekKey].Days += $weekDay
+    $recipeIndex++
 }
 
-$weekMenu = @{
-    weekNumber = $currentWeek
-    year = $currentYear
-    weekDays = $weekDays
+# Create week menu entities for each week
+foreach ($weekKey in $weekGroups.Keys) {
+    $weekData = $weekGroups[$weekKey]
+    
+    $weekMenu = @{
+        weekNumber = $weekData.WeekNumber
+        year = $weekData.Year
+        weekDays = $weekData.Days
+    }
+    
+    $weekMenuResponse = Invoke-ApiRequest -Method "POST" -Uri "$ApiBaseUrl/api/weekmenus" -Body $weekMenu
+    Write-Host "[SUCCESS] Created week menu for week $($weekData.WeekNumber), $($weekData.Year)" -ForegroundColor Green
 }
-
-$weekMenuResponse = Invoke-ApiRequest -Method "POST" -Uri "$ApiBaseUrl/api/weekmenus" -Body $weekMenu
-Write-Host "[SUCCESS] Created week menu for week $currentWeek, $currentYear" -ForegroundColor Green
 
 Write-Host "`nCreating Grocery Lists..." -ForegroundColor Yellow
 
@@ -726,70 +800,70 @@ if ($breakfastRecipes.Count -eq 0 -or $lunchRecipes.Count -eq 0 -or $dinnerRecip
     exit 1
 }
 
-# Create first grocery list for the upcoming 5 days
+# Create first grocery list for the upcoming 5 days starting from today
 $groceryList1 = @{
-    dayOfGrocery = (Get-Date).AddDays(1).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
+    dayOfGrocery = $today.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
     meals = @()
 }
 
-# Add meals for next 5 days
-for ($i = 1; $i -le 5; $i++) {
-    $mealDate = (Get-Date).AddDays($i).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
+# Add meals for next 5 days starting from today
+for ($i = 0; $i -lt 5; $i++) {
+    $mealDate = $today.AddDays($i).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
     
     # Add breakfast
     $groceryList1.meals += @{
         dayOfMeal = $mealDate
         mealType = "breakfast"
-        recipeId = $breakfastRecipes[($i-1) % $breakfastRecipes.Count].id
+        recipeId = $breakfastRecipes[$i % $breakfastRecipes.Count].id
     }
     
     # Add lunch
     $groceryList1.meals += @{
         dayOfMeal = $mealDate
         mealType = "lunch"
-        recipeId = $lunchRecipes[($i-1) % $lunchRecipes.Count].id
+        recipeId = $lunchRecipes[$i % $lunchRecipes.Count].id
     }
     
     # Add dinner
     $groceryList1.meals += @{
         dayOfMeal = $mealDate
         mealType = "dinner"
-        recipeId = $dinnerRecipes[($i-1) % $dinnerRecipes.Count].id
+        recipeId = $dinnerRecipes[$i % $dinnerRecipes.Count].id
     }
 }
 
 $groceryList1Response = Invoke-ApiRequest -Method "POST" -Uri "$ApiBaseUrl/api/grocerylists" -Body $groceryList1
 Write-Host "[SUCCESS] Created grocery list 1 for next 5 days" -ForegroundColor Green
 
-# Create second grocery list for weekend
+# Create second grocery list for weekend (days 5-6 from today)
 $groceryList2 = @{
-    dayOfGrocery = (Get-Date).AddDays(6).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
+    dayOfGrocery = $today.AddDays(5).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
     meals = @()
 }
 
-# Add weekend meals (Saturday and Sunday)
-for ($i = 6; $i -le 7; $i++) {
-    $mealDate = (Get-Date).AddDays($i).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
+# Add weekend meals (days 5-6 from today)
+for ($i = 5; $i -le 6; $i++) {
+    $mealDate = $today.AddDays($i).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
     
     # Add breakfast
     $groceryList2.meals += @{
         dayOfMeal = $mealDate
         mealType = "breakfast"
-        recipeId = $breakfastRecipes[($i-1) % $breakfastRecipes.Count].id
+        recipeId = $breakfastRecipes[$i % $breakfastRecipes.Count].id
     }
     
     # Add lunch
     $groceryList2.meals += @{
         dayOfMeal = $mealDate
         mealType = "lunch"
-        recipeId = $lunchRecipes[($i-1) % $lunchRecipes.Count].id
+        recipeId = $lunchRecipes[$i % $lunchRecipes.Count].id
     }
     
     # Add dinner
     $groceryList2.meals += @{
         dayOfMeal = $mealDate
         mealType = "dinner"
-        recipeId = $dinnerRecipes[($i-1) % $dinnerRecipes.Count].id
+        recipeId = $dinnerRecipes[$i % $dinnerRecipes.Count].id
     }
 }
 
@@ -801,6 +875,7 @@ Write-Host "===============================================" -ForegroundColor Gr
 Write-Host "Summary:" -ForegroundColor Cyan
 Write-Host "  • Cookbooks created: $($createdCookbooks.Count)" -ForegroundColor White
 Write-Host "  • Recipes created: $($createdRecipes.Count)" -ForegroundColor White
-Write-Host "  • Week menu created: 1" -ForegroundColor White
+Write-Host "  • Recipe settings created: 1" -ForegroundColor White
+Write-Host "  • Week menus created: $($weekGroups.Count)" -ForegroundColor White
 Write-Host "  • Grocery lists created: 2" -ForegroundColor White
 Write-Host "`nYou can now access the application at: $ApiBaseUrl" -ForegroundColor Yellow

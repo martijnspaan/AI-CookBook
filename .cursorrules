@@ -24,5 +24,5 @@ After completing any piece of work that involves changes to the application code
 
 ## Exception Handling
 - If the update.ps1 script fails, troubleshoot the issue before proceeding
-- If deployment fails, check pod status with `kubectl get pods -n ai-cookbook`
+- If deployment fails, check pod status with `kubectl get pods -n default`
 - Only proceed with testing after successful deployment confirmation
