@@ -173,7 +173,7 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
       this.aggregatedIngredients = [];
       this.isLoading = false;
       const formattedDate = this.getFormattedShoppingDate(groceryList.dayOfGrocery);
-      this.translateService.get('GROCERY_LISTS.GROCERY_LIST_DETAILS_TITLE').subscribe(title => {
+      this.translateService.get('NAVIGATION.GROCERY_LISTS').subscribe(title => {
         this.pageTitleService.setPageTitle(`${title} ${formattedDate}`);
       });
       return;
@@ -192,7 +192,7 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
       this.aggregatedIngredients = [];
       this.isLoading = false;
       const formattedDate = this.getFormattedShoppingDate(groceryList.dayOfGrocery);
-      this.translateService.get('GROCERY_LISTS.GROCERY_LIST_DETAILS_TITLE').subscribe(title => {
+      this.translateService.get('NAVIGATION.GROCERY_LISTS').subscribe(title => {
         this.pageTitleService.setPageTitle(`${title} ${formattedDate}`);
       });
       return;
@@ -232,7 +232,7 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
         this.aggregateIngredients();
         this.isLoading = false;
         const formattedDate = this.getFormattedShoppingDate(groceryList.dayOfGrocery);
-        this.translateService.get('GROCERY_LISTS.GROCERY_LIST_DETAILS_TITLE').subscribe(title => {
+        this.translateService.get('NAVIGATION.GROCERY_LISTS').subscribe(title => {
         this.pageTitleService.setPageTitle(`${title} ${formattedDate}`);
       });
       },
@@ -242,7 +242,7 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
         this.aggregatedIngredients = [];
         this.isLoading = false;
         const formattedDate = this.getFormattedShoppingDate(groceryList.dayOfGrocery);
-        this.translateService.get('GROCERY_LISTS.GROCERY_LIST_DETAILS_TITLE').subscribe(title => {
+        this.translateService.get('NAVIGATION.GROCERY_LISTS').subscribe(title => {
         this.pageTitleService.setPageTitle(`${title} ${formattedDate}`);
       });
       }

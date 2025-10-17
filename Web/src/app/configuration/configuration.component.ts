@@ -40,7 +40,7 @@ export class ConfigurationComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.pageTitleService.setPageTitle('Recipe Settings');
+    this.pageTitleService.setPageTitleFromTranslation('NAVIGATION.RECIPE_SETTINGS');
 
     this.updateAccordionSections();
   }
