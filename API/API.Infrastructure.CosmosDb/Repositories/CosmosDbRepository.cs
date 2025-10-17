@@ -114,8 +114,14 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
     {
         try
         {
+            ItemRequestOptions requestOptions = new ItemRequestOptions
+            {
+                EnableContentResponseOnWrite = true
+            };
+
             ItemResponse<T> response = await Container.CreateItemAsync(
                 item,
+                requestOptions: requestOptions,
                 cancellationToken: cancellationToken);
 
             return response.Resource;
@@ -139,10 +145,16 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
         {
             string itemId = GetItemId(item);
             
+            ItemRequestOptions requestOptions = new ItemRequestOptions
+            {
+                EnableContentResponseOnWrite = true
+            };
+
             ItemResponse<T> response = await Container.ReplaceItemAsync(
                 item,
                 itemId,
                 new PartitionKey(itemId),
+                requestOptions: requestOptions,
                 cancellationToken: cancellationToken);
 
             return response.Resource;
@@ -164,8 +176,14 @@ public class CosmosDbRepository<T> : ICosmosDbRepository<T> where T : class
     {
         try
         {
+            ItemRequestOptions requestOptions = new ItemRequestOptions
+            {
+                EnableContentResponseOnWrite = true
+            };
+
             ItemResponse<T> response = await Container.UpsertItemAsync(
                 item,
+                requestOptions: requestOptions,
                 cancellationToken: cancellationToken);
 
             return response.Resource;

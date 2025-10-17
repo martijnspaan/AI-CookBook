@@ -2,7 +2,7 @@
 # This script seeds the database with example data for all entities
 
 param(
-    [string]$ApiBaseUrl = "http://localhost:4201",
+    [string]$ApiBaseUrl = "http://localhost",
     [switch]$Verbose = $false
 )
 
@@ -35,13 +35,13 @@ function Invoke-ApiRequest {
         $response = Invoke-RestMethod @params
         
         if ($Verbose) {
-            Write-Host "✓ $Method $Uri" -ForegroundColor Green
+            Write-Host "[SUCCESS] $Method $Uri" -ForegroundColor Green
         }
         
         return $response
     }
     catch {
-        Write-Host "✗ Error calling $Method $Uri" -ForegroundColor Red
+        Write-Host "[ERROR] Error calling $Method $Uri" -ForegroundColor Red
         Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
         throw
     }
@@ -58,7 +58,7 @@ function Wait-ForApi {
     do {
         try {
             $response = Invoke-RestMethod -Uri "$BaseUrl/api/recipes" -Method Get -UseBasicParsing -TimeoutSec 5
-            Write-Host "✓ API is ready!" -ForegroundColor Green
+            Write-Host "[SUCCESS] API is ready!" -ForegroundColor Green
             return $true
         }
         catch {
@@ -70,12 +70,12 @@ function Wait-ForApi {
         }
     } while ($attempt -lt $maxAttempts)
     
-    Write-Host "✗ API not ready after $maxAttempts attempts" -ForegroundColor Red
+    Write-Host "[ERROR] API not ready after $maxAttempts attempts" -ForegroundColor Red
     return $false
 }
 
 # Main execution
-Write-Host "🍳 Meal Week Planner Database Initialization" -ForegroundColor Cyan
+Write-Host "Meal Week Planner Database Initialization" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 
 # Wait for API to be ready
@@ -83,7 +83,7 @@ if (-not (Wait-ForApi -BaseUrl $ApiBaseUrl)) {
     exit 1
 }
 
-Write-Host "`n📚 Creating Cookbooks..." -ForegroundColor Yellow
+Write-Host "`nCreating Cookbooks..." -ForegroundColor Yellow
 
 # Create 5 cookbooks
 $cookbooks = @(
@@ -113,13 +113,13 @@ $createdCookbooks = @()
 foreach ($cookbook in $cookbooks) {
     $response = Invoke-ApiRequest -Method "POST" -Uri "$ApiBaseUrl/api/cookbooks" -Body $cookbook
     $createdCookbooks += $response
-    Write-Host "✓ Created cookbook: $($cookbook.title)" -ForegroundColor Green
+    Write-Host "[SUCCESS] Created cookbook: $($cookbook.title)" -ForegroundColor Green
 }
 
-Write-Host "`n🍽️ Creating Recipes..." -ForegroundColor Yellow
+Write-Host "`nCreating Recipes..." -ForegroundColor Yellow
 
 # Define meal types
-$mealTypes = @("Breakfast", "Lunch", "Dinner", "Snack")
+$mealTypes = @("Breakfast", "Lunch", "Dinner")
 
 # Create 5 recipes for each meal type (20 total)
 $recipes = @()
@@ -508,14 +508,14 @@ $recipes += @{
     )
 }
 
-# SNACK RECIPES
+# Breakfast RECIPES
 $recipes += @{
     Title = "Hollandse Bitterballen"
-    Description = "Krokante bitterballen met ragout, typisch Nederlandse snack."
-    Tags = @("snack", "krokant", "ragout", "nederlands")
+    Description = "Krokante bitterballen met ragout, typisch Nederlandse Breakfast."
+    Tags = @("Breakfast", "krokant", "ragout", "nederlands")
     CookbookId = $createdCookbooks[0].id
     Page = 234
-    MealTypes = @("Snack")
+    MealTypes = @("Breakfast")
     Ingredients = @(
         @{ name = "Rundvlees"; type = "vlees"; amount = @{ value = 200; unit = "gram" } },
         @{ name = "Boter"; type = "zuivel"; amount = @{ value = 50; unit = "gram" } },
@@ -541,7 +541,7 @@ $recipes += @{
     Tags = @("mediterraan", "olijven", "kruiden", "light")
     CookbookId = $createdCookbooks[1].id
     Page = 45
-    MealTypes = @("Snack")
+    MealTypes = @("Breakfast")
     Ingredients = @(
         @{ name = "Zwarte olijven"; type = "groente"; amount = @{ value = 100; unit = "gram" } },
         @{ name = "Groene olijven"; type = "groente"; amount = @{ value = 100; unit = "gram" } },
@@ -566,7 +566,7 @@ $recipes += @{
     Tags = @("aziatisch", "knapperig", "groenten", "dip")
     CookbookId = $createdCookbooks[2].id
     Page = 112
-    MealTypes = @("Snack")
+    MealTypes = @("Breakfast")
     Ingredients = @(
         @{ name = "Spring roll vellen"; type = "graan"; amount = @{ value = 12; unit = "stuks" } },
         @{ name = "Wortelen"; type = "groente"; amount = @{ value = 2; unit = "stuks" } },
@@ -592,7 +592,7 @@ $recipes += @{
     Tags = @("vegetarisch", "hummus", "gezond", "dip")
     CookbookId = $createdCookbooks[3].id
     Page = 78
-    MealTypes = @("Snack")
+    MealTypes = @("Breakfast")
     Ingredients = @(
         @{ name = "Kikkererwten"; type = "peulvrucht"; amount = @{ value = 400; unit = "gram" } },
         @{ name = "Tahini"; type = "saus"; amount = @{ value = 3; unit = "eetlepels" } },
@@ -618,7 +618,7 @@ $recipes += @{
     Tags = @("gezond", "energy", "dadels", "noten")
     CookbookId = $createdCookbooks[4].id
     Page = 201
-    MealTypes = @("Snack")
+    MealTypes = @("Breakfast")
     Ingredients = @(
         @{ name = "Dadels"; type = "fruit"; amount = @{ value = 200; unit = "gram" } },
         @{ name = "Amandelen"; type = "noten"; amount = @{ value = 100; unit = "gram" } },
@@ -641,12 +641,32 @@ $recipes += @{
 # Create all recipes
 $createdRecipes = @()
 foreach ($recipe in $recipes) {
-    $response = Invoke-ApiRequest -Method "POST" -Uri "$ApiBaseUrl/api/recipes/upload" -Body $recipe
-    $createdRecipes += $response
-    Write-Host "✓ Created recipe: $($recipe.Title)" -ForegroundColor Green
+    try {
+        response = Invoke-ApiRequest -Method "POST" -Uri "$ApiBaseUrl/api/recipes/upload" -Body $recipe        
+        
+        # Check if response has error property
+        if ($response.PSObject.Properties.Name -contains "error") {
+            Write-Host "[ERROR] API returned error: $($response.error)" -ForegroundColor Red
+            continue
+        }
+        
+        # Check if response has the expected recipe properties
+        if ($response.PSObject.Properties.Name -contains "Title" -and $response.PSObject.Properties.Name -contains "MealTypes") {            
+            $createdRecipes += $response
+        } else {
+            Write-Host "[ERROR] Response missing expected properties. Available: $($response.PSObject.Properties.Name -join ', ')" -ForegroundColor Red
+            continue
+        }
+        
+        Write-Host "[SUCCESS] Created recipe: $($recipe.Title)" -ForegroundColor Green
+    }
+    catch {
+        Write-Host "[ERROR] Failed to create recipe '$($recipe.Title)': $($_.Exception.Message)" -ForegroundColor Red
+    }
 }
 
-Write-Host "`n📅 Creating Week Menu..." -ForegroundColor Yellow
+Write-Host "`nCreating Week Menu..." -ForegroundColor Yellow
+
 
 # Calculate current week and upcoming 5 days
 $today = Get-Date
@@ -656,9 +676,24 @@ $currentYear = $today.Year
 # Create week menu for current week with next 5 days
 $weekDays = @()
 $dayOfWeek = 1 # Monday
+
 $breakfastRecipes = $createdRecipes | Where-Object { $_.MealTypes -contains "Breakfast" }
 $lunchRecipes = $createdRecipes | Where-Object { $_.MealTypes -contains "Lunch" }
 $dinnerRecipes = $createdRecipes | Where-Object { $_.MealTypes -contains "Dinner" }
+
+# Check if we have recipes for each meal type
+if ($breakfastRecipes.Count -eq 0) {
+    Write-Host "[WARNING] No breakfast recipes found. Skipping week menu creation." -ForegroundColor Yellow
+    exit 1
+}
+if ($lunchRecipes.Count -eq 0) {
+    Write-Host "[WARNING] No lunch recipes found. Skipping week menu creation." -ForegroundColor Yellow
+    exit 1
+}
+if ($dinnerRecipes.Count -eq 0) {
+    Write-Host "[WARNING] No dinner recipes found. Skipping week menu creation." -ForegroundColor Yellow
+    exit 1
+}
 
 for ($i = 0; $i -lt 5; $i++) {
     $weekDay = @{
@@ -678,9 +713,18 @@ $weekMenu = @{
 }
 
 $weekMenuResponse = Invoke-ApiRequest -Method "POST" -Uri "$ApiBaseUrl/api/weekmenus" -Body $weekMenu
-Write-Host "✓ Created week menu for week $currentWeek, $currentYear" -ForegroundColor Green
+Write-Host "[SUCCESS] Created week menu for week $currentWeek, $currentYear" -ForegroundColor Green
 
-Write-Host "`n🛒 Creating Grocery Lists..." -ForegroundColor Yellow
+Write-Host "`nCreating Grocery Lists..." -ForegroundColor Yellow
+
+# Verify we still have recipes for each meal type (in case they were cleared)
+if ($breakfastRecipes.Count -eq 0 -or $lunchRecipes.Count -eq 0 -or $dinnerRecipes.Count -eq 0) {
+    Write-Host "[ERROR] Missing recipes for meal types. Cannot create grocery lists." -ForegroundColor Red
+    Write-Host "Breakfast recipes: $($breakfastRecipes.Count)" -ForegroundColor Red
+    Write-Host "Lunch recipes: $($lunchRecipes.Count)" -ForegroundColor Red
+    Write-Host "Dinner recipes: $($dinnerRecipes.Count)" -ForegroundColor Red
+    exit 1
+}
 
 # Create first grocery list for the upcoming 5 days
 $groceryList1 = @{
@@ -715,7 +759,7 @@ for ($i = 1; $i -le 5; $i++) {
 }
 
 $groceryList1Response = Invoke-ApiRequest -Method "POST" -Uri "$ApiBaseUrl/api/grocerylists" -Body $groceryList1
-Write-Host "✓ Created grocery list 1 for next 5 days" -ForegroundColor Green
+Write-Host "[SUCCESS] Created grocery list 1 for next 5 days" -ForegroundColor Green
 
 # Create second grocery list for weekend
 $groceryList2 = @{
@@ -750,13 +794,13 @@ for ($i = 6; $i -le 7; $i++) {
 }
 
 $groceryList2Response = Invoke-ApiRequest -Method "POST" -Uri "$ApiBaseUrl/api/grocerylists" -Body $groceryList2
-Write-Host "✓ Created grocery list 2 for weekend" -ForegroundColor Green
+Write-Host "[SUCCESS] Created grocery list 2 for weekend" -ForegroundColor Green
 
-Write-Host "`n🎉 Database initialization completed successfully!" -ForegroundColor Green
+Write-Host "`nDatabase initialization completed successfully!" -ForegroundColor Green
 Write-Host "===============================================" -ForegroundColor Green
-Write-Host "📊 Summary:" -ForegroundColor Cyan
+Write-Host "Summary:" -ForegroundColor Cyan
 Write-Host "  • Cookbooks created: $($createdCookbooks.Count)" -ForegroundColor White
 Write-Host "  • Recipes created: $($createdRecipes.Count)" -ForegroundColor White
 Write-Host "  • Week menu created: 1" -ForegroundColor White
 Write-Host "  • Grocery lists created: 2" -ForegroundColor White
-Write-Host "`n🌐 You can now access the application at: $ApiBaseUrl" -ForegroundColor Yellow
+Write-Host "`nYou can now access the application at: $ApiBaseUrl" -ForegroundColor Yellow

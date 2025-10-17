@@ -3,9 +3,9 @@
 ## Automatic Deployment Rule
 After completing any piece of work that involves changes to the application code, ALWAYS automatically run the appropriate update.ps1 script command based on which components were modified:
 
-- If changes were made to files in the `API/` directory: Run `.\update.ps1 -Image api`
-- If changes were made to files in the `Web/` directory: Run `.\update.ps1 -Image web`  
-- If changes were made to both `API/` and `Web/` directories: Run `.\update.ps1 -Image all`
+- If changes were made to files in the `API/` directory: Run `.\update.ps1 -Component api`
+- If changes were made to files in the `Web/` directory: Run `.\update.ps1 -Component web`  
+- If changes were made to both `API/` and `Web/` directories: Run `.\update.ps1 -Component all`
 - If no application code changes were made: Do not run the update script
 
 ## Testing Protocol

@@ -39,6 +39,7 @@ The Meal Week Planner is an intelligent culinary application that revolutionizes
 - Execute each command individually for better error handling and debugging
 - Always verify current working directory before running scripts
 - Implement proper error checking and logging for all script operations
+- **NO EMOTICONS IN LOG OUTPUT**: Never use emoticons (🍳, ✓, ✗, etc.) in script log output as they can cause display issues and are not suitable for automated environments
 
 ### Code Quality Standards
 - **Self-Documenting Code**: Write code that tells a story through descriptive names

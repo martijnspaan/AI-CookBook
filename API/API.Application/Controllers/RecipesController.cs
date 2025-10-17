@@ -51,15 +51,22 @@ public static class RecipesController
         // POST /api/recipes - Create a new recipe
         endpoints.MapPost("/api/recipes", async (CreateRecipeUseCaseInput input, CreateRecipeUseCase createRecipeUseCase) =>
         {
-            CreateRecipeUseCaseOutput output = await createRecipeUseCase.Execute(input);
+            try
+            {
+                CreateRecipeUseCaseOutput output = await createRecipeUseCase.Execute(input);
 
-            if (output.IsSuccess)
-            {
-                return Results.Json(output.Recipe, statusCode: 201);
+                if (output.IsSuccess && output.Recipe != null)
+                {
+                    return Results.Json(output.Recipe, statusCode: 201);
+                }
+                else
+                {
+                    return Results.Json(new { error = output.ErrorMessage ?? "Failed to create recipe" }, statusCode: 400);
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return Results.Json(new { error = output.ErrorMessage }, statusCode: 400);
+                return Results.Json(new { error = ex.Message }, statusCode: 500);
             }
         })
         .WithName("CreateRecipe")
@@ -111,7 +118,7 @@ public static class RecipesController
             }
             catch (Exception ex)
             {
-                return Results.Json(new { error = ex.Message }, statusCode: 400);
+                return Results.BadRequest(new { error = ex.Message });
             }
         })
         .WithName("UploadRecipe")

@@ -34,7 +34,7 @@ COSMOSDB_PARTITION_KEY_PATH=/id
 The secrets are automatically applied when you run the deployment script:
 
 ```bash
-.\Update.ps1 -Image all
+.\Update.ps1 -Component all
 ```
 
 Or manually:
