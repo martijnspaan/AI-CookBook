@@ -19,7 +19,8 @@ public class CreateRecipeUseCase(ICosmosDbRepository<RecipeEntity> repository)
                 Recipe = input.Recipe,
                 CookbookId = input.CookbookId,
                 Page = input.Page,
-                MealTypes = input.MealTypes ?? new List<string>()
+                MealTypes = input.MealTypes ?? new List<string>(),
+                ServingSize = input.ServingSize
             };
 
             RecipeEntity createdRecipe = await repository.CreateAsync(recipe);

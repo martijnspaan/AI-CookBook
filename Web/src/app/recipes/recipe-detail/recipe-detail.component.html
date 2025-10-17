@@ -69,6 +69,15 @@
                     {{ recipe.page }}
                   </div>
                 </div>
+                <div class="col-auto serving-size-field-container">
+                  <label class="form-label fw-bold">{{ 'RECIPES.SERVING_SIZE' | translate }}</label>
+                  <div *ngIf="isEditingMode">
+                    <input type="number" class="form-control serving-size-input" [(ngModel)]="editedRecipe!.servingSize" min="1" [placeholder]="'RECIPES.SERVING_SIZE' | translate">
+                  </div>
+                  <div *ngIf="!isEditingMode" class="recipe-field">
+                    {{ recipe.servingSize }} {{ 'RECIPES.PEOPLE' | translate }}
+                  </div>
+                </div>
               </div>
             </div>
 

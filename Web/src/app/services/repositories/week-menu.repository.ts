@@ -247,7 +247,7 @@ export class WeekMenuRepository extends BaseRepository<WeekMenu> {
   /**
    * Add to sync queue (protected method from base class)
    */
-  private async addToSyncQueue(type: 'CREATE' | 'UPDATE' | 'DELETE', entityId: string, data?: any): Promise<void> {
+  protected override async addToSyncQueue(type: 'CREATE' | 'UPDATE' | 'DELETE', entityId: string, data?: any): Promise<void> {
     await this.indexedDB.addToSyncQueue({
       type,
       entityType: this.entityType,
@@ -259,7 +259,7 @@ export class WeekMenuRepository extends BaseRepository<WeekMenu> {
   /**
    * Generate temporary ID for offline operations
    */
-  private generateTempId(): string {
+  protected override generateTempId(): string {
     return `temp_${this.entityType}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 }

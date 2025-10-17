@@ -119,5 +119,23 @@ public static class GroceryListController
         })
         .WithName("UpdateIngredientState")
         .WithOpenApi();
+
+        // POST /api/grocerylists/{id}/recalculate - Recalculate grocery list based on serving counts
+        endpoints.MapPost("/api/grocerylists/{id}/recalculate", async (string id, RecalculateGroceryListUseCase recalculateGroceryListUseCase) =>
+        {
+            RecalculateGroceryListUseCaseInput input = new RecalculateGroceryListUseCaseInput(id);
+            RecalculateGroceryListUseCaseOutput output = await recalculateGroceryListUseCase.Execute(input);
+
+            if (output.IsSuccess)
+            {
+                return Results.Json(output.GroceryList);
+            }
+            else
+            {
+                return Results.Json(new { error = output.ErrorMessage }, statusCode: 404);
+            }
+        })
+        .WithName("RecalculateGroceryList")
+        .WithOpenApi();
     }
 }

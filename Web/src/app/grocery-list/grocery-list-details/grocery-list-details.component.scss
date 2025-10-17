@@ -97,16 +97,57 @@
         align-items: center;
         padding: 0.25rem 0;
         
-        .meal-name {
-          font-size: 0.85rem;
-          color: #495057;
-          font-weight: 500;
+        .meal-info {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
           flex: 1;
+          
+          .meal-name {
+            font-size: 0.85rem;
+            color: #495057;
+            font-weight: 500;
+          }
+          
+          .meal-type-badge {
+            font-size: 0.8em;
+            padding: 0.35em 0.65em;
+          }
         }
         
-        .meal-type-badge {
-          font-size: 0.8em;
-          padding: 0.35em 0.65em;
+        .meal-serving-info {
+          .serving-count-badge {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-weight: 500;
+            white-space: nowrap;
+          }
+        }
+        
+        // Mobile responsive adjustments
+        @media (max-width: 450px) {
+          .meal-info {
+            gap: 0.25rem;
+            
+            .meal-name {
+              font-size: 0.8rem;
+            }
+            
+            .meal-type-badge {
+              font-size: 0.75em;
+              padding: 0.3em 0.5em;
+            }
+          }
+          
+          .meal-serving-info {
+            .serving-count-badge {
+              font-size: 0.7rem;
+              padding: 0.2rem 0.4rem;
+            }
+          }
         }
       }
     }

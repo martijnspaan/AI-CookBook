@@ -30,17 +30,21 @@ public class Meal
     [JsonProperty("RecipeId")]
     public string? RecipeId { get; set; }
 
+    [JsonProperty("ServingCount")]
+    public int? ServingCount { get; set; }
+
     public Meal() { }
 
-    public Meal(DateTime dayOfMeal, string mealType = "", string? recipeId = null)
+    public Meal(DateTime dayOfMeal, string mealType = "", string? recipeId = null, int? servingCount = null)
     {
         DayOfMeal = dayOfMeal;
         MealType = mealType;
         RecipeId = recipeId;
+        ServingCount = servingCount;
     }
 
     [JsonConstructor]
-    public Meal(object dayOfMeal, string mealType = "", string? recipeId = null)
+    public Meal(object dayOfMeal, string mealType = "", string? recipeId = null, int? servingCount = null)
     {
         // Handle backward compatibility - dayOfMeal can be either DateTime or DayOfWeek enum (int)
         if (dayOfMeal is DateTime dateTime)
@@ -67,6 +71,7 @@ public class Meal
 
         MealType = mealType;
         RecipeId = recipeId;
+        ServingCount = servingCount;
     }
 }
 

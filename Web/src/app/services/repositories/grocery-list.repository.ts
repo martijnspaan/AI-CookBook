@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { BaseRepository } from './base-repository';
 import { IndexedDBService } from '../offline/indexeddb.service';
 import { ConnectivityService } from '../offline/connectivity.service';
@@ -77,14 +78,18 @@ export class GroceryListRepository extends BaseRepository<GroceryList> {
    * Create grocery list with offline support
    */
   createGroceryList(groceryListRequest: CreateGroceryListRequest): Observable<GroceryList> {
-    return this.createEntityWithOfflineSupport(groceryListRequest);
+    return this.createEntityWithOfflineSupport(groceryListRequest).pipe(
+      map(groceryList => groceryList!)
+    );
   }
 
   /**
    * Update grocery list with offline support
    */
   updateGroceryList(groceryListId: string, groceryListRequest: CreateGroceryListRequest): Observable<GroceryList> {
-    return this.updateEntityWithOfflineSupport(groceryListId, groceryListRequest);
+    return this.updateEntityWithOfflineSupport(groceryListId, groceryListRequest).pipe(
+      map(groceryList => groceryList!)
+    );
   }
 
   /**
@@ -234,7 +239,7 @@ export class GroceryListRepository extends BaseRepository<GroceryList> {
   /**
    * Add to sync queue (protected method from base class)
    */
-  private async addToSyncQueue(type: 'CREATE' | 'UPDATE' | 'DELETE', entityId: string, data?: any): Promise<void> {
+  protected override async addToSyncQueue(type: 'CREATE' | 'UPDATE' | 'DELETE', entityId: string, data?: any): Promise<void> {
     await this.indexedDB.addToSyncQueue({
       type,
       entityType: this.entityType,

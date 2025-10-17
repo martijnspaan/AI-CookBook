@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError, from, of } from 'rxjs';
-import { catchError, switchMap, tap } from 'rxjs/operators';
+import { catchError, switchMap, tap, map } from 'rxjs/operators';
 import { IndexedDBService } from '../offline/indexeddb.service';
 import { ConnectivityService } from '../offline/connectivity.service';
 import { SyncService } from '../offline/sync.service';
@@ -99,7 +99,7 @@ export abstract class BaseRepository<T> {
   /**
    * Create entity with offline support
    */
-  protected createEntityWithOfflineSupport(entityData: any): Observable<T> {
+  protected createEntityWithOfflineSupport(entityData: any): Observable<T | null> {
     // Generate temporary ID for offline operations
     const tempId = this.generateTempId();
     const entityWithTempId = { ...entityData, id: tempId };
@@ -121,7 +121,9 @@ export abstract class BaseRepository<T> {
               // Add to sync queue for later retry
               this.addToSyncQueue('CREATE', tempId, entityData);
               // Return the locally cached entity
-              return from(this.indexedDB.getEntityById<T>(this.entityType, tempId));
+              return from(this.indexedDB.getEntityById<T>(this.entityType, tempId)).pipe(
+                map(entity => entity || entityWithTempId as T)
+              );
             })
           );
         } else {
@@ -129,7 +131,9 @@ export abstract class BaseRepository<T> {
           // Add to sync queue for when we come back online
           this.addToSyncQueue('CREATE', tempId, entityData);
           // Return the locally cached entity
-          return from(this.indexedDB.getEntityById<T>(this.entityType, tempId));
+          return from(this.indexedDB.getEntityById<T>(this.entityType, tempId)).pipe(
+            map(entity => entity || entityWithTempId as T)
+          );
         }
       }),
       catchError(this.handleError)
@@ -139,7 +143,7 @@ export abstract class BaseRepository<T> {
   /**
    * Update entity with offline support
    */
-  protected updateEntityWithOfflineSupport(id: string, entityData: any): Observable<T> {
+  protected updateEntityWithOfflineSupport(id: string, entityData: any): Observable<T | null> {
     // Update local cache immediately
     return from(this.saveEntityToCache({ ...entityData, id, isDirty: true })).pipe(
       switchMap(() => {
@@ -157,7 +161,9 @@ export abstract class BaseRepository<T> {
               // Add to sync queue for later retry
               this.addToSyncQueue('UPDATE', id, entityData);
               // Return the locally cached entity
-              return from(this.indexedDB.getEntityById<T>(this.entityType, id));
+              return from(this.indexedDB.getEntityById<T>(this.entityType, id)).pipe(
+                map(entity => entity || { ...entityData, id } as T)
+              );
             })
           );
         } else {
@@ -165,7 +171,9 @@ export abstract class BaseRepository<T> {
           // Add to sync queue for when we come back online
           this.addToSyncQueue('UPDATE', id, entityData);
           // Return the locally cached entity
-          return from(this.indexedDB.getEntityById<T>(this.entityType, id));
+          return from(this.indexedDB.getEntityById<T>(this.entityType, id)).pipe(
+            map(entity => entity || { ...entityData, id } as T)
+          );
         }
       }),
       catchError(this.handleError)
@@ -288,7 +296,7 @@ export abstract class BaseRepository<T> {
   /**
    * Add operation to sync queue
    */
-  private async addToSyncQueue(type: 'CREATE' | 'UPDATE' | 'DELETE', entityId: string, data?: any): Promise<void> {
+  protected async addToSyncQueue(type: 'CREATE' | 'UPDATE' | 'DELETE', entityId: string, data?: any): Promise<void> {
     await this.indexedDB.addToSyncQueue({
       type,
       entityType: this.entityType,
@@ -300,7 +308,7 @@ export abstract class BaseRepository<T> {
   /**
    * Generate temporary ID for offline operations
    */
-  private generateTempId(): string {
+  protected generateTempId(): string {
     return `temp_${this.entityType}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
   }
 

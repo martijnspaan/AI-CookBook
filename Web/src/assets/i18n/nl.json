@@ -90,6 +90,9 @@
     "NO_COOKBOOK": "Geen kookboek",
     "PAGE": "Pagina",
     "PAGE_PLACEHOLDER": "Paginanummer in kookboek",
+    "SERVING_SIZE": "Portiegrootte",
+    "SERVING_SIZE_PLACEHOLDER": "Aantal personen",
+    "PEOPLE": "personen",
     "MEAL_CATEGORIES_LABEL": "Maaltijdcategorieën",
     "INGREDIENTS": "Ingrediënten",
     "INGREDIENT_NAME_PLACEHOLDER": "Voer ingrediëntnaam in",
@@ -112,7 +115,8 @@
   },
   "WEEK_MENU": {
     "SAVING_WEEK_MENU": "Weekmenu opslaan...",
-    "NEW_GROCERY_LIST": "Nieuwe Boodschappenlijst"
+    "NEW_GROCERY_LIST": "Nieuwe Boodschappenlijst",
+    "SERVING_COUNT": "Aantal Porties"
   },
   "GROCERY_LISTS": {
     "LOADING_GROCERY_LISTS": "Boodschappenlijsten laden...",

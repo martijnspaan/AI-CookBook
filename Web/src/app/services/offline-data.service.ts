@@ -7,12 +7,10 @@ import { WeekMenuRepository } from './repositories/week-menu.repository';
 import { ConnectivityService } from './offline/connectivity.service';
 import { SyncService } from './offline/sync.service';
 import { PwaService } from './offline/pwa.service';
-import { 
-  Recipe, CreateRecipeRequest, UpdateRecipeRequest,
-  Cookbook, CreateCookbookRequest, UpdateCookbookRequest,
-  GroceryList, CreateGroceryListRequest, UpdateIngredientStateRequest,
-  WeekMenu, CreateOrUpdateWeekMenuRequest, CreateOrUpdateWeekMenuResponse
-} from '../models';
+import { Recipe, CreateRecipeRequest, UpdateRecipeRequest } from '../models/recipe.model';
+import { Cookbook, CreateCookbookRequest, UpdateCookbookRequest } from '../models/cookbook.model';
+import { GroceryList, CreateGroceryListRequest, UpdateIngredientStateRequest } from '../models/grocery-list.model';
+import { WeekMenu, CreateOrUpdateWeekMenuRequest, CreateOrUpdateWeekMenuResponse } from '../models/week-menu.model';
 
 /**
  * Centralized offline data service that provides a unified interface

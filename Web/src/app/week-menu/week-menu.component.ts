@@ -8,10 +8,8 @@ import { GroceryListDialogComponent, MealSelection } from './grocery-list-dialog
 import { RecipeGridComponent } from './recipe-grid/recipe-grid.component';
 import { Recipe } from '../models/recipe.model';
 import { PageTitleService } from '../services/page-title.service';
-import { WeekMenuService } from '../services/week-menu.service';
-import { RecipeService } from '../services/recipe.service';
+import { OfflineDataService } from '../services/offline-data.service';
 import { GroceryListDialogService } from '../services/grocery-list-dialog.service';
-import { GroceryListService } from '../services/grocery-list.service';
 import { WeekMenu, WeekDay, CreateOrUpdateWeekMenuRequest } from '../models/week-menu.model';
 import { forkJoin, Observable, Subject } from 'rxjs';
 import { DateTimeUtil } from '../utils/date-time.util';
@@ -44,11 +42,9 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private pageTitleService: PageTitleService,
-    private weekMenuService: WeekMenuService,
-    private recipeService: RecipeService,
+    private offlineDataService: OfflineDataService,
     private groceryListDialogService: GroceryListDialogService,
     private recipeSelectionDialogService: RecipeSelectionDialogService,
-    private groceryListService: GroceryListService,
     private router: Router,
     private translateService: TranslateService
   ) {}
@@ -89,7 +85,8 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
       date: dateString,
       mealType: event.mealType,
       recipeId: event.recipe.id,
-      recipeTitle: event.recipe.title
+      recipeTitle: event.recipe.title,
+      servingCount: event.recipe.servingSize || 2
     };
     
     this.recipeAssignments.push(newAssignment);
@@ -156,6 +153,21 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     this.resetSelection();
   }
 
+  onServingCountChanged(event: { mealType: 'breakfast' | 'lunch' | 'dinner'; date: Date; servingCount: number }): void {
+    const dateString = this.formatDateAsString(event.date);
+    
+    // Find the assignment and update the serving count
+    const assignment = this.recipeAssignments.find(a => 
+      a.date === dateString && a.mealType === event.mealType
+    );
+    
+    if (assignment) {
+      assignment.servingCount = event.servingCount;
+      // Save to API
+      this.saveWeekMenuToApi();
+    }
+  }
+
   onDialogClosed(): void {
     this.resetSelection();
   }
@@ -170,7 +182,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isLoadingRecipes = true;
     this.errorMessage = null;
     
-    this.recipeService.getAllRecipes().subscribe({
+    this.offlineDataService.getAllRecipes().subscribe({
       next: (recipes) => {
         this.recipes = recipes;
         this.isLoadingRecipes = false;
@@ -185,7 +197,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private loadWeekMenus(): void {
     this.isCalendarLoading = true;
-    this.weekMenuService.getWeekMenus().subscribe({
+    this.offlineDataService.getAllWeekMenus().subscribe({
       next: (weekMenus) => {
         
         // Load ALL week menus and convert them to recipe assignments
@@ -244,7 +256,8 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
           date: dateString,
           mealType: 'breakfast',
           recipeId: weekDay.breakfastRecipeId,
-          recipeTitle: 'Loading...'
+          recipeTitle: 'Loading...',
+          servingCount: weekDay.breakfastServingCount
         });
       }
       
@@ -253,7 +266,8 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
           date: dateString,
           mealType: 'lunch',
           recipeId: weekDay.lunchRecipeId,
-          recipeTitle: 'Loading...'
+          recipeTitle: 'Loading...',
+          servingCount: weekDay.lunchServingCount
         });
       }
       
@@ -262,7 +276,8 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
           date: dateString,
           mealType: 'dinner',
           recipeId: weekDay.dinnerRecipeId,
-          recipeTitle: 'Loading...'
+          recipeTitle: 'Loading...',
+          servingCount: weekDay.dinnerServingCount
         });
       }
     });
@@ -341,7 +356,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    this.recipeService.getAllRecipes().subscribe({
+    this.offlineDataService.getAllRecipes().subscribe({
       next: (recipes: Recipe[]) => {
         const recipeTitleMap = new Map<string, string>();
         recipes.forEach(recipe => recipeTitleMap.set(recipe.id, recipe.title));
@@ -393,7 +408,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     };
 
 
-    this.weekMenuService.createOrUpdateWeekMenu(request).subscribe({
+    this.offlineDataService.createOrUpdateWeekMenu(request).subscribe({
       next: (response) => {
         this.currentWeekMenu = {
           id: response.id,
@@ -470,8 +485,11 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
       const weekDay: WeekDay = {
         dayOfWeek: DateTimeUtil.getApiDayOfWeek(currentDate),
         breakfastRecipeId: dayAssignments.find(a => a.mealType === 'breakfast')?.recipeId,
+        breakfastServingCount: dayAssignments.find(a => a.mealType === 'breakfast')?.servingCount,
         lunchRecipeId: dayAssignments.find(a => a.mealType === 'lunch')?.recipeId,
-        dinnerRecipeId: dayAssignments.find(a => a.mealType === 'dinner')?.recipeId
+        lunchServingCount: dayAssignments.find(a => a.mealType === 'lunch')?.servingCount,
+        dinnerRecipeId: dayAssignments.find(a => a.mealType === 'dinner')?.recipeId,
+        dinnerServingCount: dayAssignments.find(a => a.mealType === 'dinner')?.servingCount
       };
       
       weekDays.push(weekDay);
@@ -491,8 +509,8 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   private fetchRecipeTitlesAndUpdateAssignments(recipeIds: string[], assignments: RecipeAssignment[]): void {
     
     // Create observables for each recipe fetch
-    const recipeObservables: Observable<Recipe>[] = recipeIds.map(id => 
-      this.recipeService.getRecipeById(id)
+    const recipeObservables: Observable<Recipe | null>[] = recipeIds.map(id => 
+      this.offlineDataService.getRecipeById(id)
     );
     
     // Fetch all recipes in parallel
@@ -500,8 +518,8 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
       next: (recipes) => {
         // Create a map of recipe ID to recipe title for quick lookup
         const recipeTitleMap = new Map<string, string>();
-        recipes.forEach(recipe => {
-          recipeTitleMap.set(recipe.id, recipe.title);
+        recipes.filter(recipe => recipe !== null).forEach(recipe => {
+          recipeTitleMap.set(recipe!.id, recipe!.title);
         });
         
         // Update the recipe assignments with actual titles
@@ -598,7 +616,8 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
       return {
         dayOfMeal: meal.date, // Store the actual date instead of just day name
         mealType: meal.mealType,
-        recipeId: meal.recipeId
+        recipeId: meal.recipeId,
+        servingCount: meal.servingCount
       };
     });
 
@@ -608,7 +627,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     };
 
 
-    this.groceryListService.createGroceryList(groceryListRequest).subscribe({
+    this.offlineDataService.createGroceryList(groceryListRequest).subscribe({
       next: (groceryList) => {
         this.groceryListDialogService.closeGroceryListDialog();
         this.router.navigate(['/grocery-list']);

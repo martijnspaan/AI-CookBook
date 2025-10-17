@@ -227,6 +227,11 @@
               <input type="number" class="form-control" id="page" formControlName="page" min="1" [placeholder]="'RECIPES.PAGE_PLACEHOLDER' | translate">
             </div>
             
+            <div class="mb-3">
+              <label for="servingSize" class="form-label fw-bold">{{ 'RECIPES.SERVING_SIZE' | translate }}</label>
+              <input type="number" class="form-control" id="servingSize" formControlName="servingSize" min="1" value="2" [placeholder]="'RECIPES.SERVING_SIZE_PLACEHOLDER' | translate">
+            </div>
+            
             <div class="mb-3" *ngIf="mealTypesFormArray.controls.length > 0">
               <label class="form-label fw-bold">{{ 'RECIPES.MEAL_CATEGORIES_LABEL' | translate }}</label>
               <div formArrayName="mealTypes">

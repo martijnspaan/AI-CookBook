@@ -22,6 +22,7 @@ export interface RecipeAssignment {
   mealType: 'breakfast' | 'lunch' | 'dinner';
   recipeId: string;
   recipeTitle: string;
+  servingCount?: number;
 }
 
 @Component({
@@ -39,6 +40,7 @@ export class WeekCalendarComponent implements AfterViewInit, OnChanges {
   @Output() mealSlotClicked = new EventEmitter<{ mealType: 'breakfast' | 'lunch' | 'dinner'; date: Date }>();
   @Output() recipeDropped = new EventEmitter<{ recipe: Recipe; mealType: 'breakfast' | 'lunch' | 'dinner'; date: Date }>();
   @Output() recipeRemoved = new EventEmitter<{ mealType: 'breakfast' | 'lunch' | 'dinner'; date: Date }>();
+  @Output() servingCountChanged = new EventEmitter<{ mealType: 'breakfast' | 'lunch' | 'dinner'; date: Date; servingCount: number }>();
 
   @ViewChild('scrollContainer', { static: false }) scrollContainer!: ElementRef;
 
@@ -46,6 +48,7 @@ export class WeekCalendarComponent implements AfterViewInit, OnChanges {
   allDays: WeekDate[] = [];
   private readonly DAYS_TO_SHOW = 14; // Show 14 days starting from current day
   mealSlots: MealSlot[] = [];
+  servingCountOptions: number[] = Array.from({ length: 8 }, (_, i) => i + 1);
   
   // Drag highlighting properties
   isDragActive = false;
@@ -240,5 +243,36 @@ export class WeekCalendarComponent implements AfterViewInit, OnChanges {
       mealType: mealType,
       date: date
     });
+  }
+
+  getServingCountForMealSlot(date: Date, mealType: 'breakfast' | 'lunch' | 'dinner'): number {
+    const dateString = this.formatDateAsString(date);
+    const assignment = this.recipeAssignments.find(a => 
+      a.date === dateString && a.mealType === mealType
+    );
+    return assignment?.servingCount || 2; // Default to 2 if not set
+  }
+
+  updateServingCount(date: Date, mealType: 'breakfast' | 'lunch' | 'dinner', event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    const servingCount = parseInt(target.value, 10);
+    
+    if (servingCount && servingCount > 0) {
+      // Use the same date formatting as the parent component
+      const dateString = this.formatDateAsString(date);
+      const assignment = this.recipeAssignments.find(a => 
+        a.date === dateString && a.mealType === mealType
+      );
+      
+      if (assignment) {
+        assignment.servingCount = servingCount;
+        // Emit event to save changes to database
+        this.servingCountChanged.emit({
+          mealType: mealType,
+          date: date,
+          servingCount: servingCount
+        });
+      }
+    }
   }
 }

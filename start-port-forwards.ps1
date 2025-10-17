@@ -43,10 +43,10 @@ $webPort = 8080
 $apiPort = 8081
 
 Write-Host "Starting web port forward (localhost:$webPort -> pod:4200)..." -ForegroundColor Cyan
-Start-Process -FilePath "kubectl" -ArgumentList "port-forward", "--address", "0.0.0.0", "service/meal-week-planner-web-service", "$webPort`:4200" -WindowStyle Hidden
+Start-Process -FilePath "kubectl" -ArgumentList "port-forward", "--address", "0.0.0.0", "service/meal-week-planner-web-service", "$webPort`:4200" -WindowStyle Hidden -RedirectStandardOutput "nul" -RedirectStandardError "nul2"
 
 Write-Host "Starting API port forward (localhost:$apiPort -> pod:4201)..." -ForegroundColor Cyan
-Start-Process -FilePath "kubectl" -ArgumentList "port-forward", "--address", "0.0.0.0", "service/meal-week-planner-api-service", "$apiPort`:4201" -WindowStyle Hidden
+Start-Process -FilePath "kubectl" -ArgumentList "port-forward", "--address", "0.0.0.0", "service/meal-week-planner-api-service", "$apiPort`:4201" -WindowStyle Hidden -RedirectStandardOutput "nul" -RedirectStandardError "nul2"
 
 # Wait for port forwards to establish
 Write-Host "`nWaiting for port forwards to establish..." -ForegroundColor Yellow

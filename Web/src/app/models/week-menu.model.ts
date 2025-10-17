@@ -1,8 +1,11 @@
 export interface WeekDay {
   dayOfWeek: number; // 0 = Sunday, 1 = Monday, etc.
   breakfastRecipeId?: string;
+  breakfastServingCount?: number;
   lunchRecipeId?: string;
+  lunchServingCount?: number;
   dinnerRecipeId?: string;
+  dinnerServingCount?: number;
 }
 
 export interface WeekMenu {

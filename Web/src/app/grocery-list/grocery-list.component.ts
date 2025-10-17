@@ -3,9 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { PageTitleService } from '../services/page-title.service';
-import { GroceryListService } from '../services/grocery-list.service';
-import { RecipeService } from '../services/recipe.service';
-import { WeekMenuService } from '../services/week-menu.service';
+import { OfflineDataService } from '../services/offline-data.service';
 import { GroceryList, Meal } from '../models/grocery-list.model';
 import { Recipe } from '../models/recipe.model';
 import { WeekMenu } from '../models/week-menu.model';
@@ -53,9 +51,7 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
 
   constructor(
     private pageTitleService: PageTitleService,
-    private groceryListService: GroceryListService,
-    private recipeService: RecipeService,
-    private weekMenuService: WeekMenuService,
+    private offlineDataService: OfflineDataService,
     private router: Router,
     private translateService: TranslateService
   ) {}
@@ -73,7 +69,7 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
     this.isLoading = true;
     this.errorMessage = null;
 
-    this.groceryListService.getAllGroceryLists().subscribe({
+    this.offlineDataService.getAllGroceryLists().subscribe({
       next: (groceryLists) => {
         this.loadGroceryListsWithRecipes(groceryLists);
       },
@@ -112,7 +108,7 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
 
     // Fetch all recipes in parallel
     const recipeObservables = Array.from(recipeIds).map(id =>
-      this.recipeService.getRecipeById(id).pipe(
+      this.offlineDataService.getRecipeById(id).pipe(
         catchError((error) => {
           console.error(`Error fetching recipe ${id}:`, error);
           return of(null); // Return null for failed requests
@@ -169,7 +165,7 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
 
     // Fetch all recipes in parallel
     const recipeObservables = Array.from(recipeIds).map(id =>
-      this.recipeService.getRecipeById(id).pipe(
+      this.offlineDataService.getRecipeById(id).pipe(
         catchError((error) => {
           console.error(`Error fetching recipe ${id}:`, error);
           return of(null); // Return null for failed requests
@@ -305,7 +301,7 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
     this.isDeleting = true;
     this.errorMessage = null;
 
-    this.groceryListService.deleteGroceryList(groceryListId).subscribe({
+    this.offlineDataService.deleteGroceryList(groceryListId).subscribe({
       next: () => {
         this.isDeleting = false;
         
@@ -345,7 +341,7 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
   }
 
   private loadWeekMenus(): void {
-    this.weekMenuService.getWeekMenus().subscribe({
+    this.offlineDataService.getAllWeekMenus().subscribe({
       next: (weekMenus) => {
         this.convertWeekMenusToRecipeAssignments(weekMenus);
       },
@@ -376,7 +372,7 @@ export class GroceryListComponent implements OnInit, AfterViewInit {
     
     // Fetch all recipes in parallel
     const recipeObservables = Array.from(recipeIdsToFetch).map(id =>
-      this.recipeService.getRecipeById(id).pipe(
+      this.offlineDataService.getRecipeById(id).pipe(
         catchError((error) => {
           console.error(`Error fetching recipe ${id}:`, error);
           return of(null);

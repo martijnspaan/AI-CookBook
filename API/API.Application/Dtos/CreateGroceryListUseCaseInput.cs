@@ -7,4 +7,5 @@ public record CreateGroceryListUseCaseInput(
 public record GroceryListMealInput(
     string DayOfMeal, // This will be an ISO 8601 date string
     string MealType,
-    string? RecipeId = null);
+    string? RecipeId = null,
+    int? ServingCount = null);

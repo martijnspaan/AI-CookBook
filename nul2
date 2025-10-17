@@ -1,0 +1,1 @@
+E1017 16:59:50.036233   36924 portforward.go:394] error copying from local connection to remote stream: read tcp4 127.0.0.1:8080->127.0.0.1:52668: wsarecv: An existing connection was forcibly closed by the remote host.

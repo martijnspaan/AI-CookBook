@@ -45,6 +45,15 @@
                   <small class="recipe-title">
                     {{ getRecipeForMealSlot(day.date, meal.type) }}
                   </small>
+                  <div class="serving-count-container">
+                    <select 
+                      class="serving-count-select" 
+                      [value]="getServingCountForMealSlot(day.date, meal.type)"
+                      (change)="updateServingCount(day.date, meal.type, $event)"
+                      title="Number of people">
+                      <option *ngFor="let count of servingCountOptions" [value]="count">{{ count }}</option>
+                    </select>
+                  </div>
                   <button 
                     type="button"
                     class="btn-remove-recipe"

@@ -105,6 +105,7 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<GetAllGroceryListsUseCase>();
         services.AddScoped<DeleteGroceryListUseCase>();
         services.AddScoped<UpdateIngredientStateUseCase>();
+        services.AddScoped<RecalculateGroceryListUseCase>();
         services.AddScoped<GetRecipeSettingsUseCase>();
         services.AddScoped<UpdateRecipeSettingsUseCase>();
 

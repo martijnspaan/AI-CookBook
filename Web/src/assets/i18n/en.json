@@ -90,6 +90,9 @@
     "NO_COOKBOOK": "No cookbook",
     "PAGE": "Page",
     "PAGE_PLACEHOLDER": "Page number in cookbook",
+    "SERVING_SIZE": "Serving Size",
+    "SERVING_SIZE_PLACEHOLDER": "Number of people",
+    "PEOPLE": "people",
     "MEAL_CATEGORIES_LABEL": "Meal Categories",
     "INGREDIENTS": "Ingredients",
     "INGREDIENT_NAME_PLACEHOLDER": "Enter ingredient name",
@@ -112,7 +115,8 @@
   },
   "WEEK_MENU": {
     "SAVING_WEEK_MENU": "Saving week menu...",
-    "NEW_GROCERY_LIST": "New Grocery List"
+    "NEW_GROCERY_LIST": "New Grocery List",
+    "SERVING_COUNT": "Serving Count"
   },
   "GROCERY_LISTS": {
     "LOADING_GROCERY_LISTS": "Loading grocery lists...",

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { BaseRepository } from './base-repository';
 import { IndexedDBService } from '../offline/indexeddb.service';
 import { ConnectivityService } from '../offline/connectivity.service';
@@ -73,14 +74,18 @@ export class RecipeRepository extends BaseRepository<Recipe> {
    * Create new recipe with offline support
    */
   createNewRecipe(recipeRequest: CreateRecipeRequest): Observable<Recipe> {
-    return this.createEntityWithOfflineSupport(recipeRequest);
+    return this.createEntityWithOfflineSupport(recipeRequest).pipe(
+      map(recipe => recipe!)
+    );
   }
 
   /**
    * Update existing recipe with offline support
    */
   updateExistingRecipe(recipeId: string, recipeRequest: UpdateRecipeRequest): Observable<Recipe> {
-    return this.updateEntityWithOfflineSupport(recipeId, recipeRequest);
+    return this.updateEntityWithOfflineSupport(recipeId, recipeRequest).pipe(
+      map(recipe => recipe!)
+    );
   }
 
   /**

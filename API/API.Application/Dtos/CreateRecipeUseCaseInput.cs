@@ -10,4 +10,5 @@ public record CreateRecipeUseCaseInput(
     List<string> Recipe,
     string? CookbookId = null,
     int? Page = null,
-    List<string>? MealTypes = null);
+    List<string>? MealTypes = null,
+    int ServingSize = 2);

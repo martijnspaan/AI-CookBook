@@ -19,6 +19,7 @@ export interface MealSelection {
   recipeId: string;
   isSelected: boolean;
   isAlreadyUsed: boolean;
+  servingCount?: number;
 }
 
 @Component({
@@ -143,8 +144,9 @@ export class GroceryListDialogComponent implements OnInit, OnChanges {
           mealType: assignment.mealType,
           recipeTitle: assignment.recipeTitle,
           recipeId: assignment.recipeId,
-          isSelected: !isAlreadyUsed,
-          isAlreadyUsed: isAlreadyUsed
+          isSelected: false, // All meals unselected by default
+          isAlreadyUsed: isAlreadyUsed,
+          servingCount: assignment.servingCount
         });
       }
     });

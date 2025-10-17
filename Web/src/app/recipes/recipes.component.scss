@@ -305,16 +305,41 @@
   border-radius: 0.5rem;
   padding: 1rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: visible; // Ensure dropdowns are not clipped
 }
 
 .filter-dropdown {
   min-width: 200px;
   flex: 1;
   max-width: 300px;
+  position: relative;
+  z-index: 1; // Ensure proper stacking context
+  
+  // When wrapped, ensure the dropdown has enough space
+  &:first-child {
+    z-index: 2; // Higher z-index for the first dropdown to appear above others
+  }
+}
+
+// Responsive handling for filter section
+@media (max-width: 768px) {
+  .filter-section {
+    .d-flex {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    
+    .filter-dropdown {
+      min-width: 100%;
+      max-width: 100%;
+    }
+  }
 }
 
 .clear-filters-btn {
-  color: #6c757d;
+  
+  color: #dc3545;
   text-decoration: none;
   padding: 0.375rem 0.75rem;
   border-radius: 0.375rem;
@@ -326,6 +351,7 @@
   }
   
   &:disabled {
+    color: #6c757d;
     opacity: 0.5;
     cursor: not-allowed;
   }

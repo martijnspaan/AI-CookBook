@@ -29,6 +29,9 @@ public class RecipeEntity : BaseCosmosDbEntity
     [JsonProperty("MealTypes")]
     public List<string> MealTypes { get; set; } = new();
 
+    [JsonProperty("ServingSize")]
+    public int ServingSize { get; set; } = 2;
+
     public RecipeEntity()
     {
     }

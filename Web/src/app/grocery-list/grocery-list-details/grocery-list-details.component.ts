@@ -256,12 +256,17 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
 
     this.groceryList.meals.forEach(meal => {
       if (meal.recipe && meal.recipe.ingredients) {
+        // Calculate scale factor based on serving count
+        const servingCount = meal.servingCount || meal.recipe.servingSize || 2;
+        const scaleFactor = servingCount / meal.recipe.servingSize;
+        
         meal.recipe.ingredients.forEach(ingredient => {
           const key = ingredient.name.toLowerCase();
+          const scaledAmount = ingredient.amount.value * scaleFactor;
           
           if (ingredientMap.has(key)) {
             const existing = ingredientMap.get(key)!;
-            existing.totalAmount += ingredient.amount.value;
+            existing.totalAmount += scaledAmount;
             if (!existing.recipes.includes(meal.recipe!.title)) {
               existing.recipes.push(meal.recipe!.title);
             }
@@ -269,7 +274,7 @@ export class GroceryListDetailsComponent implements OnInit, OnDestroy {
             ingredientMap.set(key, {
               name: ingredient.name,
               type: ingredient.type,
-              totalAmount: ingredient.amount.value,
+              totalAmount: scaledAmount,
               unit: ingredient.amount.unit,
               recipes: [meal.recipe!.title],
               state: this.ingredientStates.get(key) || 'List'

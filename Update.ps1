@@ -238,9 +238,9 @@ function Show-Status {
     
     # Show access URLs
     Write-ColorOutput "`nAccess URLs:" $YELLOW
-    Write-ColorOutput "Web Application: http://localhost:$WEB_PORT" $GREEN
-    Write-ColorOutput "API Service: http://localhost:$API_PORT" $GREEN
-    Write-ColorOutput "API Health: http://localhost:$API_PORT/health" $GREEN
+    Write-ColorOutput "Web Application: http://localhost:8080" $GREEN
+    Write-ColorOutput "API Service: http://localhost:8081" $GREEN
+    Write-ColorOutput "API Health: http://localhost:8081/health" $GREEN
 }
 
 function Show-Logs {
@@ -371,12 +371,18 @@ switch ($Component.ToLower()) {
         Write-ColorOutput "`nRestarting port forwarding..." $BLUE
         try {
             # Kill existing kubectl processes
-            Get-Process | Where-Object {$_.ProcessName -like "*kubectl*"} | Stop-Process -Force -ErrorAction SilentlyContinue
-            Write-ColorOutput "Cleaned up existing port forwards" $GREEN
+            $kubectlProcesses = Get-Process -Name "kubectl" -ErrorAction SilentlyContinue
+            if ($kubectlProcesses) {
+                $kubectlProcesses | Stop-Process -Force
+                Write-ColorOutput "Cleaned up existing port forwards" $GREEN
+            }
+            
+            # Wait for cleanup
+            Start-Sleep -Seconds 2
             
             # Start new port forwards
-            Start-Process -FilePath "powershell" -ArgumentList "-Command", ".\start-port-forwards.ps1" -WindowStyle Hidden
-            Start-Sleep -Seconds 3
+            Start-Process -FilePath "powershell" -ArgumentList "-ExecutionPolicy", "Bypass", "-Command", ".\start-port-forwards.ps1" -WindowStyle Hidden
+            Start-Sleep -Seconds 5
             Write-ColorOutput "Port forwarding restarted successfully" $GREEN
         } catch {
             Write-ColorOutput "WARNING: Could not restart port forwarding automatically" $YELLOW

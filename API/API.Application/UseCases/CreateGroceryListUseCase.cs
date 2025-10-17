@@ -20,7 +20,8 @@ public class CreateGroceryListUseCase(ICosmosDbRepository<GroceryListEntity> rep
             List<Meal> meals = input.Meals.Select(mealInput => new Meal(
                 ParseDateTime(mealInput.DayOfMeal),
                 mealInput.MealType,
-                mealInput.RecipeId
+                mealInput.RecipeId,
+                mealInput.ServingCount
             )).ToList();
 
             GroceryListEntity groceryList = new GroceryListEntity

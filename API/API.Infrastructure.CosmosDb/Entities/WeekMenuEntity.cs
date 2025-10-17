@@ -22,5 +22,8 @@ public class WeekMenuEntity : BaseCosmosDbEntity
 public record WeekDay(
     [property: JsonProperty("dayOfWeek")] DayOfWeek DayOfWeek = DayOfWeek.Monday,
     [property: JsonProperty("breakfastRecipeId")] string? BreakfastRecipeId = null,
+    [property: JsonProperty("breakfastServingCount")] int? BreakfastServingCount = null,
     [property: JsonProperty("lunchRecipeId")] string? LunchRecipeId = null,
-    [property: JsonProperty("dinnerRecipeId")] string? DinnerRecipeId = null);
+    [property: JsonProperty("lunchServingCount")] int? LunchServingCount = null,
+    [property: JsonProperty("dinnerRecipeId")] string? DinnerRecipeId = null,
+    [property: JsonProperty("dinnerServingCount")] int? DinnerServingCount = null);

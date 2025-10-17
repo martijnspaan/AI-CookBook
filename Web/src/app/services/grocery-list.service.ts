@@ -48,6 +48,12 @@ export class GroceryListService {
     );
   }
 
+  recalculateGroceryList(groceryListId: string): Observable<GroceryList> {
+    return this.httpClient.post<GroceryList>(`${this.apiBaseUrl}/${groceryListId}/recalculate`, {}).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'An unknown error occurred';
     

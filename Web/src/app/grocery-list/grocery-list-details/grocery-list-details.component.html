@@ -25,8 +25,13 @@
         <div class="meals-overview">
           <div class="meals-list-compact">
             <div *ngFor="let meal of groceryList.meals" class="meal-item-row">
-              <span class="meal-name">{{ meal.recipeTitle || 'Loading...' }}</span>
-              <span class="badge bg-primary meal-type-badge">{{ getMealTypeLabel(meal.mealType) }}</span>
+              <div class="meal-info">
+                <span class="meal-name">{{ meal.recipeTitle || 'Loading...' }}</span>
+                <span class="badge bg-primary meal-type-badge">{{ getMealTypeLabel(meal.mealType) }}</span>
+              </div>
+              <div class="meal-serving-info" *ngIf="meal.servingCount">
+                <span class="serving-count-badge">{{ meal.servingCount }} {{ 'RECIPES.PEOPLE' | translate }}</span>
+              </div>
             </div>
           </div>
         </div>

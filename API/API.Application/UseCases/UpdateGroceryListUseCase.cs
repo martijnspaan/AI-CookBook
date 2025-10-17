@@ -31,7 +31,8 @@ public class UpdateGroceryListUseCase(ICosmosDbRepository<GroceryListEntity> rep
             List<Meal> meals = input.Meals.Select(mealInput => new Meal(
                 ParseDateTime(mealInput.DayOfMeal),
                 mealInput.MealType,
-                mealInput.RecipeId
+                mealInput.RecipeId,
+                mealInput.ServingCount
             )).ToList();
 
             // Update the existing grocery list

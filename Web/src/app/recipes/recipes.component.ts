@@ -5,8 +5,7 @@ import { FormBuilder, FormGroup, FormArray, FormControl, Validators, ReactiveFor
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { RecipeService } from '../services/recipe.service';
-import { CookbookService } from '../services/cookbook.service';
+import { OfflineDataService } from '../services/offline-data.service';
 import { RecipeModalService } from '../services/recipe-modal.service';
 import { RecipeSettingsService } from '../services/recipe-settings.service';
 import { MealTypeTranslationService } from '../services/meal-type-translation.service';
@@ -67,8 +66,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   };
 
   constructor(
-    private readonly recipeService: RecipeService,
-    private readonly cookbookService: CookbookService,
+    private readonly offlineDataService: OfflineDataService,
     private readonly recipeModalService: RecipeModalService,
     private readonly recipeSettingsService: RecipeSettingsService,
     private readonly mealTypeTranslationService: MealTypeTranslationService,
@@ -83,6 +81,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
       tags: this.formBuilder.array([]),
       cookbookId: [''],
       page: [null],
+      servingSize: [2, [Validators.required, Validators.min(1)]],
       mealTypes: this.formBuilder.array([]),
       ingredients: this.formBuilder.array([]),
       recipeSteps: this.formBuilder.array([])
@@ -134,7 +133,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     this.isLoadingRecipes = true;
     this.errorMessage = null;
     
-    this.recipeService.getAllRecipes()
+    this.offlineDataService.getAllRecipes()
       .pipe(takeUntil(this.destroySubject))
       .subscribe({
         next: (recipes) => {
@@ -153,7 +152,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
   loadAllCookbooks(): void {
     this.isLoadingCookbooks = true;
     
-    this.cookbookService.getAllCookbooks()
+    this.offlineDataService.getAllCookbooks()
       .pipe(takeUntil(this.destroySubject))
       .subscribe({
         next: (cookbooks) => {
@@ -238,7 +237,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
     
     const confirmationMessage = `Are you sure you want to delete "${recipe.title}"?`;
     if (confirm(confirmationMessage)) {
-      this.recipeService.deleteRecipeById(recipe.id)
+      this.offlineDataService.deleteRecipe(recipe.id)
         .pipe(takeUntil(this.destroySubject))
         .subscribe({
           next: () => {
@@ -356,7 +355,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
       const createRecipeRequest = this.buildCreateRecipeRequest(formData);
       
 
-      this.recipeService.createNewRecipe(createRecipeRequest)
+      this.offlineDataService.createRecipe(createRecipeRequest)
         .pipe(takeUntil(this.destroySubject))
         .subscribe({
           next: (createdRecipe) => {
@@ -387,6 +386,7 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
       recipe: recipeSteps,
       cookbookId: formData.cookbookId || undefined,
       page: formData.page || undefined,
+      servingSize: formData.servingSize || 2,
       mealTypes: mealTypes
     };
   }

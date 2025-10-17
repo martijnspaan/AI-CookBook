@@ -2,6 +2,7 @@ export interface Meal {
   dayOfMeal: string;
   mealType: string;
   recipeId?: string;
+  servingCount?: number;
 }
 
 export interface IngredientState {

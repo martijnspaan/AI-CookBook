@@ -63,6 +63,7 @@ interface RecipeData {
   cookbookId?: string;
   page?: number;
   mealTypes: string[];
+  servingSize: number;
   createdAt?: Date;
   updatedAt?: Date;
   lastSyncAt?: Date;
@@ -220,6 +221,13 @@ export class IndexedDBService {
   async deleteRecipe(id: string): Promise<void> {
     const db = await this.getDb();
     await db.delete('recipes', id);
+  }
+
+  // Generic method for getting entities by ID
+  async getEntityById<T>(entityType: 'recipe' | 'cookbook' | 'groceryList' | 'weekMenu', id: string): Promise<T | undefined> {
+    const db = await this.getDb();
+    const storeName = entityType + 's' as 'recipes' | 'cookbooks' | 'groceryLists' | 'weekMenus';
+    return await db.get(storeName, id) as T | undefined;
   }
 
   // ========== COOKBOOKS OPERATIONS ==========

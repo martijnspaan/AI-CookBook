@@ -239,6 +239,7 @@ export class RecipeDetailComponent implements OnInit, OnDestroy, AfterViewInit {
       recipe: this.editedRecipe.recipe,
       cookbookId: this.editedRecipe.cookbookId,
       page: this.editedRecipe.page,
+      servingSize: this.editedRecipe.servingSize,
       mealTypes: this.editedRecipe.mealTypes
     };
 
