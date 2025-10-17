@@ -15,6 +15,12 @@ export class PwaService {
   constructor(private swUpdate: SwUpdate) {
     this.setupInstallPrompt();
     this.setupUpdateNotifications();
+    
+    // Check for updates on page load and when app becomes visible
+    if (this.swUpdate.isEnabled) {
+      this.checkForUpdatesOnPageLoad();
+      this.setupVisibilityChangeListener();
+    }
   }
 
   /**
@@ -54,10 +60,13 @@ export class PwaService {
    */
   private setupUpdateNotifications(): void {
     if (this.swUpdate.isEnabled) {
-      // Check for updates every 6 hours
+      // Check for updates periodically (every 5 minutes)
+      // This provides a reasonable balance between responsiveness and performance
+      const checkInterval = 5 * 60 * 1000; // 5 minutes
+      
       setInterval(() => {
         this.swUpdate.checkForUpdate();
-      }, 6 * 60 * 60 * 1000);
+      }, checkInterval);
 
       // Listen for available updates
       this.swUpdate.versionUpdates
@@ -200,21 +209,6 @@ export class PwaService {
     return '1.0.0'; // This could be dynamically retrieved from package.json
   }
 
-  /**
-   * Check if the app needs to be updated
-   */
-  async checkForUpdates(): Promise<boolean> {
-    if (this.swUpdate.isEnabled) {
-      try {
-        const updateAvailable = await this.swUpdate.checkForUpdate();
-        return updateAvailable;
-      } catch (error) {
-        console.error('Error checking for updates:', error);
-        return false;
-      }
-    }
-    return false;
-  }
 
   /**
    * Force update the app
@@ -228,6 +222,155 @@ export class PwaService {
         console.error('Error forcing update:', error);
       }
     }
+  }
+
+  /**
+   * Check for updates on page load and handle them intelligently
+   */
+  private async checkForUpdatesOnPageLoad(): Promise<void> {
+    if (!this.swUpdate.isEnabled) {
+      return;
+    }
+
+    try {
+      const updateFound = await this.swUpdate.checkForUpdate();
+      
+      if (updateFound) {
+        console.log('Update found on page load');
+        
+        // Check if this is a fresh page load (not a navigation within the app)
+        const isFreshPageLoad = performance.navigation?.type === 0 || 
+                               performance.navigation?.type === 1;
+        
+        if (isFreshPageLoad) {
+          // For fresh page loads, automatically activate the update
+          console.log('Fresh page load detected - activating update automatically');
+          await this.swUpdate.activateUpdate();
+          // Don't reload here as the user just loaded the page
+        } else {
+          // For navigation within the app, prompt the user
+          console.log('Navigation detected - prompting user for update');
+          this.promptUserUpdate();
+        }
+      }
+    } catch (error) {
+      console.error('Error checking for updates on page load:', error);
+    }
+  }
+
+  /**
+   * Setup listener for when the app becomes visible (user switches back to tab)
+   */
+  private setupVisibilityChangeListener(): void {
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && this.swUpdate.isEnabled) {
+        console.log('App became visible - checking for updates');
+        this.swUpdate.checkForUpdate();
+      }
+    });
+  }
+
+  /**
+   * Manually check for updates
+   */
+  async checkForUpdates(): Promise<boolean> {
+    if (this.swUpdate.isEnabled) {
+      try {
+        console.log('Manual update check started...');
+        const updateFound = await this.swUpdate.checkForUpdate();
+        console.log('Manual update check completed. Update found:', updateFound);
+        
+        if (updateFound) {
+          console.log('Update found, attempting to activate...');
+          await this.swUpdate.activateUpdate();
+          console.log('Update activated, reloading page...');
+          window.location.reload();
+        }
+        
+        return updateFound;
+      } catch (error) {
+        console.error('Error checking for updates:', error);
+        return false;
+      }
+    } else {
+      console.log('Service worker updates are not enabled');
+      return false;
+    }
+  }
+
+  /**
+   * Force check for updates and apply immediately
+   */
+  async forceCheckAndUpdate(): Promise<void> {
+    console.log('Force checking for updates...');
+    try {
+      const updateFound = await this.checkForUpdates();
+      if (!updateFound) {
+        console.log('No updates found');
+      }
+    } catch (error) {
+      console.error('Error in force check and update:', error);
+    }
+  }
+
+  /**
+   * Clear service worker cache and force reload
+   */
+  async clearCacheAndReload(): Promise<void> {
+    console.log('Clearing service worker cache...');
+    try {
+      if ('serviceWorker' in navigator) {
+        const registration = await navigator.serviceWorker.getRegistration();
+        if (registration) {
+          // Clear all caches
+          const cacheNames = await caches.keys();
+          await Promise.all(
+            cacheNames.map(cacheName => caches.delete(cacheName))
+          );
+          console.log('All caches cleared');
+          
+          // Unregister current service worker
+          await registration.unregister();
+          console.log('Service worker unregistered');
+          
+          // Reload the page to trigger fresh registration
+          window.location.reload();
+        }
+      }
+    } catch (error) {
+      console.error('Error clearing cache:', error);
+    }
+  }
+
+  /**
+   * Force a hard refresh bypassing cache
+   */
+  forceHardRefresh(): void {
+    console.log('Forcing hard refresh...');
+    // Clear all caches and reload
+    if ('caches' in window) {
+      caches.keys().then(cacheNames => {
+        cacheNames.forEach(cacheName => {
+          caches.delete(cacheName);
+        });
+        (window as any).location.reload();
+      });
+    } else {
+      (window as any).location.reload();
+    }
+  }
+
+  /**
+   * Expose methods to window for console access
+   */
+  exposeToWindow(): void {
+    (window as any).pwaService = {
+      clearCacheAndReload: () => this.clearCacheAndReload(),
+      forceHardRefresh: () => this.forceHardRefresh(),
+      forceCheckAndUpdate: () => this.forceCheckAndUpdate(),
+      checkForUpdates: () => this.checkForUpdates()
+    };
+    console.log('PWA service methods exposed to window.pwaService');
   }
 }
 

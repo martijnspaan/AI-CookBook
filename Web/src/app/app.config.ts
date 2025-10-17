@@ -35,8 +35,8 @@ export const appConfig: ApplicationConfig = {
         defaultLanguage: 'en'
       })
     ), provideServiceWorker('ngsw-worker.js', {
-            enabled: !isDevMode(),
-            registrationStrategy: 'registerWhenStable:30000'
+            enabled: true,
+            registrationStrategy: 'registerImmediately'
           })
   ]
 };

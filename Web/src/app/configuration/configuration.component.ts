@@ -41,6 +41,7 @@ export class ConfigurationComponent implements OnInit {
 
   ngOnInit(): void {
     this.pageTitleService.setPageTitle('Recipe Settings');
+
     this.updateAccordionSections();
   }
 

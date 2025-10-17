@@ -13,6 +13,7 @@ import { GroceryListDialogService } from './services/grocery-list-dialog.service
 import { RecipeSelectionDialogService, RecipeSelectionDialogData } from './services/recipe-selection-dialog.service';
 import { FooterService, FooterButtonConfig } from './services/footer.service';
 import { LanguageService } from './services/language.service';
+import { PwaService } from './services/offline/pwa.service';
 import { filter, takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { Recipe } from './models/recipe.model';
@@ -71,13 +72,17 @@ export class AppComponent implements OnInit, OnDestroy {
     private recipeSelectionDialogService: RecipeSelectionDialogService,
     private footerService: FooterService,
     private translate: TranslateService,
-    private languageService: LanguageService
+    private languageService: LanguageService,
+    private pwaService: PwaService
   ) {}
 
   ngOnInit(): void {
     // Initialize language service first to restore user's language preference
     // The language service will automatically load the saved language from localStorage
     // and set it as the current language for the translation service
+    
+    // Expose PWA service to window for console access
+    this.pwaService.exposeToWindow();
     
     // Set initial page title
     this.pageTitleService.setPageTitleFromTranslation('PAGE_TITLES.AI_COOKBOOK');

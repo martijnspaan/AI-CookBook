@@ -148,7 +148,8 @@ function Deploy-Secrets {
 function Deploy-Application {
     param(
         [string]$ManifestPath,
-        [string]$AppName
+        [string]$AppName,
+        [string]$DeploymentName
     )
     
     Write-ColorOutput "Deploying $AppName..." $BLUE
@@ -163,6 +164,15 @@ function Deploy-Application {
         if ($LASTEXITCODE -ne 0) {
             Write-ColorOutput "ERROR: Failed to deploy $AppName" $RED
             exit 1
+        }
+        
+        # Force rollout restart to ensure pods pick up latest images
+        Write-ColorOutput "Restarting deployment $DeploymentName to pick up latest images..." $BLUE
+        kubectl rollout restart deployment/$DeploymentName
+        if ($LASTEXITCODE -ne 0) {
+            Write-ColorOutput "WARNING: Failed to restart deployment $DeploymentName" $YELLOW
+        } else {
+            Write-ColorOutput "Successfully restarted deployment $DeploymentName" $GREEN
         }
         
         Write-ColorOutput "Successfully deployed $AppName" $GREEN
@@ -284,21 +294,30 @@ switch ($Component.ToLower()) {
     "web" {
         Test-Prerequisites
         if (-not $SkipBuild) {
-            $webImage = Build-Image $WEB_IMAGE $ImageTag "Web"
+            Build-Image $WEB_IMAGE $ImageTag "Web" | Out-Null
             Load-ImageToKind $WEB_IMAGE $ImageTag
         }
-        Deploy-Application "deploy/k8s/web-deployment.yaml" "Web Application"
+        Deploy-Application "deploy/k8s/web-deployment.yaml" "Web Application" "meal-week-planner-web"
         Wait-For-Deployment "meal-week-planner-web"
+        Write-ColorOutput "Forcing service worker update check..." $BLUE
+        Start-Sleep -Seconds 5  # Wait for pod to be fully ready
+        try {
+            # Trigger service worker update check via the Angular service worker API
+            Invoke-WebRequest -Uri "http://localhost/ngsw/state" -UseBasicParsing | Out-Null
+            Write-ColorOutput "Service worker update check triggered" $GREEN
+        } catch {
+            Write-ColorOutput "WARNING: Could not trigger service worker update check" $YELLOW
+        }
         Show-Status
     }
     "api" {
         Test-Prerequisites
         Deploy-Secrets
         if (-not $SkipBuild) {
-            $apiImage = Build-Image $API_IMAGE $ImageTag "API"
+            Build-Image $API_IMAGE $ImageTag "API" | Out-Null
             Load-ImageToKind $API_IMAGE $ImageTag
         }
-        Deploy-Application "deploy/k8s/api-deployment.yaml" "API Application"
+        Deploy-Application "deploy/k8s/api-deployment.yaml" "API Application" "meal-week-planner-api"
         Wait-For-Deployment "meal-week-planner-api"
         Show-Status
     }
@@ -317,12 +336,22 @@ switch ($Component.ToLower()) {
         }
         
         # Deploy both applications
-        Deploy-Application "deploy/k8s/api-deployment.yaml" "API Application"
-        Deploy-Application "deploy/k8s/web-deployment.yaml" "Web Application"
+        Deploy-Application "deploy/k8s/api-deployment.yaml" "API Application" "meal-week-planner-api"
+        Deploy-Application "deploy/k8s/web-deployment.yaml" "Web Application" "meal-week-planner-web"
         
         # Wait for deployments
         Wait-For-Deployment "meal-week-planner-api"
         Wait-For-Deployment "meal-week-planner-web"
+        
+        Write-ColorOutput "Forcing service worker update check..." $BLUE
+        Start-Sleep -Seconds 5  # Wait for pods to be fully ready
+        try {
+            # Trigger service worker update check via the Angular service worker API
+            Invoke-WebRequest -Uri "http://localhost/ngsw/state" -UseBasicParsing | Out-Null
+            Write-ColorOutput "Service worker update check triggered" $GREEN
+        } catch {
+            Write-ColorOutput "WARNING: Could not trigger service worker update check" $YELLOW
+        }
         
         Show-Status
         
