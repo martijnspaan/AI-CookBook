@@ -11,27 +11,30 @@
       <div class="spinner"></div>
     </div>
 
-    <!-- Week Calendar -->
-    <app-week-calendar 
-      *ngIf="!isCalendarLoading"
-      [selectedWeek]="selectedWeek"
-      [recipeAssignments]="recipeAssignments"
-      [selectedMealSlot]="selectedMealSlot"
-      (weekChanged)="onWeekChanged($event)"
-      (mealSlotClicked)="onMealSlotClicked($event.mealType, $event.date)">
-    </app-week-calendar>
+    <!-- Two Column Layout -->
+    <div *ngIf="!isCalendarLoading" class="two-column-layout">
+      <!-- Left Column: Week Calendar -->
+      <div class="left-column">
+        <app-week-calendar 
+          [selectedWeek]="selectedWeek"
+          [recipeAssignments]="recipeAssignments"
+          [selectedMealSlot]="selectedMealSlot"
+          (weekChanged)="onWeekChanged($event)"
+          (recipeDropped)="onRecipeDropped($event)"
+          (recipeRemoved)="onRecipeRemoved($event)">
+        </app-week-calendar>
+      </div>
 
-
-    <!-- Recipe Selection Dialog -->
-    <app-recipe-selection-dialog
-      [isVisible]="showRecipeSelectionDialog"
-      [selectedMealType]="selectedMealType"
-      [selectedDate]="selectedDate"
-      [currentRecipe]="currentRecipe"
-      (recipeSelected)="onRecipeSelected($event)"
-      (recipeRemoved)="onRecipeRemoved($event)"
-      (dialogClosed)="onDialogClosed()">
-    </app-recipe-selection-dialog>
+      <!-- Right Column: Recipe Grid -->
+      <div class="right-column">
+        <app-recipe-grid
+          [recipes]="recipes"
+          [isLoadingRecipes]="isLoadingRecipes"
+          [errorMessage]="errorMessage"
+          (recipeSelected)="onRecipeSelected($event)">
+        </app-recipe-grid>
+      </div>
+    </div>
 
     <!-- Grocery List Dialog -->
     <app-grocery-list-dialog

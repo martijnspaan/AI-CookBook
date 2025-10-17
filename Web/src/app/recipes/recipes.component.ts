@@ -525,6 +525,11 @@ export class RecipesComponent implements OnInit, OnDestroy, AfterViewInit {
         return true;
       }
       
+      // Search in description
+      if (recipe.description?.toLowerCase().includes(query)) {
+        return true;
+      }
+      
       // Search in tags
       if (recipe.tags.some(tag => tag.toLowerCase().includes(query))) {
         return true;

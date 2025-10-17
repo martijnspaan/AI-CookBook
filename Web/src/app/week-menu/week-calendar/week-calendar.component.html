@@ -8,33 +8,51 @@
         [class.today]="isToday(day.date)"
         [class.weekend]="day.isWeekend">
         
-        <div class="day-header">
-          <span class="day-name">{{ day.dayName }}</span>
-          <span class="day-number">{{ day.dayNumber }}</span>
-          <span class="day-month">{{ day.month }}</span>
-        </div>
-        
-        <div class="day-content">
+        <div class="day-row">
+          <div class="day-header">
+            <span class="day-name">{{ day.dayName }}</span>
+            <div class="date-info">
+              <span class="day-number">{{ day.dayNumber }}</span>
+              <span class="day-month">{{ day.month }}</span>
+            </div>
+          </div>
+          
           <div class="meal-slots">
             <div 
               *ngFor="let meal of mealSlots" 
               class="meal-slot"
               [class.weekend-meal]="day.isWeekend"
-              [class.selected]="isMealSlotSelected(day.date, meal.type)">
-              <div class="meal-label">{{ meal.label }}</div>
+              [class.selected]="isMealSlotSelected(day.date, meal.type)"
+              [class.has-recipe]="getRecipeForMealSlot(day.date, meal.type)"
+              [class.drag-over]="isMealSlotDragOver(meal.type, day.date)"
+              (dragover)="onDragOver($event, meal.type, day.date)"
+              (dragleave)="onDragLeave($event)"
+              (drop)="onDrop($event, meal.type, day.date)">
+              <div class="meal-label">
+                {{ meal.label }}
+              </div>
               <div 
                 class="meal-placeholder"
-                (click)="onMealSlotClick(meal.type, day.date)">
+                [class.drop-zone]="true">
                 <small 
                   *ngIf="!getRecipeForMealSlot(day.date, meal.type)" 
                   class="text-muted">
-                  Select recipe
+                  Drop recipe here
                 </small>
-                <small 
+                <div 
                   *ngIf="getRecipeForMealSlot(day.date, meal.type)" 
-                  class="recipe-title">
-                  {{ getRecipeForMealSlot(day.date, meal.type) }}
-                </small>
+                  class="recipe-title-container">
+                  <small class="recipe-title">
+                    {{ getRecipeForMealSlot(day.date, meal.type) }}
+                  </small>
+                  <button 
+                    type="button"
+                    class="btn-remove-recipe"
+                    (click)="removeRecipeFromSlot(meal.type, day.date)"
+                    title="Remove recipe">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </div>

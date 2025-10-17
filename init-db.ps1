@@ -800,30 +800,20 @@ $groceryList1 = @{
     meals = @()
 }
 
-# Add meals for next 5 days starting from today
-for ($i = 0; $i -lt 5; $i++) {
-    $mealDate = $today.AddDays($i).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
-    
-    # Add breakfast
-    $groceryList1.meals += @{
-        dayOfMeal = $mealDate
-        mealType = "breakfast"
-        recipeId = $breakfastRecipes[$i % $breakfastRecipes.Count].id
-    }
-    
-    # Add lunch
-    $groceryList1.meals += @{
-        dayOfMeal = $mealDate
-        mealType = "lunch"
-        recipeId = $lunchRecipes[$i % $lunchRecipes.Count].id
-    }
-    
-    # Add dinner
-    $groceryList1.meals += @{
-        dayOfMeal = $mealDate
-        mealType = "dinner"
-        recipeId = $dinnerRecipes[$i % $dinnerRecipes.Count].id
-    }
+$mealDate = $today.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
+
+# Add breakfast
+$groceryList1.meals += @{
+    dayOfMeal = $mealDate
+    mealType = "breakfast"
+    recipeId = $breakfastRecipes[0].id
+}
+
+# Add dinner
+$groceryList1.meals += @{
+    dayOfMeal = $mealDate
+    mealType = "dinner"
+    recipeId = $dinnerRecipes[0].id
 }
 
 $groceryList1Response = Invoke-ApiRequest -Method "POST" -Uri "$ApiBaseUrl/api/grocerylists" -Body $groceryList1
@@ -835,30 +825,20 @@ $groceryList2 = @{
     meals = @()
 }
 
-# Add weekend meals (days 5-6 from today)
-for ($i = 5; $i -le 6; $i++) {
-    $mealDate = $today.AddDays($i).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
-    
-    # Add breakfast
-    $groceryList2.meals += @{
-        dayOfMeal = $mealDate
-        mealType = "breakfast"
-        recipeId = $breakfastRecipes[$i % $breakfastRecipes.Count].id
-    }
-    
-    # Add lunch
-    $groceryList2.meals += @{
-        dayOfMeal = $mealDate
-        mealType = "lunch"
-        recipeId = $lunchRecipes[$i % $lunchRecipes.Count].id
-    }
-    
-    # Add dinner
-    $groceryList2.meals += @{
-        dayOfMeal = $mealDate
-        mealType = "dinner"
-        recipeId = $dinnerRecipes[$i % $dinnerRecipes.Count].id
-    }
+$mealDate = $today.AddDays($i).ToString("yyyy-MM-ddTHH:mm:ss.fffZ")    
+
+# Add lunch
+$groceryList2.meals += @{
+    dayOfMeal = $mealDate
+    mealType = "lunch"
+    recipeId = $lunchRecipes[1].id
+}
+
+# Add dinner
+$groceryList2.meals += @{
+    dayOfMeal = $mealDate
+    mealType = "dinner"
+    recipeId = $dinnerRecipes[1].id
 }
 
 $groceryList2Response = Invoke-ApiRequest -Method "POST" -Uri "$ApiBaseUrl/api/grocerylists" -Body $groceryList2

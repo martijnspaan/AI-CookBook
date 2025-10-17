@@ -58,7 +58,8 @@
   margin-top: 56px; // Height of fixed header
   overflow-y: auto;
   overflow-x: hidden;
-  height: calc(100vh - 56px); // Full height minus header
+  height: calc(100vh - 56px); // Full height minus header  
+  background-color: white;
   
   @media (max-width: 450px) {
     margin-top: 48px; // Height of fixed header on mobile
@@ -80,6 +81,8 @@
 .content-wrapper {
   height: 100%;
   width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
   padding: 1.5rem;
   
   @media (max-width: 450px) {

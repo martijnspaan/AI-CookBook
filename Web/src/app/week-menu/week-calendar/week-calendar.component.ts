@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, ViewChild, ElementRef, AfterViewInit, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { Recipe } from '../../models/recipe.model';
 
 export interface WeekDate {
   date: Date;
@@ -36,6 +37,8 @@ export class WeekCalendarComponent implements AfterViewInit, OnChanges {
   @Input() selectedMealSlot: { mealType: 'breakfast' | 'lunch' | 'dinner'; date: Date } | null = null;
   @Output() weekChanged = new EventEmitter<Date>();
   @Output() mealSlotClicked = new EventEmitter<{ mealType: 'breakfast' | 'lunch' | 'dinner'; date: Date }>();
+  @Output() recipeDropped = new EventEmitter<{ recipe: Recipe; mealType: 'breakfast' | 'lunch' | 'dinner'; date: Date }>();
+  @Output() recipeRemoved = new EventEmitter<{ mealType: 'breakfast' | 'lunch' | 'dinner'; date: Date }>();
 
   @ViewChild('scrollContainer', { static: false }) scrollContainer!: ElementRef;
 
@@ -43,6 +46,10 @@ export class WeekCalendarComponent implements AfterViewInit, OnChanges {
   allDays: WeekDate[] = [];
   private readonly DAYS_TO_SHOW = 14; // Show 14 days starting from current day
   mealSlots: MealSlot[] = [];
+  
+  // Drag highlighting properties
+  isDragActive = false;
+  dragOverMealSlot: { mealType: 'breakfast' | 'lunch' | 'dinner'; date: Date } | null = null;
 
   constructor(private readonly translate: TranslateService) {
     this.initializeMealSlots();
@@ -67,6 +74,7 @@ export class WeekCalendarComponent implements AfterViewInit, OnChanges {
         this.scrollContainer.nativeElement.scrollTop = 0;
       }, 0);
     }
+    this.setupGlobalDragListeners();
   }
 
   ngOnChanges() {
@@ -164,5 +172,73 @@ export class WeekCalendarComponent implements AfterViewInit, OnChanges {
     if (!this.selectedMealSlot) return false;
     return this.selectedMealSlot.date.toDateString() === date.toDateString() && 
            this.selectedMealSlot.mealType === mealType;
+  }
+
+  private setupGlobalDragListeners(): void {
+    // Listen for drag start events to detect when a recipe is being dragged
+    document.addEventListener('dragstart', (event) => {
+      if (event.target && (event.target as HTMLElement).closest('.recipe-card')) {
+        this.isDragActive = true;
+      }
+    });
+
+    // Listen for drag end events to reset highlighting
+    document.addEventListener('dragend', () => {
+      this.isDragActive = false;
+      this.dragOverMealSlot = null;
+    });
+  }
+
+  onDragOver(event: DragEvent, mealType: 'breakfast' | 'lunch' | 'dinner', date: Date): void {
+    event.preventDefault();
+    event.dataTransfer!.dropEffect = 'move';
+    
+    // Set the current drag over meal slot for highlighting
+    if (this.isDragActive) {
+      this.dragOverMealSlot = { mealType, date };
+    }
+  }
+
+  onDragLeave(event: DragEvent): void {
+    // Only clear if we're leaving the meal slot area entirely
+    const relatedTarget = event.relatedTarget as HTMLElement;
+    if (!relatedTarget || !relatedTarget.closest('.meal-slot')) {
+      this.dragOverMealSlot = null;
+    }
+  }
+
+  onDrop(event: DragEvent, mealType: 'breakfast' | 'lunch' | 'dinner', date: Date): void {
+    event.preventDefault();
+    
+    // Reset drag state
+    this.isDragActive = false;
+    this.dragOverMealSlot = null;
+    
+    try {
+      const recipeData = event.dataTransfer!.getData('application/json');
+      const recipe: Recipe = JSON.parse(recipeData);
+      
+      this.recipeDropped.emit({
+        recipe: recipe,
+        mealType: mealType,
+        date: date
+      });
+    } catch (error) {
+      console.error('Error parsing dropped recipe data:', error);
+    }
+  }
+
+  isMealSlotDragOver(mealType: 'breakfast' | 'lunch' | 'dinner', date: Date): boolean {
+    return this.isDragActive && 
+           this.dragOverMealSlot !== null &&
+           this.dragOverMealSlot.mealType === mealType &&
+           this.dragOverMealSlot.date.toDateString() === date.toDateString();
+  }
+
+  removeRecipeFromSlot(mealType: 'breakfast' | 'lunch' | 'dinner', date: Date): void {
+    this.recipeRemoved.emit({
+      mealType: mealType,
+      date: date
+    });
   }
 }

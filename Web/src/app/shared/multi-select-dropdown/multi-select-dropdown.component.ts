@@ -87,11 +87,6 @@ export class MultiSelectDropdownComponent implements OnInit, OnDestroy, OnChange
     this.selectionChanged.emit([]);
   }
 
-  selectAll(): void {
-    const availableOptions = this.filteredOptions.filter(option => !option.disabled);
-    this.selectedValues = availableOptions.map(option => option.value);
-    this.selectionChanged.emit([...this.selectedValues]);
-  }
 
   getDisplayText(): string {
     if (this.selectedValues.length === 0) {
@@ -132,8 +127,4 @@ export class MultiSelectDropdownComponent implements OnInit, OnDestroy, OnChange
     }
   }
 
-  areAllOptionsSelected(): boolean {
-    const availableOptions = this.filteredOptions.filter(option => !option.disabled);
-    return availableOptions.length > 0 && availableOptions.every(option => this.isSelected(option));
-  }
 }

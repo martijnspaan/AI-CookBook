@@ -1,0 +1,51 @@
+<div class="recipe-filter-section">
+  <div class="d-flex align-items-center gap-3 flex-wrap">
+    <!-- Meal Type Filter -->
+    <div *ngIf="showMealTypeFilter" class="filter-dropdown">
+      <app-multi-select-dropdown
+        [options]="options.mealTypeOptions"
+        [selectedValues]="filterState.selectedMealTypeFilters"
+        [placeholder]="'RECIPES.ALL_MEAL_CATEGORIES' | translate"
+        [disabled]="isLoading">
+      </app-multi-select-dropdown>
+    </div>
+    
+    <!-- Cookbook Filter -->
+    <div *ngIf="showCookbookFilter" class="filter-dropdown">
+      <app-multi-select-dropdown
+        [options]="options.cookbookOptions"
+        [selectedValues]="filterState.selectedCookbookFilters"
+        [placeholder]="'RECIPES.ALL_COOKBOOKS' | translate"
+        [disabled]="isLoading">
+      </app-multi-select-dropdown>
+    </div>
+    
+    <!-- Clear Filters Button -->
+    <button 
+      type="button" 
+      class="btn btn-link btn-sm clear-filters-btn"
+      (click)="clearFilters()"
+      [disabled]="!hasActiveFilters()"
+      [title]="'RECIPES.CLEAR_FILTERS' | translate">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <!-- Search Section -->
+  <div *ngIf="showSearchFilter" class="search-section mt-3">
+    <div class="search-container position-relative">
+      <div class="input-group">
+        <span class="input-group-text">
+          <i class="fas fa-search"></i>
+        </span>
+        <input
+          type="text"
+          class="form-control"
+          [placeholder]="'RECIPES.SEARCH_PLACEHOLDER' | translate"
+          [value]="filterState.searchQuery"
+          (input)="onSearchInput($event)"
+          autocomplete="off">
+      </div>
+    </div>
+  </div>
+</div>

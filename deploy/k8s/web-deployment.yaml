@@ -21,7 +21,7 @@ spec:
         kubernetes.io/hostname: meal-week-planner-worker2
       containers:
       - name: web
-        image: docker.io/library/meal-week-planner-web:latest
+        image: meal-week-planner-web:latest
         imagePullPolicy: Never
         ports:
         - containerPort: 4200

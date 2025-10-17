@@ -47,23 +47,6 @@
         (click)="$event.stopPropagation()">
     </div>
 
-    <!-- Select All / Clear All Actions -->
-    <div *ngIf="filteredOptions.length > 0" class="action-buttons">
-      <button 
-        type="button"
-        class="action-button select-all"
-        (click)="selectAll()"
-        [disabled]="areAllOptionsSelected()">
-        Select All
-      </button>
-      <button 
-        type="button"
-        class="action-button clear-all"
-        (click)="clearSelection()"
-        [disabled]="selectedValues.length === 0">
-        Clear All
-      </button>
-    </div>
 
     <!-- Options List -->
     <div class="options-container">

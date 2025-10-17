@@ -4,8 +4,8 @@ import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { WeekCalendarComponent, RecipeAssignment } from './week-calendar/week-calendar.component';
 import { RecipeSelectionDialogService } from '../services/recipe-selection-dialog.service';
-import { RecipeSelectionDialogComponent } from './recipe-selection-dialog/recipe-selection-dialog.component';
 import { GroceryListDialogComponent, MealSelection } from './grocery-list-dialog/grocery-list-dialog.component';
+import { RecipeGridComponent } from './recipe-grid/recipe-grid.component';
 import { Recipe } from '../models/recipe.model';
 import { PageTitleService } from '../services/page-title.service';
 import { WeekMenuService } from '../services/week-menu.service';
@@ -20,7 +20,7 @@ import { takeUntil } from 'rxjs/operators';
 @Component({
   selector: 'app-week-menu',
   standalone: true,
-  imports: [CommonModule, WeekCalendarComponent, RecipeSelectionDialogComponent, GroceryListDialogComponent],
+  imports: [CommonModule, WeekCalendarComponent, GroceryListDialogComponent, RecipeGridComponent],
   templateUrl: './week-menu.component.html',
   styleUrl: './week-menu.component.scss'
 })
@@ -37,6 +37,8 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   allWeekMenus: WeekMenu[] = [];
   isSaving: boolean = false;
   isCalendarLoading: boolean = true;
+  isLoadingRecipes: boolean = false;
+  errorMessage: string | null = null;
   currentRecipe: Recipe | null = null;
   private destroySubject = new Subject<void>();
 
@@ -56,6 +58,7 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     this.loadAllRecipes();
     this.subscribeToGroceryListDialog();
     this.subscribeToRecipeSelectionDialog();
+    this.subscribeToTouchDropEvents();
   }
 
   ngAfterViewInit(): void {
@@ -72,6 +75,29 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
     const currentRecipe = this.getCurrentRecipe(mealType, date);
     this.recipeSelectionDialogService.openDialog(mealType, date, currentRecipe);
   }
+
+  onRecipeDropped(event: { recipe: Recipe; mealType: 'breakfast' | 'lunch' | 'dinner'; date: Date }) {
+    const dateString = this.formatDateAsString(event.date);
+    
+    // Remove existing assignment for this meal slot
+    this.recipeAssignments = this.recipeAssignments.filter(
+      assignment => !(assignment.date === dateString && assignment.mealType === event.mealType)
+    );
+    
+    // Add new assignment
+    const newAssignment: RecipeAssignment = {
+      date: dateString,
+      mealType: event.mealType,
+      recipeId: event.recipe.id,
+      recipeTitle: event.recipe.title
+    };
+    
+    this.recipeAssignments.push(newAssignment);
+    
+    // Save to API
+    this.saveWeekMenuToApi();
+  }
+
 
   getCurrentRecipe(mealType?: 'breakfast' | 'lunch' | 'dinner', date?: Date): Recipe | null {
     const targetMealType = mealType || this.selectedMealType;
@@ -141,12 +167,18 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private loadAllRecipes(): void {
+    this.isLoadingRecipes = true;
+    this.errorMessage = null;
+    
     this.recipeService.getAllRecipes().subscribe({
       next: (recipes) => {
         this.recipes = recipes;
+        this.isLoadingRecipes = false;
       },
       error: (error) => {
         console.error('Error loading recipes:', error);
+        this.errorMessage = 'Failed to load recipes. Please make sure the API is running.';
+        this.isLoadingRecipes = false;
       }
     });
   }
@@ -536,6 +568,27 @@ export class WeekMenuComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroySubject.next();
     this.destroySubject.complete();
+    
+    // Remove touch drop event listener
+    document.removeEventListener('touchRecipeDropped', this.handleTouchDrop);
+  }
+
+  private subscribeToTouchDropEvents(): void {
+    // Bind the handler to maintain 'this' context
+    this.handleTouchDrop = this.handleTouchDrop.bind(this);
+    document.addEventListener('touchRecipeDropped', this.handleTouchDrop as EventListener);
+  }
+
+  private handleTouchDrop = (event: Event): void => {
+    const customEvent = event as CustomEvent;
+    const { recipe, mealType, date } = customEvent.detail;
+    
+    // Use the same logic as the regular drop
+    this.onRecipeDropped({
+      recipe: recipe,
+      mealType: mealType,
+      date: date
+    });
   }
 
   onGroceryListCreated(event: { selectedDay: Date; selectedMeals: MealSelection[] }): void {

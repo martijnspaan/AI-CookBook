@@ -1,26 +1,61 @@
 .recipe-grid-container {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
-  margin-top: 2rem;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
 }
 
 .recipe-grid-header {
+  flex-shrink: 0;
+  margin-bottom: 1rem;
+  
   h4 {
     color: #333;
     font-weight: 600;
+    margin: 0 0 0.5rem 0;
   }
   
   p {
     font-size: 0.9rem;
+    margin: 0;
   }
 }
+
+// Recipe filters are now handled by the reusable component
 
 .recipes-grid {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #dee2e6;
+    border-radius: 3px;
+    
+    &:hover {
+      background: #adb5bd;
+    }
+  }
   
   @media (max-width: 450px) {
     gap: 0.5rem;
@@ -33,25 +68,51 @@
 
 .recipe-card {
   background: #f8f9fa;
-  border: 2px solid transparent;
+  border: 2px solid #3ba85c;
   border-radius: 8px;
   padding: 1rem;
-  cursor: pointer;
+  cursor: grab;
   transition: all 0.2s ease;
   min-height: 100px;
   display: flex;
   flex-direction: column;
   width: 100%;
+  user-select: none;
   
   &:hover {
     background: #e9ecef;
-    border-color: #dee2e6;
+    border-color: #2d8a47;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
   
   &:active {
     transform: translateY(0);
+    cursor: grabbing;
+  }
+  
+  &[draggable="true"]:hover {
+    cursor: grab;
+  }
+  
+  &[draggable="true"]:active {
+    cursor: grabbing;
+    opacity: 0.8;
+    transform: rotate(2deg);
+  }
+  
+  &.touch-dragging {
+    cursor: grabbing;
+    opacity: 0.8;
+    transform: rotate(2deg);
+    z-index: 9999;
+    transition: none;
+    pointer-events: none;
+    position: relative;
+    
+    * {
+      pointer-events: none;
+    }
   }
 }
 

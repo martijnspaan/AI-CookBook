@@ -367,9 +367,32 @@ switch ($Component.ToLower()) {
         
         Show-Status
         
+        # Restart port forwarding
+        Write-ColorOutput "`nRestarting port forwarding..." $BLUE
+        try {
+            # Kill existing kubectl processes
+            Get-Process | Where-Object {$_.ProcessName -like "*kubectl*"} | Stop-Process -Force -ErrorAction SilentlyContinue
+            Write-ColorOutput "Cleaned up existing port forwards" $GREEN
+            
+            # Start new port forwards
+            Start-Process -FilePath "powershell" -ArgumentList "-Command", ".\start-port-forwards.ps1" -WindowStyle Hidden
+            Start-Sleep -Seconds 3
+            Write-ColorOutput "Port forwarding restarted successfully" $GREEN
+        } catch {
+            Write-ColorOutput "WARNING: Could not restart port forwarding automatically" $YELLOW
+            Write-ColorOutput "Please run .\start-port-forwards.ps1 manually" $YELLOW
+        }
+        
         Write-ColorOutput "`nDeployment completed successfully!" $GREEN
-        Write-ColorOutput "Access your application at: http://localhost:$WEB_PORT" $GREEN
-        Write-ColorOutput "API endpoint: http://localhost:$API_PORT" $GREEN
+        Write-ColorOutput "Access your application at: http://localhost:8080" $GREEN
+        Write-ColorOutput "API endpoint: http://localhost:8081" $GREEN
+        
+        # Cache busting instructions
+        Write-ColorOutput "`nCache Busting Instructions:" $YELLOW
+        Write-ColorOutput "If you don't see the latest changes, try:" $YELLOW
+        Write-ColorOutput "1. Hard refresh: Ctrl+Shift+R (Chrome/Edge) or Ctrl+F5 (Firefox)" $YELLOW
+        Write-ColorOutput "2. Clear browser cache and reload" $YELLOW
+        Write-ColorOutput "3. Open in incognito/private mode" $YELLOW
     }
 }
 

@@ -1,13 +1,26 @@
 <div class="recipe-grid-container">
   <div class="recipe-grid-header mb-3">
-    <h4 class="mb-0">Select Recipe</h4>
     <p class="text-muted mb-0" *ngIf="selectedMealType">
       Choose a recipe for {{ selectedMealType }}
     </p>
   </div>
 
+        <!-- Recipe Filters -->
+        <div class="mb-3">
+          <app-recipe-filter
+            [options]="filterOptions"
+            [filterState]="filterState"
+            [isLoading]="isLoading"
+            [showCookbookFilter]="true"
+            [showMealTypeFilter]="true"
+            [showSearchFilter]="true"
+            (filterChanged)="onFilterChanged($event)"
+            (filtersCleared)="onFiltersCleared()">
+          </app-recipe-filter>
+        </div>
+
   <!-- Loading State -->
-  <div *ngIf="isLoadingRecipes" class="text-center py-4">
+  <div *ngIf="isLoading" class="text-center py-4">
     <div class="spinner-border text-primary" role="status">
       <span class="visually-hidden">Loading...</span>
     </div>
@@ -15,17 +28,22 @@
   </div>
 
   <!-- Error State -->
-  <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+  <div *ngIf="error" class="alert alert-danger" role="alert">
     <h6 class="alert-heading">Error!</h6>
-    <p>{{ errorMessage }}</p>
+    <p>{{ error }}</p>
     <button class="btn btn-outline-danger btn-sm" (click)="loadAllRecipes()">Try Again</button>
   </div>
 
   <!-- Recipes Grid -->
-  <div *ngIf="!isLoadingRecipes && !errorMessage && recipes.length > 0" class="recipes-grid">
+  <div *ngIf="!isLoading && !error && recipesToShow.length > 0" class="recipes-grid">
     <div 
-      *ngFor="let recipe of recipes" 
+      *ngFor="let recipe of recipesToShow" 
       class="recipe-card"
+      draggable="true"
+      (dragstart)="onDragStart($event, recipe)"
+      (touchstart)="onTouchStart($event, recipe)"
+      (touchmove)="onTouchMove($event)"
+      (touchend)="onTouchEnd($event)"
       (click)="selectRecipe(recipe)">
       <div class="recipe-card-content">
         <div class="d-flex align-items-center justify-content-between mb-2">
@@ -36,6 +54,21 @@
             </span>
           </div>
         </div>
+        
+        <!-- Recipe Description -->
+        <div class="recipe-description mb-2" *ngIf="recipe.description">
+          <small class="text-muted">{{ recipe.description }}</small>
+        </div>
+        
+        <!-- Cookbook Information -->
+        <div class="recipe-cookbook mb-2" *ngIf="recipe.cookbookId">
+          <small class="text-info">
+            <i class="fas fa-book me-1"></i>
+            <strong>{{ getCookbookTitle(recipe.cookbookId) }}</strong>
+          </small>
+        </div>
+        
+        <!-- Recipe Tags -->
         <div class="recipe-tags">
           <span *ngFor="let tag of recipe.tags" class="badge bg-secondary me-1 mb-1">
             {{ tag }}
@@ -46,7 +79,7 @@
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="!isLoadingRecipes && !errorMessage && recipes.length === 0" class="text-center py-4">
+  <div *ngIf="!isLoading && !error && recipesToShow.length === 0" class="text-center py-4">
     <div class="text-muted">
       <i class="fas fa-egg"></i>
       <h6 class="mt-2">No recipes available</h6>
