@@ -17,6 +17,8 @@ spec:
         app: meal-week-planner-api
         version: v1
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: meal-week-planner-worker
       containers:
       - name: api
         image: docker.io/library/meal-week-planner-api:latest

@@ -23,10 +23,22 @@ nodes:
     hostPort: 4201
     protocol: TCP
 - role: worker
+  kubeadmConfigPatches:
+  - |
+    kind: JoinConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "node-type=api"
   extraMounts:
   - hostPath: E:\Kind\shared-data
     containerPath: /shared-data
 - role: worker
+  kubeadmConfigPatches:
+  - |
+    kind: JoinConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "node-type=web"
   extraMounts:
   - hostPath: E:\Kind\shared-data
     containerPath: /shared-data
