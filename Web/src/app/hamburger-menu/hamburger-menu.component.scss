@@ -241,11 +241,29 @@
     top: 48px; // Below the fixed header on mobile
     height: calc(100vh - 48px); // Full height minus header on mobile
   }
+  
+  // Hide tablet-only navigation items on mobile
+  .menu-items .tablet-only {
+    display: none !important;
+  }
 }
 
 // Tablet adjustments
 @media (min-width: 451px) and (max-width: 768px) {
   .menu-items {
     width: 280px;
+  }
+  
+  // Ensure tablet-only items are visible on tablet and desktop
+  .tablet-only {
+    display: block !important;
+  }
+}
+
+// Desktop adjustments
+@media (min-width: 769px) {
+  // Ensure tablet-only items are visible on desktop
+  .tablet-only {
+    display: block !important;
   }
 }
