@@ -40,6 +40,7 @@ The Meal Week Planner is an intelligent culinary application that revolutionizes
 - Always verify current working directory before running scripts
 - Implement proper error checking and logging for all script operations
 - **NO EMOTICONS IN LOG OUTPUT**: Never use emoticons (🍳, ✓, ✗, etc.) in script log output as they can cause display issues and are not suitable for automated environments
+- **CURL COMMAND**: In PowerShell environments, always use `curl.exe` instead of `curl` to avoid PowerShell's Invoke-WebRequest alias
 
 ### Code Quality Standards
 - **Self-Documenting Code**: Write code that tells a story through descriptive names
@@ -66,8 +67,10 @@ The Meal Week Planner is an intelligent culinary application that revolutionizes
 ### Local Development Testing
 - **Primary Environment**: Always test on localhost Kubernetes cluster
 - **Port Configuration**:
-  - Web Application: `http://localhost:4200`
-  - API Service: `http://localhost:4201`
+  - Web Application (via Ingress): `http://localhost:8080` (requires port-forward)
+  - API Service (Direct): `http://localhost:4201` (requires port-forward)
+  - API Service (via Ingress): `http://localhost:8080/api/*` (requires port-forward)
+- **Port Forwarding Required**: Use `kubectl port-forward` to access services
 - **Deployment Verification**: Confirm successful pod deployment before testing
 - **End-to-End Validation**: Test complete user workflows, not just individual components
 

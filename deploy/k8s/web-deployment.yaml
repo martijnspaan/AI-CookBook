@@ -26,9 +26,7 @@ spec:
         ports:
         - containerPort: 4200
           protocol: TCP
-        env:
-        - name: API_URL
-          value: "http://localhost:4201"
+        env: []
         resources:
           requests:
             memory: "128Mi"

@@ -2,7 +2,7 @@
 # This script seeds the database with example data for all entities
 
 param(
-    [string]$ApiBaseUrl = "http://localhost:4200",
+    [string]$ApiBaseUrl = "http://localhost:4201",
     [switch]$Verbose = $false
 )
 
@@ -691,19 +691,13 @@ $recipeSettings = @{
         "suiker", "honing", "ahornsiroop", "vanille", "kaneel", "nootmuskaat"
     )
     units = @(
-        "gram", "kilogram", "liter", "milliliter", "deciliter",
+        "gram", "kilo", "liter", "milliliter", "deciliter",
         "eetlepel", "theelepel", "kopje", "glas", "schaaltje",
         "stuks", "plakjes", "snippers", "takjes", "teentjes",
-        "snufje", "beetje", "handje", "bosje", "bundel"
+        "snufje", "beetje", "handje", "bosje"
     )
     categories = @(
-        "Voorgerecht", "Soep", "Salade", "Hoofdgerecht", "Bijgerecht",
-        "Dessert", "Drank", "Saus", "Marinade", "Dressing",
-        "Ontbijt", "Lunch", "Diner", "Snack", "Tussendoortje",
-        "Vegetarisch", "Veganistisch", "Glutenvrij", "Lactosevrij",
-        "Nederlands", "Italiaans", "Frans", "Spaans", "Grieks", "Aziatisch",
-        "Mediterraan", "Mexicaans", "Indisch", "Thais", "Chinees", "Japans",
-        "Snel", "Makkelijk", "Klassiek", "Modern", "Gezond", "Comfort Food"
+        "Groente", "Fruit", "Vlees", "Vis", "Zuivel", "Kruiden", "Specerijen", "Saus", "Marinade", "Dressing"
     )
 }
 
